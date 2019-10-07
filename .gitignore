@@ -1,0 +1,9 @@
+Cargo.lock
+
+# IDE metadate
+.idea
+.vscode
+*.iml
+
+# MacOS folder metadata
+.DS_Store
