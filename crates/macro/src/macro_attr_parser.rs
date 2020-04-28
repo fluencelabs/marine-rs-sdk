@@ -28,7 +28,7 @@ pub enum HandlerAttr {
 }
 
 impl HandlerAttrs {
-    pub fn init_fn_name(&self) -> Option<(&str)> {
+    pub fn init_fn_name(&self) -> Option<&str> {
         self.handler_attrs
             .iter()
             .filter_map(|attr| match attr {
@@ -38,7 +38,7 @@ impl HandlerAttrs {
             .next()
     }
 
-    pub fn side_modules(&self) -> Option<(&Vec<String>)> {
+    pub fn side_modules(&self) -> Option<&Vec<String>> {
         self.handler_attrs
             .iter()
             .filter_map(|attr| match attr {
@@ -58,7 +58,7 @@ impl Default for HandlerAttrs {
 }
 
 impl Parse for HandlerAttrs {
-    fn parse(input: ParseStream) -> syn::Result<Self> {
+    fn parse(input: ParseStream<'_>) -> syn::Result<Self> {
         let mut attrs = HandlerAttrs::default();
         if input.is_empty() {
             return Ok(attrs);
@@ -73,7 +73,7 @@ impl Parse for HandlerAttrs {
 }
 
 impl Parse for HandlerAttr {
-    fn parse(input: ParseStream) -> syn::Result<Self> {
+    fn parse(input: ParseStream<'_>) -> syn::Result<Self> {
         // trying to parse the `init_fn`/`side_modules`/... tokens
         let attr_name = input.step(|cursor| match cursor.ident() {
             Some((ident, rem)) => Ok((ident, rem)),

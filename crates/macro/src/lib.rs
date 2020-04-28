@@ -85,9 +85,9 @@
     unused_unsafe,
     unreachable_patterns
 )]
+#![warn(rust_2018_idioms)]
 #![recursion_limit = "128"]
 
-extern crate proc_macro;
 mod macro_attr_parser;
 mod macro_input_parser;
 

@@ -21,7 +21,7 @@
 pub mod errors;
 
 use self::errors::MemError;
-use std::alloc::{Alloc, Global, Layout};
+use std::alloc::{alloc as global_alloc, dealloc as global_dealloc, Layout};
 use std::mem;
 use std::num::NonZeroUsize;
 use std::ptr::{self, NonNull};
@@ -43,7 +43,7 @@ pub const RESPONSE_SIZE_BYTES: usize = 4;
 ///
 pub unsafe fn alloc(size: NonZeroUsize) -> MemResult<NonNull<u8>> {
     let layout: Layout = Layout::from_size_align(size.get(), mem::align_of::<u8>())?;
-    Global.alloc(layout).map_err(Into::into)
+    Ok(NonNull::new_unchecked(global_alloc(layout)))
 }
 
 /// Deallocates memory area for current memory pointer and size. Actually is just a wrapper for
@@ -57,7 +57,7 @@ pub unsafe fn alloc(size: NonZeroUsize) -> MemResult<NonNull<u8>> {
 ///
 pub unsafe fn dealloc(ptr: NonNull<u8>, size: NonZeroUsize) -> MemResult<()> {
     let layout = Layout::from_size_align(size.get(), mem::align_of::<u8>())?;
-    Global.dealloc(ptr, layout);
+    global_dealloc(ptr.as_ptr(), layout);
     Ok(())
 }
 

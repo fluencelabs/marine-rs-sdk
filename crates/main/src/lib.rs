@@ -29,8 +29,7 @@
     unused_unsafe,
     unreachable_patterns
 )]
-
-extern crate core;
+#![warn(rust_2018_idioms)]
 
 pub mod memory;
 

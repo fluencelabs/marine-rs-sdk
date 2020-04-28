@@ -33,6 +33,7 @@
     unused_unsafe,
     unreachable_patterns
 )]
+#![warn(rust_2018_idioms)]
 
 extern crate fluence_sdk_macro;
 extern crate fluence_sdk_main;
