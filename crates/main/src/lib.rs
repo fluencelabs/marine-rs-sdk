@@ -18,7 +18,7 @@
 //! `export_allocator` feature), `logger` (is turned on by the `wasm_logger` feature), and `memory`
 //! modules.
 
-#![doc(html_root_url = "https://docs.rs/fluence-sdk-main/0.1.9")]
+#![doc(html_root_url = "https://docs.rs/fluence-sdk-main/0.1.10")]
 #![feature(allocator_api)]
 #![deny(
     dead_code,
