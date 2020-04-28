@@ -1,6 +1,6 @@
 [package]
 name = "fluence"
-version = "0.1.10"  # remember to update html_root_url
+version = "0.1.11"  # remember to update html_root_url
 description = "Fluence backend SDK for developing backend applications for the Fluence network"
 documentation = "https://docs.rs/fluence/"
 repository = "https://github.com/fluencelabs/rust-sdk"
@@ -18,8 +18,8 @@ all-features = true
 path = "src/lib.rs"
 
 [dependencies]
-fluence-sdk-macro = { path = "crates/macro", version = "=0.1.10" }
-fluence-sdk-main = { path = "crates/main", version = "=0.1.10" }
+fluence-sdk-macro = { path = "crates/macro", version = "=0.1.11" }
+fluence-sdk-main = { path = "crates/main", version = "=0.1.11" }
 
 [features]
 default = ["export_allocator"]
@@ -28,6 +28,9 @@ wasm_logger = ["fluence-sdk-main/wasm_logger"]
 
 # Turn on a compilation for the module that contains the standard implementation of allocate/deallocate functions.
 export_allocator = ["fluence-sdk-main/export_allocator"]
+
+# Provides additional imports to allow this module work as a side module
+side_module = ["fluence-sdk-main/side_module"]
 
 [workspace]
 members = [
