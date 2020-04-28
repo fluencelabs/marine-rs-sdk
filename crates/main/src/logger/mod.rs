@@ -73,7 +73,7 @@
 //! [`lazy_static::initialize()`]: https://docs.rs/lazy_static/1.3.0/lazy_static/fn.initialize.html
 //! [`backend app debugging`]: https://fluence.dev/docs/debugging
 
-extern crate log;
+use log;
 
 /// The Wasm Logger.
 ///
@@ -137,12 +137,12 @@ impl WasmLogger {
 
 impl log::Log for WasmLogger {
     #[inline]
-    fn enabled(&self, metadata: &log::Metadata) -> bool {
+    fn enabled(&self, metadata: &log::Metadata<'_>) -> bool {
         metadata.level() <= self.level
     }
 
     #[inline]
-    fn log(&self, record: &log::Record) {
+    fn log(&self, record: &log::Record<'_>) {
         if !self.enabled(record.metadata()) {
             return;
         }

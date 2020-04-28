@@ -136,12 +136,8 @@ impl Parse for HandlerAttr {
 
 pub fn generate_side_modules_glue_code(side_modules_list: &[String]) -> syn::Result<TokenStream2> {
     let mut modules_glue_code = quote!();
+
     for module_name in side_modules_list {
-        let allocate_fn_name = format!("{}_allocate", module_name);
-        let deallocate_fn_name = format!("{}_deallocate", module_name);
-        let invoke_fn_name = format!("{}_invoke", module_name);
-        let load_fn_name = format!("{}_load", module_name);
-        let store_fn_name = format!("{}_store", module_name);
         let module_name_ident = syn::parse_str::<syn::Ident>(&module_name)?;
 
         modules_glue_code = quote! {
@@ -149,23 +145,18 @@ pub fn generate_side_modules_glue_code(side_modules_list: &[String]) -> syn::Res
                 #[link(wasm_import_module = #module_name)]
                 extern "C" {
                     // Allocate chunk of module memory, and return a pointer to that region
-                    #[link_name = #allocate_fn_name]
                     pub fn allocate(size: usize) -> i32;
 
                     // Deallocate chunk of module memory after it's not used anymore
-                    #[link_name = #deallocate_fn_name]
                     pub fn deallocate(ptr: i32, size: usize);
 
                     // Call module's invocation handler with data specified by pointer and size
-                    #[link_name = #invoke_fn_name]
                     pub fn invoke(ptr: i32, size: usize) -> i32;
 
                     // Read 1 byte from ptr location of module memory
-                    #[link_name = #load_fn_name]
                     pub fn load(ptr: i32) -> u8;
 
                     // Put 1 byte at ptr location in module memory
-                    #[link_name = #store_fn_name]
                     pub fn store(ptr: *mut i32, byte: u8);
                 }
 
