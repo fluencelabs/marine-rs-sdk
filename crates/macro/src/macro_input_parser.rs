@@ -43,13 +43,12 @@ impl ParsedType {
                     "Unsuitable type in Vec brackets - only Vec<u8> is supported",
                 )
             })?;
-            let arg_val = arg.value();
 
             // converts T to syn::Type
-            let arg_type = match arg_val {
+            let arg_type = match arg {
                 syn::GenericArgument::Type(ty) => Ok(ty),
                 _ => Err(Error::new(
-                    arg_val.span(),
+                    arg.span(),
                     "Unsuitable type in Vec brackets - only Vec<u8> is supported",
                 )),
             }?;
@@ -79,7 +78,6 @@ impl ParsedType {
                     "Unsuitable type in Vec brackets - only Vec<u8> is supported",
                 )
             })?;
-            let arg_segment = arg_segment.value();
 
             Ok(arg_segment.ident.to_string())
         }
@@ -103,7 +101,6 @@ impl ParsedType {
                     "The invocation handler should have a non-empty input argument type",
                 )
             })?;
-        let type_segment = type_segment.value();
 
         match type_segment.ident.to_string().as_str() {
             "String" => Ok(ParsedType::Utf8String),
@@ -126,7 +123,7 @@ impl ParsedType {
 
     pub fn from_fn_arg(fn_arg: &syn::FnArg) -> syn::Result<Self> {
         match fn_arg {
-            syn::FnArg::Captured(arg) => ParsedType::from_type(&arg.ty),
+            syn::FnArg::Typed(arg) => ParsedType::from_type(&arg.ty),
             _ => Err(Error::new(fn_arg.span(), "Unknown argument")),
         }
     }

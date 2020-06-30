@@ -96,75 +96,46 @@ use crate::macro_input_parser::{InputTypeGenerator, ParsedType, ReturnTypeGenera
 use proc_macro::TokenStream;
 use quote::quote;
 use syn::spanned::Spanned;
-use syn::{parse::Error, parse_macro_input, ItemFn};
+use syn::{parse::Error, parse_macro_input, ItemFn, Visibility};
 
 fn invoke_handler_impl(
     attr: proc_macro2::TokenStream,
-    fn_item: syn::ItemFn,
+    fn_item: ItemFn,
 ) -> syn::Result<proc_macro2::TokenStream> {
     let ItemFn {
-        constness,
-        unsafety,
-        abi,
-        ident,
-        decl,
+        vis,
+        sig,
         ..
     } = &fn_item;
 
-    if let Err(e) = (|| {
-        if let Some(constness) = constness {
-            return Err(Error::new(
-                constness.span,
-                "The invocation handler shouldn't be constant",
-            ));
-        }
-        if let Some(unsafety) = unsafety {
-            return Err(Error::new(
-                unsafety.span,
-                "The invocation handler shouldn't be unsage",
-            ));
-        }
-        if let Some(abi) = abi {
-            return Err(Error::new(
-                abi.extern_token.span,
-                "The invocation handler shouldn't have any custom linkage",
-            ));
-        }
-        if !decl.generics.params.is_empty() || decl.generics.where_clause.is_some() {
-            return Err(Error::new(
-                decl.fn_token.span,
-                "The invocation handler shouldn't use template parameters",
-            ));
-        }
-        if let Some(variadic) = decl.variadic {
-            return Err(Error::new(
-                variadic.spans[0],
-                "The invocation handler shouldn't use variadic interface",
-            ));
-        }
-        Ok(())
-    })() {
-        return Err(e);
+    match vis {
+        Visibility::Public(_) => {},
+        _ => return Err(Error::new(
+            vis.span(),
+            "The #[faas_export] could be applied only to public functions",
+        ))
     }
 
-    let input_type = match decl.inputs.len() {
+    let input_type = match sig.inputs.len() {
         0 => ParsedType::Empty,
-        1 => ParsedType::from_fn_arg(decl.inputs.first().unwrap().into_value())?,
+        1 => ParsedType::from_fn_arg(sig.inputs.first().unwrap())?,
         _ => {
             return Err(Error::new(
-                decl.inputs.span(),
+                sig.inputs.span(),
                 "The invocation handler shouldn't have more than one argument",
             ))
         },
     };
-    let output_type = ParsedType::from_return_type(&decl.output)?;
+
+    let output_type = ParsedType::from_return_type(&sig.output)?;
     if output_type == ParsedType::Empty {
         return Err(Error::new(
-            decl.output.span(),
+            sig.output.span(),
             "The invocation handler should have the return value",
         ));
     }
 
+    let ident = &sig.ident;
     let prolog = input_type.generate_fn_prolog();
     let prolog = match input_type {
         ParsedType::Empty => quote! {
