@@ -14,12 +14,12 @@
  * limitations under the License.
  */
 
-//! The main part of Fluence backend SDK. Contains `export_allocator` (is turned on by the
-//! `export_allocator` feature), `logger` (is turned on by the `wasm_logger` feature), and `memory`
+//! The main part of Fluence backend SDK. Contains `export_allocator`, `logger` and `result`
 //! modules.
 
+#![allow(clippy::missing_safety_doc)]
+#![allow(clippy::needless_doctest_main)]
 #![doc(html_root_url = "https://docs.rs/fluence-sdk-main/0.1.11")]
-#![feature(allocator_api)]
 #![deny(
     dead_code,
     nonstandard_style,
@@ -31,16 +31,16 @@
 )]
 #![warn(rust_2018_idioms)]
 
-pub mod memory;
+mod export_allocator;
+mod logger;
+mod result;
 
-#[cfg(feature = "wasm_logger")]
-pub mod logger;
+pub(crate) use logger::log_utf8_string;
 
-#[cfg(feature = "side_module")]
-pub mod side_module;
-
-#[cfg(feature = "expect_eth")]
-pub mod eth;
-
-#[cfg(feature = "export_allocator")]
-pub mod export_allocator;
+pub use export_allocator::allocate;
+pub use export_allocator::deallocate;
+pub use logger::WasmLogger;
+pub use result::get_result_ptr;
+pub use result::get_result_size;
+pub use result::set_result_ptr;
+pub use result::set_result_size;

@@ -73,8 +73,6 @@
 //! [`lazy_static::initialize()`]: https://docs.rs/lazy_static/1.3.0/lazy_static/fn.initialize.html
 //! [`backend app debugging`]: https://fluence.dev/docs/debugging
 
-use log;
-
 /// The Wasm Logger.
 ///
 /// This struct implements the [`Log`] trait from the [`log`] crate, which allows it to act as a
@@ -92,8 +90,8 @@ pub struct WasmLogger {
 }
 
 impl WasmLogger {
-    /// Initializes the global logger with a [`WasmLogger`] instance with
-    /// `max_log_level` set to a specific log level.
+    /// Initializes the global logger with a [`WasmLogger`] instance, sets
+    /// `max_log_level` to a given log level.
     ///
     /// ```
     /// # use fluence::sdk::*;
@@ -114,8 +112,8 @@ impl WasmLogger {
         Ok(())
     }
 
-    /// Initializes the global logger with a [`WasmLogger`] instance with `max_log_level` set to
-    /// `Level::Info`.
+    /// Initializes the global logger with a [`WasmLogger`] instance, sets
+    /// `max_log_level` to `Level::Info`.
     ///
     /// ```
     /// # use fluence::sdk::*;
@@ -162,9 +160,9 @@ impl log::Log for WasmLogger {
     fn flush(&self) {}
 }
 
-/// logger is a module provided by a VM that can process log messages.
-#[link(wasm_import_module = "logger")]
+/// log_utf8_string should be provided directly by a host.
+#[link(wasm_import_module = "host")]
 extern "C" {
     // Writes a byte string of size bytes that starts from ptr to a logger
-    fn log_utf8_string(ptr: i32, size: i32);
+    pub fn log_utf8_string(ptr: i32, size: i32);
 }

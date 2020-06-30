@@ -1,5 +1,5 @@
 /*
- * Copyright 2018 Fluence Labs Limited
+ * Copyright 2020 Fluence Labs Limited
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,32 +14,42 @@
  * limitations under the License.
  */
 
-//! This module provides default implementations of [`allocate`] and [`deallocate`] functions that
-//! can be used for array passing and returning.
-//!
-//! [`allocate`]: fn.allocate.html
-//! [`deallocate`]: fn.deallocate.html
+use crate::log_utf8_string;
 
-use crate::memory::{alloc, dealloc};
-use std::num::NonZeroUsize;
-use std::ptr::NonNull;
+use std::alloc::alloc as global_alloc;
+use std::alloc::dealloc as global_dealloc;
+use std::alloc::Layout;
 
 /// Allocates memory area of specified size and returns its address.
-/// Used from the host environment for memory allocation while parameters passing.
+/// Returns 0 if supplied size is too long.
 #[no_mangle]
-pub unsafe fn allocate(size: usize) -> NonNull<u8> {
-    let non_zero_size = NonZeroUsize::new(size)
-        .unwrap_or_else(|| panic!("[Error] Allocation of zero bytes is not allowed."));
-    alloc(non_zero_size).unwrap_or_else(|_| panic!("[Error] Allocation of {} bytes failed.", size))
+pub unsafe fn allocate(size: usize) -> usize {
+    let layout = match Layout::from_size_align(size, std::mem::align_of::<u8>()) {
+        Ok(layout) => layout,
+        // in this case a err could be only in a case of too long allocated size,
+        // so just return 0
+        Err(_) => return 0,
+    };
+
+    let msg = format!("sdk.allocate: {:?}\n", size);
+    log_utf8_string(msg.as_ptr() as _, msg.len() as _);
+
+    global_alloc(layout) as _
 }
 
 /// Deallocates memory area for provided memory pointer and size.
-/// Used from the host environment for memory deallocation after reading results of function from
-/// Wasm memory.
+/// Does nothing if supplied size is too long.
 #[no_mangle]
-pub unsafe fn deallocate(ptr: NonNull<u8>, size: usize) {
-    let non_zero_size = NonZeroUsize::new(size)
-        .unwrap_or_else(|| panic!("[Error] Deallocation of zero bytes is not allowed."));
-    dealloc(ptr, non_zero_size)
-        .unwrap_or_else(|_| panic!("[Error] Deallocate failed for ptr={:?} size={}.", ptr, size));
+pub unsafe fn deallocate(ptr: *mut u8, size: usize) {
+    let layout = match Layout::from_size_align(size, std::mem::align_of::<u8>()) {
+        Ok(layout) => layout,
+        // in this case a err could be only in a case of too long allocated size,
+        // so just done nothing
+        Err(_) => return,
+    };
+
+    let msg = format!("sdk.deallocate: {:?} {}\n", ptr, size);
+    log_utf8_string(msg.as_ptr() as _, msg.len() as _);
+
+    global_dealloc(ptr, layout);
 }

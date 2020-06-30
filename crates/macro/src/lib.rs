@@ -201,7 +201,7 @@ fn invoke_handler_impl(
 }
 
 #[proc_macro_attribute]
-pub fn invocation_handler(attr: TokenStream, input: TokenStream) -> TokenStream {
+pub fn faas_export(attr: TokenStream, input: TokenStream) -> TokenStream {
     let fn_item = parse_macro_input!(input as ItemFn);
     match invoke_handler_impl(attr.into(), fn_item) {
         Ok(v) => v,

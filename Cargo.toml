@@ -22,15 +22,8 @@ fluence-sdk-macro = { path = "crates/macro", version = "=0.1.11" }
 fluence-sdk-main = { path = "crates/main", version = "=0.1.11" }
 
 [features]
-default = ["export_allocator"]
-# Turn on a compilation for the module that contains Wasm logger realization.
-wasm_logger = ["fluence-sdk-main/wasm_logger"]
-
-# Turn on a compilation for the module that contains the standard implementation of allocate/deallocate functions.
-export_allocator = ["fluence-sdk-main/export_allocator"]
-
-# Provides additional imports to allow this module work as a side module
-side_module = ["fluence-sdk-main/side_module"]
+# Print some internal logs by log_utf8_string
+print_logs = ["fluence-sdk-main/print_logs"]
 
 [workspace]
 members = [

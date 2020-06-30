@@ -23,7 +23,6 @@
 //! please import this crate with `default-features = false`.
 //!
 #![doc(html_root_url = "https://docs.rs/fluence/0.1.11")]
-#![feature(allocator_api)]
 #![deny(
     dead_code,
     nonstandard_style,
@@ -38,20 +37,8 @@
 extern crate fluence_sdk_macro;
 extern crate fluence_sdk_main;
 
-/// A module which should be typically globally imported:
-///
-/// ```
-/// use fluence::sdk::*;
-/// ```
-pub mod sdk {
-    // TODO: need to introduce macros to avoid code duplication with crates/main/lib.rs
-    pub use fluence_sdk_main::memory;
-
-    #[cfg(feature = "wasm_logger")]
-    pub use fluence_sdk_main::logger;
-
-    #[cfg(feature = "export_allocator")]
-    pub use fluence_sdk_main::export_allocator;
-
-    pub use fluence_sdk_macro::invocation_handler;
-}
+pub use fluence_sdk_macro::faas_export;
+pub use fluence_sdk_main::get_result_ptr;
+pub use fluence_sdk_main::get_result_size;
+pub use fluence_sdk_main::set_result_ptr;
+pub use fluence_sdk_main::set_result_size;
