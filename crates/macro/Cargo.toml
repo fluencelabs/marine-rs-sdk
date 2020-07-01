@@ -21,4 +21,5 @@ proc-macro = true
 syn = { version = '1.0.33', features = ['full'] }
 quote = "1.0.7"
 proc-macro2 = "1.0.18"
+
 fluence-sdk-main = { path = "../main", version = "=0.1.11" }

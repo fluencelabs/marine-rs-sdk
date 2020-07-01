@@ -15,13 +15,26 @@
  */
 
 use quote::quote;
-use syn::{parse::Error, spanned::Spanned};
+use syn::parse::Error;
+use syn::spanned::Spanned;
 
 #[derive(PartialEq)]
-pub enum ParsedType {
+pub(crate) enum ParsedType {
+    Empty,
+    I8,
+    I16,
+    I32,
+    I64,
+    U8,
+    U16,
+    U32,
+    U64,
+    F32,
+    F64,
+    Boolean,
     Utf8String,
     ByteVector,
-    Empty,
+    Record(String),
 }
 
 impl ParsedType {
@@ -103,6 +116,17 @@ impl ParsedType {
             })?;
 
         match type_segment.ident.to_string().as_str() {
+            "i8" => Ok(ParsedType::I8),
+            "i16" => Ok(ParsedType::I16),
+            "i32" => Ok(ParsedType::I32),
+            "i64" => Ok(ParsedType::I64),
+            "u8" => Ok(ParsedType::U8),
+            "u16" => Ok(ParsedType::U16),
+            "u32" => Ok(ParsedType::U32),
+            "u64" => Ok(ParsedType::U64),
+            "f32" => Ok(ParsedType::F32),
+            "f64" => Ok(ParsedType::F32),
+            "bool" => Ok(ParsedType::Boolean),
             "String" => Ok(ParsedType::Utf8String),
             "Vec" => match parse_vec_bracket(&type_segment.arguments) {
                 Ok(value) => match value.as_str() {
@@ -114,9 +138,9 @@ impl ParsedType {
                 },
                 Err(e) => Err(e),
             },
-            _ => Err(Error::new(
+            type_name => Err(Error::new(
                 type_segment.span(),
-                "Only String and Vec<u8> input types are supported (also, it is possible not to specify the input argument)",
+                format!("{} is unsupported", type_name),
             )),
         }
     }
@@ -136,15 +160,15 @@ impl ParsedType {
     }
 }
 
-pub trait InputTypeGenerator {
+pub trait PrologGenerator {
     fn generate_fn_prolog(&self) -> proc_macro2::TokenStream;
 }
 
-pub trait ReturnTypeGenerator {
+pub trait EpilogGenerator {
     fn generate_fn_epilog(&self) -> proc_macro2::TokenStream;
 }
 
-impl InputTypeGenerator for ParsedType {
+impl PrologGenerator for ParsedType {
     fn generate_fn_prolog(&self) -> proc_macro2::TokenStream {
         match self {
             ParsedType::Utf8String => quote! {
@@ -160,11 +184,12 @@ impl InputTypeGenerator for ParsedType {
                 // this way does it without any additional imports of the export allocator module
                 let arg = memory::read_request_from_mem(ptr, len);
             },
+            _ => unimplemented!(),
         }
     }
 }
 
-impl ReturnTypeGenerator for ParsedType {
+impl EpilogGenerator for ParsedType {
     fn generate_fn_epilog(&self) -> proc_macro2::TokenStream {
         match self {
             ParsedType::Utf8String => quote! {
@@ -178,6 +203,7 @@ impl ReturnTypeGenerator for ParsedType {
                     .expect("Putting result vector to memory has failed")
             },
             ParsedType::Empty => quote! {},
+            _ => unimplemented!(),
         }
     }
 }
