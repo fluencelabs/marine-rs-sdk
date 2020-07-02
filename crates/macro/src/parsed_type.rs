@@ -164,23 +164,24 @@ impl ParsedType {
     }
 }
 
-pub(crate) trait ArgumentsGenerator {
+// TODO: replace String with Ident
+pub(crate) trait MacroPartsGenerator {
     fn generate_arguments(&self) -> Vec<WasmType>;
-}
 
-pub(crate) trait PrologGenerator {
+    fn generate_return_expression(&self) -> proc_macro2::TokenStream;
+
+    fn generate_return_type(&self) -> String;
+
     fn generate_fn_prolog(
         &self,
         generated_arg_id: usize,
         supplied_arg_start_id: usize,
     ) -> proc_macro2::TokenStream;
-}
 
-pub(crate) trait EpilogGenerator {
     fn generate_fn_epilog(&self) -> proc_macro2::TokenStream;
 }
 
-impl ArgumentsGenerator for ParsedType {
+impl MacroPartsGenerator for ParsedType {
     fn generate_arguments(&self) -> Vec<WasmType> {
         // TODO: investigate possible issues in conversion between signed and unsigned types
         match self {
@@ -201,9 +202,37 @@ impl ArgumentsGenerator for ParsedType {
             ParsedType::Record(_) => vec![WasmType::I32, WasmType::I32],
         }
     }
-}
 
-impl PrologGenerator for ParsedType {
+    fn generate_return_expression(&self) -> proc_macro2::TokenStream {
+        match self {
+            ParsedType::Empty => quote! {},
+            ParsedType::Utf8String => quote! {},
+            ParsedType::ByteVector => quote! {},
+            ParsedType::Record(_) => quote! {},
+            _ => quote! {
+                let result =
+            },
+        }
+    }
+
+    fn generate_return_type(&self) -> String {
+        match self {
+            ParsedType::I8 => "-> i32",
+            ParsedType::I16 => "-> i32",
+            ParsedType::I32 => "-> i32",
+            ParsedType::I64 => "-> i64",
+            ParsedType::U8 => "-> i32",
+            ParsedType::U16 => "-> i32",
+            ParsedType::U32 => "-> i32",
+            ParsedType::U64 => "-> i64",
+            ParsedType::F32 => "-> f32",
+            ParsedType::F64 => "-> f64",
+            ParsedType::Boolean => "-> i32",
+            _ => "",
+        }
+        .to_string()
+    }
+
     fn generate_fn_prolog(
         &self,
         generated_ard_id: usize,
@@ -266,44 +295,42 @@ impl PrologGenerator for ParsedType {
             },
         }
     }
-}
 
-impl EpilogGenerator for ParsedType {
     fn generate_fn_epilog(&self) -> proc_macro2::TokenStream {
         match self {
             ParsedType::Empty => quote! {},
             ParsedType::I8 => quote! {
-                return result;
+                return result as _;
             },
             ParsedType::I16 => quote! {
-                return result;
+                return result as _;
             },
             ParsedType::I32 => quote! {
-                return result;
+                return result as _;
             },
             ParsedType::I64 => quote! {
-                return result;
+                return result as _;
             },
             ParsedType::U8 => quote! {
-                return result;
+                return result as _;
             },
             ParsedType::U16 => quote! {
-                return result;
+                return result as _;
             },
             ParsedType::U32 => quote! {
-                return result;
+                return result as _;
             },
             ParsedType::U64 => quote! {
-                return result;
+                return result as _;
             },
             ParsedType::F32 => quote! {
-                return result;
+                return result as _;
             },
             ParsedType::F64 => quote! {
-                return result;
+                return result as _;
             },
             ParsedType::Boolean => quote! {
-                return result;
+                return result as _;
             },
             ParsedType::Utf8String => quote! {
                 fluence::set_result_ptr(result.as_ptr() as _);

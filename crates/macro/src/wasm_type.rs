@@ -1,5 +1,4 @@
 use proc_macro2::TokenStream;
-use quote::TokenStreamExt;
 
 pub(crate) enum WasmType {
     I32,
@@ -10,6 +9,11 @@ pub(crate) enum WasmType {
 
 impl quote::ToTokens for WasmType {
     fn to_tokens(&self, tokens: &mut TokenStream) {
-        tokens.append(self.clone());
+        match self {
+            WasmType::I32 => "i32".to_tokens(tokens),
+            WasmType::I64 => "i64".to_tokens(tokens),
+            WasmType::F32 => "f32".to_tokens(tokens),
+            WasmType::F64 => "f64".to_tokens(tokens),
+        }
     }
 }

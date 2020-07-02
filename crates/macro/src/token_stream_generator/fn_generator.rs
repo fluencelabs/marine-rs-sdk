@@ -15,19 +15,50 @@
  */
 
 use crate::fce_ast_types;
-use crate::parsed_type::ArgumentsGenerator;
-use crate::parsed_type::EpilogGenerator;
-use crate::parsed_type::PrologGenerator;
+use crate::parsed_type::MacroPartsGenerator;
 use super::GENERATED_FUNCS_PREFIX;
+use super::GENERATED_SECTION_NAME;
+use super::GENERATED_SECTION_PREFIX;
 use super::TokenStreamGenerator;
 
 use proc_macro2::TokenStream;
 use quote::quote;
+use crate::wasm_type::WasmType;
 
 impl TokenStreamGenerator for fce_ast_types::AstFunctionItem {
     fn generate_token_stream(self) -> syn::Result<TokenStream> {
+        let data = serde_json::to_string(&self).unwrap();
+        let data_size = data.len();
         let func_name = self.name;
-        let prefix = "__fce_generated_func_";
+
+        let prefix = GENERATED_FUNCS_PREFIX;
+        let section_name = GENERATED_SECTION_NAME;
+        let section_prefix = GENERATED_SECTION_PREFIX;
+        let generated_global_name = uuid::Uuid::new_v4().to_string();
+
+        let return_type = self.output_type.generate_return_type();
+        let return_expression = self.output_type.generate_return_expression();
+        let epilog = self.output_type.generate_fn_epilog();
+
+        let mut prolog = TokenStream::new();
+        let mut args: Vec<String> = Vec::with_capacity(self.input_types.len());
+        let mut raw_args: Vec<WasmType> = Vec::with_capacity(self.input_types.len());
+        let mut input_type_id = 0;
+        for input_type in self.input_types {
+            let type_prolog = input_type.generate_fn_prolog(input_type_id, input_type_id);
+            let type_raw_args = input_type.generate_arguments();
+
+            args.extend(
+                type_raw_args
+                    .iter()
+                    .enumerate()
+                    .map(|(id, _)| format!("converted_arg_{}", input_type_id + id)),
+            );
+
+            input_type_id += type_raw_args.len();
+            raw_args.extend(type_raw_args);
+            prolog.extend(type_prolog);
+        }
 
         let embedded_tokens = quote! {
             #[cfg_attr(
@@ -36,10 +67,10 @@ impl TokenStreamGenerator for fce_ast_types::AstFunctionItem {
             )]
             #[doc(hidden)]
             #[allow(clippy::all)]
-            pub extern "C" fn #prefix_#func_name(#(#raw_args)*) #ret_type {
+            pub extern "C" fn #prefix#func_name(#(#raw_args)*) #return_type {
                 #prolog
 
-                #ret_expression #func_name(#(#args)*);
+                #return_expression #func_name(#(#args)*);
 
                 #epilog
             }
@@ -48,7 +79,7 @@ impl TokenStreamGenerator for fce_ast_types::AstFunctionItem {
             #[allow(clippy::all)]
             #[doc(hidden)]
             #[link_section = #section_name]
-            pub static #generated_global_name: [u8; #size] = { #data };
+            pub static #func_name#section_prefix#generated_global_name: [u8; #data_size] = { #data };
         };
 
         Ok(embedded_tokens)
