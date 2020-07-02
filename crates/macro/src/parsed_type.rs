@@ -14,11 +14,15 @@
  * limitations under the License.
  */
 
+use crate::wasm_type::WasmType;
+
 use quote::quote;
+use serde::Serialize;
+use serde::Deserialize;
 use syn::parse::Error;
 use syn::spanned::Spanned;
 
-#[derive(PartialEq)]
+#[derive(Debug, Clone, PartialEq, Serialize, Deserialize)]
 pub(crate) enum ParsedType {
     Empty,
     I8,
@@ -160,31 +164,106 @@ impl ParsedType {
     }
 }
 
-pub trait PrologGenerator {
-    fn generate_fn_prolog(&self) -> proc_macro2::TokenStream;
+pub(crate) trait ArgumentsGenerator {
+    fn generate_arguments(&self) -> Vec<WasmType>;
 }
 
-pub trait EpilogGenerator {
+pub(crate) trait PrologGenerator {
+    fn generate_fn_prolog(
+        &self,
+        generated_arg_id: usize,
+        supplied_arg_start_id: usize,
+    ) -> proc_macro2::TokenStream;
+}
+
+pub(crate) trait EpilogGenerator {
     fn generate_fn_epilog(&self) -> proc_macro2::TokenStream;
 }
 
-impl PrologGenerator for ParsedType {
-    fn generate_fn_prolog(&self) -> proc_macro2::TokenStream {
+impl ArgumentsGenerator for ParsedType {
+    fn generate_arguments(&self) -> Vec<WasmType> {
+        // TODO: investigate possible issues in conversion between signed and unsigned types
         match self {
+            ParsedType::Empty => vec![],
+            ParsedType::I8 => vec![WasmType::I32],
+            ParsedType::I16 => vec![WasmType::I32],
+            ParsedType::I32 => vec![WasmType::I32],
+            ParsedType::I64 => vec![WasmType::I64],
+            ParsedType::U8 => vec![WasmType::I32],
+            ParsedType::U16 => vec![WasmType::I32],
+            ParsedType::U32 => vec![WasmType::I32],
+            ParsedType::U64 => vec![WasmType::I64],
+            ParsedType::F32 => vec![WasmType::F32],
+            ParsedType::F64 => vec![WasmType::F64],
+            ParsedType::Boolean => vec![WasmType::I32],
+            ParsedType::Utf8String => vec![WasmType::I32, WasmType::I32],
+            ParsedType::ByteVector => vec![WasmType::I32, WasmType::I32],
+            ParsedType::Record(_) => vec![WasmType::I32, WasmType::I32],
+        }
+    }
+}
+
+impl PrologGenerator for ParsedType {
+    fn generate_fn_prolog(
+        &self,
+        generated_ard_id: usize,
+        supplied_arg_start_id: usize,
+    ) -> proc_macro2::TokenStream {
+        match self {
+            ParsedType::Empty => unimplemented!(),
+            ParsedType::I8 => quote! {
+                let converted_arg_#generated_ard_id = arg_#supplied_arg_start_id as i8;
+            },
+            ParsedType::I16 => quote! {
+                let converted_arg_#generated_ard_id = arg_#supplied_arg_start_id as i16;
+            },
+            ParsedType::I32 => quote! {
+                let converted_arg_#generated_ard_id = arg_#supplied_arg_start_id as i32;
+            },
+            ParsedType::I64 => quote! {
+                let converted_arg_#generated_ard_id = arg_#supplied_arg_start_id as i64;
+            },
+            ParsedType::U8 => quote! {
+                let converted_arg_#generated_ard_id = arg_#supplied_arg_start_id as u8;
+            },
+            ParsedType::U16 => quote! {
+                let converted_arg_#generated_ard_id = arg_#supplied_arg_start_id as u16;
+            },
+            ParsedType::U32 => quote! {
+                let converted_arg_#generated_ard_id = arg_#supplied_arg_start_id as u32;
+            },
+            ParsedType::U64 => quote! {
+                let converted_arg_#generated_ard_id = arg_#supplied_arg_start_id as u64;
+            },
+            ParsedType::F32 => quote! {
+                let converted_arg_#generated_ard_id = arg_#supplied_arg_start_id as f32;
+            },
+            ParsedType::F64 => quote! {
+                let converted_arg_#generated_ard_id = arg_#supplied_arg_start_id as f64;
+            },
+            ParsedType::Boolean => quote! {
+                let converted_arg_#generated_ard_id = arg_#supplied_arg_start_id as bool;
+            },
             ParsedType::Utf8String => quote! {
-                let arg = memory::read_request_from_mem(ptr, len);
-                // TODO: it should be changed to more accurate check
-                let arg = String::from_utf8(arg).unwrap();
+                let converted_arg_#generated_ard_id = String::from_raw_parts(
+                                                        arg_#supplied_arg_start_id,
+                                                        arg_#(supplied_arg_start_id+1),
+                                                        arg_#(supplied_arg_start_id+1)
+                                                      );
             },
             ParsedType::ByteVector => quote! {
-                let arg = memory::read_request_from_mem(ptr, len);
+                let converted_arg_#generated_ard_id = Vec::from_raw_parts(
+                                                        arg_#supplied_arg_start_id,
+                                                        arg_#(supplied_arg_start_id+1),
+                                                        arg_#(supplied_arg_start_id+1)
+                                                      );
             },
-            ParsedType::Empty => quote! {
-                // it is needed to delete memory occupied by the input argument
-                // this way does it without any additional imports of the export allocator module
-                let arg = memory::read_request_from_mem(ptr, len);
+            ParsedType::Record(record_name) => quote! {
+                let converted_arg_#generated_ard_id = __fce_generated_converter_#record_name(
+                                                        arg_#supplied_arg_start_id,
+                                                        arg_#(supplied_arg_start_id+1)
+                                                        );
             },
-            _ => unimplemented!(),
         }
     }
 }
@@ -192,18 +271,55 @@ impl PrologGenerator for ParsedType {
 impl EpilogGenerator for ParsedType {
     fn generate_fn_epilog(&self) -> proc_macro2::TokenStream {
         match self {
+            ParsedType::Empty => quote! {},
+            ParsedType::I8 => quote! {
+                return result;
+            },
+            ParsedType::I16 => quote! {
+                return result;
+            },
+            ParsedType::I32 => quote! {
+                return result;
+            },
+            ParsedType::I64 => quote! {
+                return result;
+            },
+            ParsedType::U8 => quote! {
+                return result;
+            },
+            ParsedType::U16 => quote! {
+                return result;
+            },
+            ParsedType::U32 => quote! {
+                return result;
+            },
+            ParsedType::U64 => quote! {
+                return result;
+            },
+            ParsedType::F32 => quote! {
+                return result;
+            },
+            ParsedType::F64 => quote! {
+                return result;
+            },
+            ParsedType::Boolean => quote! {
+                return result;
+            },
             ParsedType::Utf8String => quote! {
-                memory::write_response_to_mem(
-                    result.as_bytes()
-                )
-                .expect("Putting result string to memory has failed")
+                fluence::set_result_ptr(result.as_ptr() as _);
+                fluence::set_result_size(result.len() as _);
+                std::mem::forget(result);
             },
             ParsedType::ByteVector => quote! {
-                memory::write_response_to_mem(&result[..])
-                    .expect("Putting result vector to memory has failed")
+                fluence::set_result_ptr(result.as_ptr() as _);
+                fluence::set_result_size(result.len() as _);
+                std::mem::forget(result);
             },
-            ParsedType::Empty => quote! {},
-            _ => unimplemented!(),
+            ParsedType::Record(_) => quote! {
+                fluence::set_result_ptr(result.as_ptr() as _);
+                fluence::set_result_size(result.len() as _);
+                std::mem::forget(result);
+            },
         }
     }
 }

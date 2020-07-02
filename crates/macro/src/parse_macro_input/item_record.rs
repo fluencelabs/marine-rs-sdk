@@ -14,12 +14,76 @@
  * limitations under the License.
  */
 use super::ParseMacroInput;
+use crate::fce_ast_types;
 use crate::fce_ast_types::FCEAst;
 
+use syn::Error;
 use syn::Result;
+use syn::spanned::Spanned;
+use crate::parsed_type::ParsedType;
 
 impl ParseMacroInput for syn::ItemStruct {
     fn parse_macro_input(self) -> Result<FCEAst> {
-        unimplemented!()
+        check_record(&self)?;
+
+        let fields = match self.fields {
+            syn::Fields::Named(named_field) => named_field,
+            _ => return Err(Error::new(self.span(), "only named field allowed")),
+        };
+
+        let fields = fields
+            .named
+            .iter()
+            .map(|field| {
+                check_field(field)?;
+                ParsedType::from_type(&field.ty)
+            })
+            .collect::<Result<Vec<_>>>()?;
+
+        let ast_record_item = fce_ast_types::AstRecordItem { fields };
+
+        Ok(FCEAst::Record(ast_record_item))
     }
+}
+
+fn check_record(record: &syn::ItemStruct) -> Result<()> {
+    match record.vis {
+        syn::Visibility::Public(_) => {}
+        _ => {
+            return Err(Error::new(
+                record.span(),
+                "#[fce] could be applied only to public struct",
+            ))
+        }
+    };
+
+    if record.generics.lt_token.is_some()
+        || record.generics.gt_token.is_some()
+        || record.generics.where_clause.is_some()
+    {
+        return Err(Error::new(
+            record.span(),
+            "#[fce] couldn't be applied to a struct with generics",
+        ));
+    }
+
+    Ok(())
+}
+
+fn check_field(field: &syn::Field) -> Result<()> {
+    match field.vis {
+        syn::Visibility::Public(_) => {}
+        _ => {
+            return Err(Error::new(
+                field.span(),
+                "#[fce] could be applied only to struct with all public fields",
+            ))
+        }
+    };
+
+    if !field.attrs.is_empty() {
+        return Err(Error::new(field.span(), "field attributes isn't allowed"));
+    }
+
+    Ok(())
 }

@@ -31,6 +31,7 @@ mod parsed_type;
 mod macro_impl;
 mod parse_macro_input;
 mod token_stream_generator;
+mod wasm_type;
 
 use macro_impl::fce_impl;
 use proc_macro::TokenStream;

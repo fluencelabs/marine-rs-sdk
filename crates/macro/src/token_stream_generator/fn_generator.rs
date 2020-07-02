@@ -15,12 +15,42 @@
  */
 
 use crate::fce_ast_types;
+use crate::parsed_type::ArgumentsGenerator;
+use crate::parsed_type::EpilogGenerator;
+use crate::parsed_type::PrologGenerator;
+use super::GENERATED_FUNCS_PREFIX;
 use super::TokenStreamGenerator;
 
 use proc_macro2::TokenStream;
+use quote::quote;
 
 impl TokenStreamGenerator for fce_ast_types::AstFunctionItem {
     fn generate_token_stream(self) -> syn::Result<TokenStream> {
-        unimplemented!()
+        let func_name = self.name;
+        let prefix = "__fce_generated_func_";
+
+        let embedded_tokens = quote! {
+            #[cfg_attr(
+                target_arch = "wasm32",
+                export_name = #func_name
+            )]
+            #[doc(hidden)]
+            #[allow(clippy::all)]
+            pub extern "C" fn #prefix_#func_name(#(#raw_args)*) #ret_type {
+                #prolog
+
+                #ret_expression #func_name(#(#args)*);
+
+                #epilog
+            }
+
+            #[cfg(target_arch = "wasm32")]
+            #[allow(clippy::all)]
+            #[doc(hidden)]
+            #[link_section = #section_name]
+            pub static #generated_global_name: [u8; #size] = { #data };
+        };
+
+        Ok(embedded_tokens)
     }
 }

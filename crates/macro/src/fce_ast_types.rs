@@ -16,6 +16,10 @@
 
 use crate::parsed_type::ParsedType;
 
+use serde::Serialize;
+use serde::Deserialize;
+
+#[derive(Debug, Clone, PartialEq, Serialize, Deserialize)]
 pub(crate) struct AstFunctionItem {
     pub(crate) name: String,
     pub(crate) input_types: Vec<ParsedType>,
@@ -24,16 +28,19 @@ pub(crate) struct AstFunctionItem {
     pub(crate) output_type: ParsedType,
 }
 
+#[derive(Debug, Clone, PartialEq, Serialize, Deserialize)]
 pub(crate) struct AstRecordItem {
     pub(crate) fields: Vec<ParsedType>,
 }
 
+#[derive(Debug, Clone, PartialEq, Serialize, Deserialize)]
 pub(crate) struct AstExternModItem {
     pub(crate) namespace: String,
     // only imports are possible here
     pub(crate) imports: Vec<AstFunctionItem>,
 }
 
+#[derive(Debug, Clone, PartialEq, Serialize, Deserialize)]
 pub(crate) enum FCEAst {
     Function(AstFunctionItem),
     Record(AstRecordItem),

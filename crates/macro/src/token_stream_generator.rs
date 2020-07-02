@@ -22,6 +22,8 @@ use crate::fce_ast_types::FCEAst;
 
 use proc_macro2::TokenStream;
 
+const GENERATED_FUNCS_PREFIX: &str = "__fce_generated_func_";
+
 pub(crate) trait TokenStreamGenerator {
     fn generate_token_stream(self) -> syn::Result<TokenStream>;
 }
