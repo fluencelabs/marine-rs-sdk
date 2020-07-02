@@ -50,12 +50,17 @@ impl ParseMacroInput for syn::ItemForeignMod {
             .into_iter()
             .filter_map(|attr| attr.parse_meta().ok())
             .filter(|meta| meta.path().is_ident(LINK_DIRECTIVE_NAME))
-            .filter_map(|meta| match meta {
-                syn::Meta::List(meta_list) => Some(meta_list),
-                _ => None,
+            .filter_map(|meta| {
+                let pair = match meta {
+                    syn::Meta::List(mut meta_list) if meta_list.nested.len() == 1 => {
+                        meta_list.nested.pop().unwrap()
+                    }
+                    _ => return None,
+                };
+                Some(pair.into_tuple().0)
             })
-            .filter_map(|meta_list| match meta_list.nested.first().unwrap() {
-                syn::NestedMeta::Meta(meta) => Some(meta.clone()),
+            .filter_map(|nested| match nested {
+                syn::NestedMeta::Meta(meta) => Some(meta),
                 _ => None,
             })
             .filter(|meta| meta.path().is_ident(WASM_IMPORT_MODULE_DIRECTIVE_NAME))
