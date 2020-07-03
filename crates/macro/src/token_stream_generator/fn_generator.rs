@@ -14,12 +14,12 @@
  * limitations under the License.
  */
 
-use crate::fce_ast_types;
-use crate::parsed_type::MacroPartsGenerator;
 use super::GENERATED_FUNCS_PREFIX;
 use super::GENERATED_SECTION_NAME;
 use super::GENERATED_SECTION_PREFIX;
 use super::TokenStreamGenerator;
+use crate::fce_ast_types;
+use crate::parsed_type::GlueCodeGenerator;
 
 use proc_macro2::TokenStream;
 use quote::quote;
@@ -29,7 +29,7 @@ impl TokenStreamGenerator for fce_ast_types::AstFunctionItem {
     fn generate_token_stream(self) -> syn::Result<TokenStream> {
         let data = serde_json::to_string(&self).unwrap();
         let data_size = data.len();
-        let func_name = self.name;
+        let func_name = self.rust_name;
 
         let prefix = GENERATED_FUNCS_PREFIX;
         let section_name = GENERATED_SECTION_NAME;
@@ -67,17 +67,19 @@ impl TokenStreamGenerator for fce_ast_types::AstFunctionItem {
             )]
             #[doc(hidden)]
             #[allow(clippy::all)]
-            pub extern "C" fn #prefix#func_name(#(#raw_args)*) #return_type {
+            pub extern "C" unsafe fn #prefix#func_name(#(#raw_args)*) #return_type {
                 #prolog
 
+                // calling the original function with converted args
                 #return_expression #func_name(#(#args)*);
 
+                // return value conversation from Rust type to a Wasm type
                 #epilog
             }
 
             #[cfg(target_arch = "wasm32")]
-            #[allow(clippy::all)]
             #[doc(hidden)]
+            #[allow(clippy::all)]
             #[link_section = #section_name]
             pub static #func_name#section_prefix#generated_global_name: [u8; #data_size] = { #data };
         };

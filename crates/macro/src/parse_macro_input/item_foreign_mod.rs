@@ -80,13 +80,13 @@ impl ParseMacroInput for syn::ItemForeignMod {
     }
 }
 
-fn parse_raw_foreign_item(raw_item: syn::ForeignItem) -> Result<fce_ast_types::AstFunctionItem> {
+fn parse_raw_foreign_item(raw_item: syn::ForeignItem) -> Result<fce_ast_types::AstExternFnItem> {
     let function_item = match raw_item {
         syn::ForeignItem::Fn(function_item) => function_item,
         _ => {
             return Err(Error::new(
                 raw_item.span(),
-                "#[fce] could be upplied only to a function, struct ot extern block",
+                "#[fce] could be applied only to a function, struct ot extern block",
             ))
         }
     };
@@ -102,13 +102,13 @@ fn parse_raw_foreign_item(raw_item: syn::ForeignItem) -> Result<fce_ast_types::A
         .map(extract_value)
         .collect();
 
-    let mut function_item = super::item_fn::parse_function(function_item.sig, function_item.vis)?;
+    let function = super::item_fn::parse_function(function_item.sig, function_item.vis)?;
+    let ast_extern_fn_item = fce_ast_types::AstExternFnItem {
+        link_name,
+        function,
+    };
 
-    if let Some(link_name) = link_name {
-        function_item.name = link_name;
-    }
-
-    Ok(function_item)
+    Ok(ast_extern_fn_item)
 }
 
 fn extract_value(nested_meta: syn::Meta) -> Option<String> {

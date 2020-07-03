@@ -44,7 +44,7 @@ pub(super) fn parse_function(
     let output_type = ParsedType::from_return_type(&output)?;
 
     let ast_function_item = fce_ast_types::AstFunctionItem {
-        name: function_sig.ident.to_string(),
+        rust_name: function_sig.ident.to_string(),
         input_types,
         output_type,
     };
