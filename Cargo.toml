@@ -29,4 +29,5 @@ print_logs = ["fluence-sdk-main/print_logs"]
 members = [
   "crates/main",
   "crates/macro",
+  "crates/greeting"
   ]

@@ -16,20 +16,25 @@
 
 use super::ParseMacroInput;
 use crate::fce_ast_types;
-use crate::fce_ast_types::FCEAst;
+use crate::fce_ast_types::{FCEAst, AstFunctionItem};
 
 use syn::Result;
 
 impl ParseMacroInput for syn::ItemFn {
     fn parse_macro_input(self) -> Result<FCEAst> {
-        parse_function(self.sig, self.vis).map(|f| FCEAst::Function(f))
+        parse_function(self.sig.clone(), self.vis.clone()).map(|f| {
+            FCEAst::Function(AstFunctionItem {
+                signature: f,
+                original: Some(self),
+            })
+        })
     }
 }
 
 pub(super) fn parse_function(
     function_sig: syn::Signature,
     function_vis: syn::Visibility,
-) -> Result<fce_ast_types::AstFunctionItem> {
+) -> Result<fce_ast_types::AstFunctionSignature> {
     use crate::parsed_type::ParsedType;
 
     check_func(&function_sig, function_vis)?;
@@ -43,8 +48,8 @@ pub(super) fn parse_function(
 
     let output_type = ParsedType::from_return_type(&output)?;
 
-    let ast_function_item = fce_ast_types::AstFunctionItem {
-        rust_name: function_sig.ident.to_string(),
+    let ast_function_item = fce_ast_types::AstFunctionSignature {
+        name: function_sig.ident.to_string(),
         input_types,
         output_type,
     };

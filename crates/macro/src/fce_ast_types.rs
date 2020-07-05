@@ -20,8 +20,8 @@ use serde::Serialize;
 use serde::Deserialize;
 
 #[derive(Debug, Clone, PartialEq, Serialize, Deserialize)]
-pub(crate) struct AstFunctionItem {
-    pub(crate) rust_name: String,
+pub(crate) struct AstFunctionSignature {
+    pub(crate) name: String,
     pub(crate) input_types: Vec<ParsedType>,
     // fce supports only one return value now,
     // waiting for adding multi-value support in Wasmer.
@@ -37,19 +37,29 @@ pub(crate) struct AstRecordItem {
 pub(crate) struct AstExternFnItem {
     pub(crate) link_name: Option<String>,
     // only imports are possible here
-    pub(crate) function: AstFunctionItem,
+    pub(crate) signature: AstFunctionSignature,
 }
 
 #[derive(Debug, Clone, PartialEq, Serialize, Deserialize)]
 pub(crate) struct AstExternModItem {
     pub(crate) namespace: String,
+
     // only imports are possible here
     pub(crate) imports: Vec<AstExternFnItem>,
 }
 
-#[derive(Debug, Clone, PartialEq, Serialize, Deserialize)]
+#[derive(Clone, Serialize, Deserialize)]
+pub(crate) struct AstFunctionItem {
+    pub(crate) signature: AstFunctionSignature,
+
+    // Option is needed only for skipping serialization/deserialization of syn::ItemFn
+    #[serde(skip)]
+    pub(crate) original: Option<syn::ItemFn>,
+}
+
+#[derive(Clone, Serialize, Deserialize)]
 pub(crate) enum FCEAst {
     Function(AstFunctionItem),
-    Record(AstRecordItem),
     ExternMod(AstExternModItem),
+    Record(AstRecordItem),
 }

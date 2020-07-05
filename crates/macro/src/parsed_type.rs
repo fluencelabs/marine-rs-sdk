@@ -14,9 +14,11 @@
  * limitations under the License.
  */
 
-mod glue_code_generator;
+mod fn_glue_code_generator;
+mod foreign_mod_glue_code_generator;
 
-pub(crate) use glue_code_generator::GlueCodeGenerator;
+pub(crate) use fn_glue_code_generator::FnGlueCodeGenerator;
+pub(crate) use foreign_mod_glue_code_generator::ForeignModeGlueCodeGenerator;
 
 use serde::Serialize;
 use serde::Deserialize;
@@ -162,5 +164,26 @@ impl ParsedType {
             syn::ReturnType::Type(_, t) => ParsedType::from_type(t.as_ref()),
             syn::ReturnType::Default => Ok(ParsedType::Empty),
         }
+    }
+
+    pub fn to_text_type(&self) -> String {
+        match self {
+            ParsedType::Empty => "",
+            ParsedType::I8 => "i8",
+            ParsedType::I16 => "i16",
+            ParsedType::I32 => "i32",
+            ParsedType::I64 => "i64",
+            ParsedType::U8 => "u8",
+            ParsedType::U16 => "u16",
+            ParsedType::U32 => "u32",
+            ParsedType::U64 => "u64",
+            ParsedType::F32 => "f32",
+            ParsedType::F64 => "f64",
+            ParsedType::Boolean => "bool",
+            ParsedType::Utf8String => "String",
+            ParsedType::ByteVector => "Vec<u8>",
+            ParsedType::Record(name) => name,
+        }
+        .into()
     }
 }

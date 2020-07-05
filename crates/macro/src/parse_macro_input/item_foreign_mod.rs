@@ -68,6 +68,10 @@ impl ParseMacroInput for syn::ItemForeignMod {
             .collect();
 
         match wasm_import_module {
+            Some(namespace) if namespace.is_empty() => Err(Error::new(
+                self_span,
+                "import module name should be defined by 'wasm_import_module' directive",
+            )),
             Some(namespace) => {
                 let extern_mod_item = fce_ast_types::AstExternModItem { namespace, imports };
                 Ok(FCEAst::ExternMod(extern_mod_item))
@@ -102,10 +106,16 @@ fn parse_raw_foreign_item(raw_item: syn::ForeignItem) -> Result<fce_ast_types::A
         .map(extract_value)
         .collect();
 
+    let link_name = match link_name {
+        Some(name) if name.is_empty() => None,
+        v @ Some(_) => v,
+        None => None,
+    };
+
     let function = super::item_fn::parse_function(function_item.sig, function_item.vis)?;
     let ast_extern_fn_item = fce_ast_types::AstExternFnItem {
         link_name,
-        function,
+        signature: function,
     };
 
     Ok(ast_extern_fn_item)

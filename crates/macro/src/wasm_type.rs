@@ -10,10 +10,18 @@ pub(crate) enum WasmType {
 impl quote::ToTokens for WasmType {
     fn to_tokens(&self, tokens: &mut TokenStream) {
         match self {
-            WasmType::I32 => "i32".to_tokens(tokens),
-            WasmType::I64 => "i64".to_tokens(tokens),
-            WasmType::F32 => "f32".to_tokens(tokens),
-            WasmType::F64 => "f64".to_tokens(tokens),
+            WasmType::I32 => {
+                syn::Ident::new("i32", proc_macro2::Span::call_site()).to_tokens(tokens)
+            }
+            WasmType::I64 => syn::parse_str::<syn::Ident>("i64")
+                .unwrap()
+                .to_tokens(tokens),
+            WasmType::F32 => syn::parse_str::<syn::Ident>("f32")
+                .unwrap()
+                .to_tokens(tokens),
+            WasmType::F64 => syn::parse_str::<syn::Ident>("f64")
+                .unwrap()
+                .to_tokens(tokens),
         }
     }
 }

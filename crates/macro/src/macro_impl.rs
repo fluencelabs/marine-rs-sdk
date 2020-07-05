@@ -23,9 +23,7 @@ use syn::Result;
 pub(super) fn fce_impl(tokens: TokenStream) -> Result<TokenStream> {
     let item = syn::parse2::<syn::Item>(tokens)?;
     let fce_ast_item = item.parse_macro_input()?;
-    fce_ast_item.generate_token_stream()
+    let tokens = fce_ast_item.generate_token_stream()?;
 
-    /*
-
-    */
+    Ok(tokens)
 }
