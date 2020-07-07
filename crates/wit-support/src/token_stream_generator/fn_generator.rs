@@ -27,7 +27,9 @@ use crate::wasm_type::WasmType;
 
 impl TokenStreamGenerator for fce_ast_types::AstFunctionItem {
     fn generate_token_stream(self) -> syn::Result<TokenStream> {
-        let data = serde_json::to_vec(&self).unwrap();
+        // TODO: change serialization protocol
+        let fce_type = fce_ast_types::FCEAst::Function(self.clone());
+        let data = serde_json::to_vec(&fce_type).unwrap();
         let data_size = data.len();
         let data = syn::LitByteStr::new(&data, proc_macro2::Span::call_site());
 
@@ -36,10 +38,11 @@ impl TokenStreamGenerator for fce_ast_types::AstFunctionItem {
         let func_name =
             syn::parse_str::<syn::Ident>(&(GENERATED_FUNCS_PREFIX.to_string() + &signature.name))?;
         let original_func_ident = syn::parse_str::<syn::Ident>(&signature.name)?;
-        let export_func_name = signature.name;
         //let func_name = syn::parse_str::<syn::Ident>(&(GENERATED_FUNCS_PREFIX.to_string() + &self.name))?;
 
-        let section_name = GENERATED_SECTION_NAME;
+        let section_name = GENERATED_SECTION_NAME.to_string() + &signature.name.replace("-", "_");
+        let export_func_name = signature.name;
+
         //let section_prefix = syn::parse_str::<syn::Ident>(GENERATED_SECTION_PREFIX)?;
         let global_static_name = syn::parse_str::<syn::Ident>(
             &(GENERATED_SECTION_PREFIX.to_string() + &export_func_name),

@@ -128,8 +128,8 @@ impl ForeignModInstructionGenerator for ParsedType {
                 Instruction::CallCore { function_index: 0 },
                 Instruction::Swap2,
                 Instruction::StringLowerMemory,
+                Instruction::CallCore { function_index: 4 },
                 Instruction::CallCore { function_index: 5 },
-                Instruction::CallCore { function_index: 6 },
             ],
             ParsedType::ByteVector => vec![
                 Instruction::Dup,
@@ -137,8 +137,8 @@ impl ForeignModInstructionGenerator for ParsedType {
                 Instruction::CallCore { function_index: 0 },
                 Instruction::Swap2,
                 Instruction::StringLowerMemory,
+                Instruction::CallCore { function_index: 4 },
                 Instruction::CallCore { function_index: 5 },
-                Instruction::CallCore { function_index: 6 },
             ],
             _ => unimplemented!(),
         }

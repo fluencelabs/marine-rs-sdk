@@ -58,6 +58,7 @@ pub struct AstFunctionItem {
 }
 
 #[derive(Clone, Serialize, Deserialize)]
+#[serde(tag = "ast_type")]
 pub enum FCEAst {
     Function(AstFunctionItem),
     ExternMod(AstExternModItem),

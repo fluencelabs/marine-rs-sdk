@@ -27,7 +27,9 @@ use crate::parsed_type::ForeignModeGlueCodeGenerator;
 
 impl TokenStreamGenerator for fce_ast_types::AstExternModItem {
     fn generate_token_stream(self) -> syn::Result<TokenStream> {
-        let data = serde_json::to_vec(&self).unwrap();
+        // TODO: change serialization protocol
+        let fce_type = fce_ast_types::FCEAst::ExternMod(self.clone());
+        let data = serde_json::to_vec(&fce_type).unwrap();
         let data_size = data.len();
         let data = syn::LitByteStr::new(&data, proc_macro2::Span::call_site());
 
@@ -36,7 +38,7 @@ impl TokenStreamGenerator for fce_ast_types::AstExternModItem {
             proc_macro2::Span::call_site(),
         );
 
-        let section_name = GENERATED_SECTION_NAME;
+        let section_name = GENERATED_SECTION_NAME.to_string() + &self.namespace.replace(".", "_");
 
         let wasm_import_module_name = &self.namespace;
         let generated_imports = generate_extern_section_items(&self);

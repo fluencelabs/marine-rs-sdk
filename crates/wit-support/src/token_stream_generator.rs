@@ -23,7 +23,7 @@ use crate::fce_ast_types::FCEAst;
 use proc_macro2::TokenStream;
 
 const GENERATED_FUNCS_PREFIX: &str = "__fce_generated_func_";
-pub const GENERATED_SECTION_NAME: &str = "__fce_generated_section";
+pub const GENERATED_SECTION_NAME: &str = "__fce_generated_section__";
 const GENERATED_SECTION_PREFIX: &str = "__fce_generated_static_global_";
 
 pub(crate) trait TokenStreamGenerator {

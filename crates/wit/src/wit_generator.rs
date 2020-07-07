@@ -9,7 +9,7 @@ use wasmer_wit::types::InterfaceType as IType;
 use wasmer_wit::ast::Interfaces;
 use wasmer_wit::interpreter::Instruction;
 
-trait WITGenerator {
+pub trait WITGenerator {
     fn generate_wit<'a>(&'a self, interfaces: &mut Interfaces<'a>);
 }
 
