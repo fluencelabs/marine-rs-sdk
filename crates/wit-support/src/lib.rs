@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-#![doc(html_root_url = "https://docs.rs/fluence-sdk-macro/0.2.0")]
+#![doc(html_root_url = "https://docs.rs/wit-support/0.2.0")]
 #![deny(
     dead_code,
     nonstandard_style,
@@ -26,17 +26,14 @@
 #![warn(rust_2018_idioms)]
 #![recursion_limit = "1024"]
 
-use wit_support::fce as fce_impl;
-use proc_macro::TokenStream;
+mod fce_ast_types;
+mod fce_macro_impl;
+mod parsed_type;
+mod parse_macro_input;
+mod token_stream_generator;
+mod wasm_type;
 
-#[proc_macro_attribute]
-pub fn fce(_attr: TokenStream, input: TokenStream) -> TokenStream {
-    // into converts proc_macro::TokenStream to proc_macro2::TokenStream
-    match fce_impl(input.into()) {
-        Ok(v) => v,
-        // converts syn:error to proc_macro2::TokenStream
-        Err(e) => e.to_compile_error(),
-    }
-    // converts proc_macro2::TokenStream to proc_macro::TokenStream
-    .into()
-}
+pub use fce_ast_types::*;
+pub use fce_macro_impl::fce;
+pub use parsed_type::ParsedType;
+pub use token_stream_generator::GENERATED_SECTION_NAME;

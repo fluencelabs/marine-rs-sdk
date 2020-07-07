@@ -26,7 +26,7 @@ use syn::parse::Error;
 use syn::spanned::Spanned;
 
 #[derive(Debug, Clone, PartialEq, Serialize, Deserialize)]
-pub(crate) enum ParsedType {
+pub enum ParsedType {
     Empty,
     I8,
     I16,

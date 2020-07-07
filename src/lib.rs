@@ -22,7 +22,7 @@
 //! By default this crate turns on export-allocator feature of the `main` crate, to disable it
 //! please import this crate with `default-features = false`.
 //!
-#![doc(html_root_url = "https://docs.rs/fluence/0.1.11")]
+#![doc(html_root_url = "https://docs.rs/fluence/0.2.0")]
 #![deny(
     dead_code,
     nonstandard_style,
@@ -42,3 +42,4 @@ pub use fluence_sdk_main::get_result_ptr;
 pub use fluence_sdk_main::get_result_size;
 pub use fluence_sdk_main::set_result_ptr;
 pub use fluence_sdk_main::set_result_size;
+pub use fluence_sdk_macro

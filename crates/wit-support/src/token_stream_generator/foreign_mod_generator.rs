@@ -51,7 +51,7 @@ impl TokenStreamGenerator for fce_ast_types::AstExternModItem {
 
             #wrapper_functions
 
-            #[cfg(target_arch = "wasm32")]
+            // #[cfg(target_arch = "wasm32")]
             #[doc(hidden)]
             #[allow(clippy::all)]
             #[link_section = #section_name]
@@ -114,10 +114,6 @@ fn generate_wrapper_functions(extern_item: &fce_ast_types::AstExternModItem) -> 
     for import in &extern_item.imports {
         let visibility = syn::Ident::new("pub", proc_macro2::Span::call_site());
         let func_name = syn::Ident::new(&import.signature.name, proc_macro2::Span::call_site());
-        let return_type = import
-            .signature
-            .output_type
-            .generate_fn_sig_return_expression();
         let arg_types: Vec<proc_macro2::TokenStream> = import
             .signature
             .input_types

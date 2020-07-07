@@ -20,10 +20,8 @@ use crate::token_stream_generator::TokenStreamGenerator;
 use proc_macro2::TokenStream;
 use syn::Result;
 
-pub(super) fn fce_impl(tokens: TokenStream) -> Result<TokenStream> {
+pub fn fce(tokens: TokenStream) -> Result<TokenStream> {
     let item = syn::parse2::<syn::Item>(tokens)?;
     let fce_ast_item = item.parse_macro_input()?;
-    let tokens = fce_ast_item.generate_token_stream()?;
-
-    Ok(tokens)
+    fce_ast_item.generate_token_stream()
 }

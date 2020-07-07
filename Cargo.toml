@@ -1,6 +1,6 @@
 [package]
 name = "fluence"
-version = "0.1.11"  # remember to update html_root_url
+version = "0.2.0"  # remember to update html_root_url
 description = "Fluence backend SDK for developing backend applications for the Fluence network"
 documentation = "https://docs.rs/fluence/"
 repository = "https://github.com/fluencelabs/rust-sdk"
@@ -9,7 +9,6 @@ readme = "Readme.md"
 keywords = ["fluence", "sdk", "webassembly"]
 categories = ["api-bindings", "wasm"]
 license = "Apache-2.0"
-maintenance = { status = "actively-developed" }
 
 [package.metadata.docs.rs] # https://docs.rs/about
 all-features = true
@@ -18,8 +17,8 @@ all-features = true
 path = "src/lib.rs"
 
 [dependencies]
-fluence-sdk-macro = { path = "crates/macro", version = "=0.1.11" }
-fluence-sdk-main = { path = "crates/main", version = "=0.1.11" }
+fluence-sdk-macro = { path = "crates/macro", version = "=0.2.0" }
+fluence-sdk-main = { path = "crates/main", version = "=0.2.0" }
 
 [features]
 # Print some internal logs by log_utf8_string
@@ -27,7 +26,9 @@ print_logs = ["fluence-sdk-main/print_logs"]
 
 [workspace]
 members = [
+  "crates/greeting",
   "crates/main",
   "crates/macro",
-  "crates/greeting"
+  "crates/wit-support",
+  "crates/wit"
   ]

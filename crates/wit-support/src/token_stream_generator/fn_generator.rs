@@ -96,7 +96,7 @@ impl TokenStreamGenerator for fce_ast_types::AstFunctionItem {
                 #epilog
             }
 
-            #[cfg(target_arch = "wasm32")]
+            // #[cfg(target_arch = "wasm32")]
             #[doc(hidden)]
             #[allow(clippy::all)]
             #[link_section = #section_name]

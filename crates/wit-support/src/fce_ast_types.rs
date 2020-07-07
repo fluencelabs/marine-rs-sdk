@@ -20,45 +20,45 @@ use serde::Serialize;
 use serde::Deserialize;
 
 #[derive(Debug, Clone, PartialEq, Serialize, Deserialize)]
-pub(crate) struct AstFunctionSignature {
-    pub(crate) name: String,
-    pub(crate) input_types: Vec<ParsedType>,
+pub struct AstFunctionSignature {
+    pub name: String,
+    pub input_types: Vec<ParsedType>,
     // fce supports only one return value now,
     // waiting for adding multi-value support in Wasmer.
-    pub(crate) output_type: ParsedType,
+    pub output_type: ParsedType,
 }
 
 #[derive(Debug, Clone, PartialEq, Serialize, Deserialize)]
-pub(crate) struct AstRecordItem {
-    pub(crate) fields: Vec<ParsedType>,
+pub struct AstRecordItem {
+    pub fields: Vec<ParsedType>,
 }
 
 #[derive(Debug, Clone, PartialEq, Serialize, Deserialize)]
-pub(crate) struct AstExternFnItem {
-    pub(crate) link_name: Option<String>,
+pub struct AstExternFnItem {
+    pub link_name: Option<String>,
     // only imports are possible here
-    pub(crate) signature: AstFunctionSignature,
+    pub signature: AstFunctionSignature,
 }
 
 #[derive(Debug, Clone, PartialEq, Serialize, Deserialize)]
-pub(crate) struct AstExternModItem {
-    pub(crate) namespace: String,
+pub struct AstExternModItem {
+    pub namespace: String,
 
     // only imports are possible here
-    pub(crate) imports: Vec<AstExternFnItem>,
+    pub imports: Vec<AstExternFnItem>,
 }
 
 #[derive(Clone, Serialize, Deserialize)]
-pub(crate) struct AstFunctionItem {
-    pub(crate) signature: AstFunctionSignature,
+pub struct AstFunctionItem {
+    pub signature: AstFunctionSignature,
 
     // Option is needed only for skipping serialization/deserialization of syn::ItemFn
     #[serde(skip)]
-    pub(crate) original: Option<syn::ItemFn>,
+    pub original: Option<syn::ItemFn>,
 }
 
 #[derive(Clone, Serialize, Deserialize)]
-pub(crate) enum FCEAst {
+pub enum FCEAst {
     Function(AstFunctionItem),
     ExternMod(AstExternModItem),
     Record(AstRecordItem),

@@ -1,0 +1,10 @@
+[package]
+name = "wit"
+version = "0.1.0"
+authors = ["Fluence Labs"]
+edition = "2018"
+
+[dependencies]
+walrus = "0.17.0"
+wit-support = { path = "../wit-support" }
+wasmer-wit = { package = "wasmer-interface-types", git = "http://github.com/fluencelabs/interface-types", branch = "master", features = ["serde"] }
