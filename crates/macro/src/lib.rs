@@ -66,7 +66,7 @@
 #![warn(rust_2018_idioms)]
 #![recursion_limit = "1024"]
 
-use wit_support::fce as fce_impl;
+use fluence_sdk_wit::fce as fce_impl;
 use proc_macro::TokenStream;
 
 #[proc_macro_attribute]

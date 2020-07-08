@@ -14,13 +14,20 @@
  * limitations under the License.
  */
 
-use crate::fce_ast_types;
-use super::TokenStreamGenerator;
+use crate::parse_macro_input::ParseMacroInput;
 
 use proc_macro2::TokenStream;
+use quote::ToTokens;
+use syn::Result;
 
-impl TokenStreamGenerator for fce_ast_types::AstRecordItem {
-    fn generate_token_stream(self) -> syn::Result<TokenStream> {
-        unimplemented!()
-    }
+pub fn fce(tokens: TokenStream) -> Result<TokenStream> {
+    let item = syn::parse2::<syn::Item>(tokens)?;
+    // convert proc_macro2 token to internal AST type
+    let fce_ast_item = item.parse_macro_input()?;
+
+    // convert internal AST type to sequence of tokens
+    let mut tokens = TokenStream::new();
+    fce_ast_item.to_tokens(&mut tokens);
+
+    Ok(tokens)
 }

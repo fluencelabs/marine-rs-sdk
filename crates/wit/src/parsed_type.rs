@@ -14,11 +14,18 @@
  * limitations under the License.
  */
 
-mod fn_glue_code_generator;
-mod foreign_mod_glue_code_generator;
+mod fn_arg;
+mod fn_epilog;
+mod fn_prolog;
+mod foreign_mod_arg;
+mod foreign_mod_epilog;
+mod foreign_mod_prolog;
 
-pub(crate) use fn_glue_code_generator::FnGlueCodeGenerator;
-pub(crate) use foreign_mod_glue_code_generator::ForeignModeGlueCodeGenerator;
+pub(crate) use fn_arg::*;
+pub(crate) use fn_epilog::*;
+pub(crate) use fn_prolog::*;
+pub(crate) use foreign_mod_prolog::*;
+pub(crate) use foreign_mod_epilog::*;
 
 use serde::Serialize;
 use serde::Deserialize;
@@ -27,7 +34,6 @@ use syn::spanned::Spanned;
 
 #[derive(Debug, Clone, PartialEq, Serialize, Deserialize)]
 pub enum ParsedType {
-    Empty,
     I8,
     I16,
     I32,
@@ -159,16 +165,15 @@ impl ParsedType {
         }
     }
 
-    pub fn from_return_type(ret_type: &syn::ReturnType) -> syn::Result<Self> {
+    pub fn from_return_type(ret_type: &syn::ReturnType) -> syn::Result<Option<Self>> {
         match ret_type {
-            syn::ReturnType::Type(_, t) => ParsedType::from_type(t.as_ref()),
-            syn::ReturnType::Default => Ok(ParsedType::Empty),
+            syn::ReturnType::Type(_, t) => Ok(Some(ParsedType::from_type(t.as_ref())?)),
+            syn::ReturnType::Default => Ok(None),
         }
     }
 
     pub fn to_text_type(&self) -> String {
         match self {
-            ParsedType::Empty => "",
             ParsedType::I8 => "i8",
             ParsedType::I16 => "i16",
             ParsedType::I32 => "i32",
@@ -185,5 +190,22 @@ impl ParsedType {
             ParsedType::Record(name) => name,
         }
         .into()
+    }
+
+    pub fn is_integral_type(&self) -> bool {
+        match self {
+            ParsedType::Boolean
+            | ParsedType::I8
+            | ParsedType::I16
+            | ParsedType::I32
+            | ParsedType::I64
+            | ParsedType::U8
+            | ParsedType::U16
+            | ParsedType::U32
+            | ParsedType::U64
+            | ParsedType::F32
+            | ParsedType::F64 => false,
+            ParsedType::Utf8String | ParsedType::ByteVector | ParsedType::Record(_) => true,
+        }
     }
 }

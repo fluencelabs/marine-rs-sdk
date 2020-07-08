@@ -14,26 +14,10 @@
  * limitations under the License.
  */
 
-#![doc(html_root_url = "https://docs.rs/wit-support/0.2.0")]
-#![deny(
-    dead_code,
-    nonstandard_style,
-    unused_imports,
-    unused_mut,
-    unused_unsafe,
-    unreachable_patterns
-)]
-#![warn(rust_2018_idioms)]
-#![recursion_limit = "1024"]
-
-mod fce_ast_types;
-mod fce_macro_impl;
-mod parsed_type;
-mod parse_macro_input;
-mod token_stream_generator;
-mod wasm_type;
-
-pub use fce_ast_types::*;
-pub use fce_macro_impl::fce;
-pub use parsed_type::ParsedType;
-pub use token_stream_generator::GENERATED_SECTION_NAME;
+#[macro_export]
+/// Crates new syn::Ident with the given string and new call span
+macro_rules! new_ident {
+    ($string: expr) => {
+        syn::Ident::new(&$string, proc_macro2::Span::call_site());
+    };
+}

@@ -28,6 +28,5 @@ debug = ["fluence-sdk-main/debug"]
 members = [
   "crates/main",
   "crates/macro",
-  "crates/wit-support",
-  "crates/wit"
+  "crates/wit",
   ]

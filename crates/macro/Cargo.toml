@@ -17,4 +17,4 @@ all-features = true
 proc-macro = true
 
 [dependencies]
-wit-support = { path = "../wit-support" }
+fluence-sdk-wit = { path = "../wit" }

@@ -25,7 +25,7 @@ pub struct AstFunctionSignature {
     pub input_types: Vec<ParsedType>,
     // fce supports only one return value now,
     // waiting for adding multi-value support in Wasmer.
-    pub output_type: ParsedType,
+    pub output_type: Option<ParsedType>,
 }
 
 #[derive(Debug, Clone, PartialEq, Serialize, Deserialize)]
