@@ -35,8 +35,6 @@ mod export_allocator;
 mod logger;
 mod result;
 
-pub(crate) use logger::log_utf8_string;
-
 pub use export_allocator::allocate;
 pub use export_allocator::deallocate;
 pub use logger::WasmLogger;
@@ -44,3 +42,13 @@ pub use result::get_result_ptr;
 pub use result::get_result_size;
 pub use result::set_result_ptr;
 pub use result::set_result_size;
+
+#[allow(unused_variables)]
+pub(crate) fn log<S: AsRef<str>>(msg: S) {
+    // logs will be printed only if debug feature is enabled
+    #[cfg(debug)]
+    unsafe {
+        let msg = msg.as_ref();
+        logger::log_utf8_string(msg.as_ptr() as _, msg.len() as _);
+    }
+}

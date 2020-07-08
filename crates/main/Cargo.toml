@@ -2,7 +2,7 @@
 name = "fluence-sdk-main"
 version = "0.2.0"  # remember to update html_root_url
 edition = "2018"
-description = "Rust SDK for writing applications for Fluence"
+description = "Rust SDK for applications for the Fluence network"
 documentation = "https://docs.rs/fluence/fluence-sdk-macro"
 repository = "https://github.com/fluencelabs/rust-sdk/crates/main"
 authors = ["Fluence Labs"]
@@ -26,4 +26,4 @@ lazy_static = "1.4.0" # used in doc test
 
 [features]
 # Print some internal logs by log_utf8_string
-print_logs = []
+debug = []

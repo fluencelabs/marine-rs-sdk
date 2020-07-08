@@ -14,6 +14,46 @@
  * limitations under the License.
  */
 
+//! Defines the #[fce] macro that should be used with all export functions, extern blocks.
+//! At now, It supports the following types that could be used as parameters in export or foreign
+//! functions: i8, i16, i32, i64, u8, u16, u32, u64, f32, f64, bool, String, Vec<u8>. Also struct
+//! where all fields are public and have aforementioned types could be used as parameters. In this
+//! case #[fce] should be also applied to this structs.
+//!
+//! # Examples
+//!
+//! This example shows how a function could be exported:
+//! ```
+//! #[fce]
+//! pub fn greeting(name: String) -> String {
+//!     format!("Hi {}", name)
+//! }
+//! ```
+//!
+//! This more complex example shows how a function could be imported from another Wasm module
+//! and how a struct could be passed:
+//!
+//! ```
+//! #[fce]
+//! struct HostReturnValue {
+//!     pub error_code: i32,
+//!     pub outcome: Vec<u8>
+//! }
+//!
+//! #[fce]
+//! pub fn read_ipfs_file(file_path: String) -> HostReturnValue {
+//!     let hash = calculate_hash(file_path);
+//!     ipfs(hash)
+//! }
+//!
+//! #[fce]
+//! #[link(wasm_import_module = "ipfs_node.wasm")]
+//! extern "C" {
+//!     pub fn ipfs(file_hash: String) -> HostReturnValue;
+//! }
+//!
+//! ```
+
 #![doc(html_root_url = "https://docs.rs/fluence-sdk-macro/0.2.0")]
 #![deny(
     dead_code,

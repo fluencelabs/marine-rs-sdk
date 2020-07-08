@@ -14,7 +14,11 @@
  * limitations under the License.
  */
 
-use crate::log_utf8_string;
+//! Contains ad-hoc implementations of returning complex data types from function calls
+//! by two global variables that contain pointer and size. Will be refactored after multi-value
+//! support in Wasmer.
+
+use super::log;
 
 use std::sync::atomic::AtomicUsize;
 
@@ -23,32 +27,28 @@ static mut RESULT_SIZE: AtomicUsize = AtomicUsize::new(0);
 
 #[no_mangle]
 pub unsafe fn get_result_ptr() -> usize {
-    let msg = "sdk.get_result_ptr\n";
-    log_utf8_string(msg.as_ptr() as _, msg.len() as _);
+    log("sdk.get_result_ptr\n");
 
     *RESULT_PTR.get_mut()
 }
 
 #[no_mangle]
 pub unsafe fn get_result_size() -> usize {
-    let msg = "sdk.get_result_size\n";
-    log_utf8_string(msg.as_ptr() as _, msg.len() as _);
+    log("sdk.get_result_size\n");
 
     *RESULT_SIZE.get_mut()
 }
 
 #[no_mangle]
 pub unsafe fn set_result_ptr(ptr: usize) {
-    let msg = format!("sdk.set_result_ptr: {}\n", ptr);
-    log_utf8_string(msg.as_ptr() as _, msg.len() as _);
+    log(format!("sdk.set_result_ptr: {}\n", ptr));
 
     *RESULT_PTR.get_mut() = ptr;
 }
 
 #[no_mangle]
 pub unsafe fn set_result_size(size: usize) {
-    let msg = format!("sdk.set_result_size: {}\n", size);
-    log_utf8_string(msg.as_ptr() as _, msg.len() as _);
+    log(format!("sdk.set_result_size: {}\n", size));
 
     *RESULT_SIZE.get_mut() = size;
 }

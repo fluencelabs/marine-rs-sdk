@@ -14,13 +14,10 @@
  * limitations under the License.
  */
 
-//! Rust backend SDK for writing applications for Fluence. This crate is just a wrapper for two
+//! Rust backend SDK for applications on the Fluence network. This crate is just a wrapper for two
 //! other crates: `main` and `macro`. The `main` crate is used for all memory relative operations
 //! and logging, while the `macro` crate contains the invocation macro to simplify entry point
 //! functions.
-//!
-//! By default this crate turns on export-allocator feature of the `main` crate, to disable it
-//! please import this crate with `default-features = false`.
 //!
 #![doc(html_root_url = "https://docs.rs/fluence/0.2.0")]
 #![deny(

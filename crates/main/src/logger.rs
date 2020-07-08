@@ -14,17 +14,8 @@
  * limitations under the License.
  */
 
-//! This module enables log messages from the Wasm side. It is implemented as a logging facade for
-//! crate [`log`]. To enable this module in your project please specify `wasm_logger` feature of
-//! `fluence_sdk`.
-//!
-//! Note that this module works only for the Wasm environments and Fluence `WasmVm` - with this
-//! feature set it is possible to compile applications only for Wasm targets such as
-//! `wasm32-unknown-unknown`, `wasm32-wasi`. (please refer to the first example to find out a way
-//! to avoid it).
-//!
-//! This feature should be used only for debugging purposes, you can find more info in the
-//! [`backend app debugging`] section of the Fluence guide.
+//! This module allows log messages from the Wasm side. It is implemented as a logging facade for
+//! crate [`log`].
 //!
 //! # Examples
 //!

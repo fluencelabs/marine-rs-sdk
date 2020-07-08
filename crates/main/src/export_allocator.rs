@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-use crate::log_utf8_string;
+use super::log;
 
 use std::alloc::alloc as global_alloc;
 use std::alloc::dealloc as global_dealloc;
@@ -31,8 +31,7 @@ pub unsafe fn allocate(size: usize) -> usize {
         Err(_) => return 0,
     };
 
-    let msg = format!("sdk.allocate: {:?}\n", size);
-    log_utf8_string(msg.as_ptr() as _, msg.len() as _);
+    log(format!("sdk.allocate: {:?}\n", size));
 
     global_alloc(layout) as _
 }
@@ -48,8 +47,7 @@ pub unsafe fn deallocate(ptr: *mut u8, size: usize) {
         Err(_) => return,
     };
 
-    let msg = format!("sdk.deallocate: {:?} {}\n", ptr, size);
-    log_utf8_string(msg.as_ptr() as _, msg.len() as _);
+    log(format!("sdk.deallocate: {:?} {}\n", ptr, size));
 
     global_dealloc(ptr, layout);
 }

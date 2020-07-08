@@ -1,8 +1,0 @@
-[package]
-name = "greeting"
-version = "0.1.0"
-authors = ["vms <michail.vms@gmail.com>"]
-edition = "2018"
-
-[dependencies]
-fluence = { path = "../../", version = "=0.2.0" }
