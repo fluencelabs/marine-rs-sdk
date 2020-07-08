@@ -15,8 +15,6 @@
  */
 
 use super::GENERATED_FUNC_PREFIX;
-use super::GENERATED_SECTION_PREFIX;
-use super::GENERATED_GLOBAL_PREFIX;
 use crate::fce_ast_types;
 use crate::new_ident;
 
@@ -26,15 +24,15 @@ use crate::parsed_type::*;
 
 impl quote::ToTokens for fce_ast_types::AstExternModItem {
     fn to_tokens(&self, tokens: &mut TokenStream) {
-        // TODO: change serialization protocol
-        let fce_type = fce_ast_types::FCEAst::ExternMod(self.clone());
-        let data = serde_json::to_vec(&fce_type).unwrap();
-        let data_size = data.len();
-        let data = syn::LitByteStr::new(&data, proc_macro2::Span::call_site());
-
-        let global_static_name =
-            new_ident!(GENERATED_GLOBAL_PREFIX.to_string() + &self.namespace.replace(".", "_"));
-        let section_name = GENERATED_SECTION_PREFIX.to_string() + &self.namespace.replace(".", "_");
+        crate::prepare_global_data!(
+            ExternMod,
+            self,
+            self.namespace,
+            data,
+            data_size,
+            global_static_name,
+            section_name
+        );
 
         let wasm_import_module_name = &self.namespace;
         let generated_imports = generate_extern_section_items(&self);

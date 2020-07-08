@@ -16,10 +16,30 @@
 
 use crate::fce_ast_types;
 
-use proc_macro2::TokenStream;
-
 impl quote::ToTokens for fce_ast_types::AstRecordItem {
-    fn to_tokens(&self, _tokens: &mut TokenStream) {
-        unimplemented!()
+    fn to_tokens(&self, tokens: &mut proc_macro2::TokenStream) {
+        let original = &self.original;
+        crate::prepare_global_data!(
+            Record,
+            self,
+            self.name,
+            data,
+            data_size,
+            global_static_name,
+            section_name
+        );
+
+        let glue_code = quote::quote! {
+            #original
+
+            // #[cfg(target_arch = "wasm32")]
+            #[doc(hidden)]
+            #[allow(clippy::all)]
+            #[link_section = #section_name]
+            pub static #global_static_name: [u8; #data_size] = { *#data };
+
+        };
+
+        tokens.extend(glue_code);
     }
 }

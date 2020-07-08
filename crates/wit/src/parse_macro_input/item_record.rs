@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 use super::ParseMacroInput;
-use crate::fce_ast_types;
+use crate::{fce_ast_types, AstRecordField};
 use crate::fce_ast_types::FCEAst;
 
 use syn::Error;
@@ -26,21 +26,31 @@ impl ParseMacroInput for syn::ItemStruct {
     fn parse_macro_input(self) -> Result<FCEAst> {
         check_record(&self)?;
 
-        let fields = match self.fields {
-            syn::Fields::Named(named_field) => named_field,
+        let fields = match &self.fields {
+            syn::Fields::Named(named_fields) => &named_fields.named,
+            syn::Fields::Unnamed(unnamed_fields) => &unnamed_fields.unnamed,
             _ => return Err(Error::new(self.span(), "only named field allowed")),
         };
 
         let fields = fields
-            .named
             .iter()
             .map(|field| {
                 check_field(field)?;
-                ParsedType::from_type(&field.ty)
+                let field_name = field.ident.as_ref().map(|ident| ident.to_string());
+                let field_type = ParsedType::from_type(&field.ty)?;
+                Ok(AstRecordField {
+                    field_name,
+                    field_type,
+                })
             })
             .collect::<Result<Vec<_>>>()?;
 
-        let ast_record_item = fce_ast_types::AstRecordItem { fields };
+        let name = self.ident.to_string();
+        let ast_record_item = fce_ast_types::AstRecordItem {
+            name,
+            fields,
+            original: Some(self),
+        };
 
         Ok(FCEAst::Record(ast_record_item))
     }

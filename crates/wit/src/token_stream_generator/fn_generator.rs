@@ -23,26 +23,23 @@ use crate::parsed_type::FnPrologDescriptor;
 use crate::new_ident;
 
 use proc_macro2::TokenStream;
-use quote::quote;
 
 impl quote::ToTokens for fce_ast_types::AstFunctionItem {
     fn to_tokens(&self, tokens: &mut TokenStream) {
-        // TODO: change serialization protocol
-        let fce_type = fce_ast_types::FCEAst::Function(self.clone());
-        // there is no condition for serialization to fail
-        let data = serde_json::to_vec(&fce_type).unwrap();
-        let data_size = data.len();
-        let data = syn::LitByteStr::new(&data, proc_macro2::Span::call_site());
+        crate::prepare_global_data!(
+            Function,
+            self,
+            self.signature.name,
+            data,
+            data_size,
+            global_static_name,
+            section_name
+        );
 
         let signature = &self.signature;
-
         let func_name = new_ident!(GENERATED_FUNC_PREFIX.to_string() + &signature.name);
         let original_func_ident = new_ident!(signature.name);
-        let section_name = GENERATED_SECTION_PREFIX.to_string() + &signature.name.replace("-", "_");
         let export_func_name = &signature.name;
-
-        let global_static_name =
-            new_ident!(GENERATED_GLOBAL_PREFIX.to_string() + &export_func_name);
 
         let FnPrologDescriptor {
             raw_arg_names,
@@ -60,7 +57,7 @@ impl quote::ToTokens for fce_ast_types::AstFunctionItem {
         // here this Option must be Some
         let original_func = &self.original;
 
-        let glue_code = quote! {
+        let glue_code = quote::quote! {
             #original_func
 
             #[cfg_attr(

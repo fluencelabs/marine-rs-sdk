@@ -29,8 +29,20 @@ pub struct AstFunctionSignature {
 }
 
 #[derive(Debug, Clone, PartialEq, Serialize, Deserialize)]
+pub struct AstRecordField {
+    // fields of tuple structs haven't got name
+    pub field_name: Option<String>,
+    pub field_type: ParsedType,
+}
+
+#[derive(Clone, Serialize, Deserialize)]
 pub struct AstRecordItem {
-    pub fields: Vec<ParsedType>,
+    pub name: String,
+    pub fields: Vec<AstRecordField>,
+
+    // Option is needed only for skipping serialization/deserialization of syn::ItemFn
+    #[serde(skip)]
+    pub original: Option<syn::ItemStruct>,
 }
 
 #[derive(Debug, Clone, PartialEq, Serialize, Deserialize)]

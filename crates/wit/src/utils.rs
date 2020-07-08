@@ -21,3 +21,21 @@ macro_rules! new_ident {
         syn::Ident::new(&$string, proc_macro2::Span::call_site());
     };
 }
+
+#[macro_export]
+macro_rules! prepare_global_data {
+    ($fce_type: ident, $self: ident, $name: expr, $data: ident, $data_size: ident, $global_static_name: ident, $section_name: ident) => {
+        // TODO: change serialization protocol
+        let fce_type = fce_ast_types::FCEAst::$fce_type($self.clone());
+        let $data = serde_json::to_vec(&fce_type).unwrap();
+        let $data_size = $data.len();
+        let $data = syn::LitByteStr::new(&$data, proc_macro2::Span::call_site());
+
+        let $global_static_name = crate::new_ident!(
+            crate::token_stream_generator::GENERATED_GLOBAL_PREFIX.to_string()
+                + &$name.replace(".", "_")
+        );
+        let $section_name = crate::token_stream_generator::GENERATED_SECTION_PREFIX.to_string()
+            + &$name.replace(".", "_");
+    };
+}
