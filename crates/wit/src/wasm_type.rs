@@ -1,7 +1,7 @@
 use proc_macro2::TokenStream;
 
 /// Raw Wasm types according to the spec except i128.
-pub(crate) enum WasmType {
+pub enum WasmType {
     I32,
     I64,
     F32,

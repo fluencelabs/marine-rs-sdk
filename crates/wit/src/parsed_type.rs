@@ -21,6 +21,8 @@ mod foreign_mod_arg;
 mod foreign_mod_epilog;
 mod foreign_mod_prolog;
 
+use crate::wasm_type::WasmType;
+
 pub(crate) use fn_arg::*;
 pub(crate) use fn_epilog::*;
 pub(crate) use fn_prolog::*;
@@ -206,6 +208,24 @@ impl ParsedType {
             | ParsedType::F32
             | ParsedType::F64 => false,
             ParsedType::Utf8String | ParsedType::ByteVector | ParsedType::Record(_) => true,
+        }
+    }
+
+    pub fn to_raw_types(&self) -> Vec<WasmType> {
+        match self {
+            ParsedType::Boolean
+            | ParsedType::I8
+            | ParsedType::I16
+            | ParsedType::I32
+            | ParsedType::U8
+            | ParsedType::U16
+            | ParsedType::U32 => vec![WasmType::I32],
+            ParsedType::I64 | ParsedType::U64 => vec![WasmType::I64],
+            ParsedType::F32 => vec![WasmType::F32],
+            ParsedType::F64 => vec![WasmType::F64],
+            ParsedType::Utf8String | ParsedType::ByteVector | ParsedType::Record(_) => {
+                vec![WasmType::I32, WasmType::I32]
+            }
         }
     }
 }
