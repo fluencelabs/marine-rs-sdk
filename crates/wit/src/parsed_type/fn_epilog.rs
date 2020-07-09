@@ -83,10 +83,7 @@ fn generate_fn_return_type(ty: &Option<ParsedType>) -> proc_macro2::TokenStream 
 
 fn generate_return_expression(ty: &Option<ParsedType>) -> proc_macro2::TokenStream {
     match ty {
-        None
-        | Some(ParsedType::Utf8String)
-        | Some(ParsedType::ByteVector)
-        | Some(ParsedType::Record(_)) => quote! {},
+        None => quote! {},
         _ => quote! {
             let result =
         },
