@@ -29,7 +29,7 @@ const WASM_IMPORT_MODULE_DIRECTIVE_NAME: &str = "wasm_import_module";
 impl ParseMacroInput for syn::ItemForeignMod {
     fn parse_macro_input(self) -> Result<FCEAst> {
         match self.abi.name {
-            Some(ref name) if name.value() != "C".to_string() => {
+            Some(ref name) if name.value() != "C" => {
                 return Err(Error::new(self.span(), "only 'C' abi is allowed"))
             }
             _ => {}

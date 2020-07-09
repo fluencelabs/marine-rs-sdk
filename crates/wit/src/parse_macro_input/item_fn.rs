@@ -95,7 +95,7 @@ fn check_func(function_sig: &syn::Signature, function_vis: syn::Visibility) -> R
             "FCE export function shouldn't use template parameters",
         ));
     }
-    if let Some(_) = variadic {
+    if variadic.is_some() {
         return Err(Error::new(
             variadic.span(),
             "FCE export function shouldn't use variadic interface",
