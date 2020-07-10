@@ -1,5 +1,5 @@
 /*
- * Copyright 2018 Fluence Labs Limited
+ * Copyright 2020 Fluence Labs Limited
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -35,7 +35,13 @@ extern crate fluence_sdk_macro;
 extern crate fluence_sdk_main;
 
 pub use fluence_sdk_macro::fce;
-pub use fluence_sdk_main::get_result_ptr;
-pub use fluence_sdk_main::get_result_size;
-pub use fluence_sdk_main::set_result_ptr;
-pub use fluence_sdk_main::set_result_size;
+pub use fluence_sdk_main::WasmLogger;
+
+/// These API functions are intended for internal usage in generated code.
+/// Normally, you shouldn't use them.
+pub mod internal {
+    pub use fluence_sdk_main::get_result_ptr;
+    pub use fluence_sdk_main::get_result_size;
+    pub use fluence_sdk_main::set_result_ptr;
+    pub use fluence_sdk_main::set_result_size;
+}

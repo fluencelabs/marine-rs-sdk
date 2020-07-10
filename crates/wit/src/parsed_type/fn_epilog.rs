@@ -97,8 +97,8 @@ fn generate_epilog(ty: &Option<ParsedType>) -> proc_macro2::TokenStream {
             return result as _;
         },
         Some(ty) if ty.is_integral_type() => quote! {
-            fluence::set_result_ptr(result.as_ptr() as _);
-            fluence::set_result_size(result.len() as _);
+            fluence::internal::set_result_ptr(result.as_ptr() as _);
+            fluence::internal::set_result_size(result.len() as _);
             std::mem::forget(result);
         },
         _ => {

@@ -1,5 +1,5 @@
 /*
- * Copyright 2018 Fluence Labs Limited
+ * Copyright 2020 Fluence Labs Limited
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -46,16 +46,16 @@ impl ForeignModEpilogGlueCodeGenerator for Option<ParsedType> {
             },
             Some(ParsedType::Utf8String) => quote! {
                 String::from_raw_parts(
-                    fluence::get_result_ptr() as _,
-                    fluence::get_result_size() as _,
-                    fluence::get_result_size() as _
+                    fluence::internal::get_result_ptr() as _,
+                    fluence::internal::get_result_size() as _,
+                    fluence::internal::get_result_size() as _
                 )
             },
             Some(ParsedType::ByteVector) => quote! {
                 Vec::from_raw_parts(
-                    fluence::get_result_ptr() as _,
-                    fluence::get_result_size() as _,
-                    fluence::get_result_size() as _
+                    fluence::internal::get_result_ptr() as _,
+                    fluence::internal::get_result_size() as _,
+                    fluence::internal::get_result_size() as _
                 )
             },
             Some(ParsedType::Record(_)) => unimplemented!(),
