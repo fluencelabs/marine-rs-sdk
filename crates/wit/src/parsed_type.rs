@@ -21,8 +21,6 @@ mod foreign_mod_arg;
 mod foreign_mod_epilog;
 mod foreign_mod_prolog;
 
-use crate::wasm_type::WasmType;
-
 pub(crate) use fn_arg::*;
 pub(crate) use fn_epilog::*;
 pub(crate) use fn_prolog::*;
