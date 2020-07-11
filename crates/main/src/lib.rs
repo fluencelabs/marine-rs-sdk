@@ -46,7 +46,7 @@ pub use result::set_result_size;
 #[allow(unused_variables)]
 pub(crate) fn log<S: AsRef<str>>(msg: S) {
     // logs will be printed only if debug feature is enabled
-    #[cfg(debug)]
+    #[cfg(feature = "debug")]
     unsafe {
         let msg = msg.as_ref();
         logger::log_utf8_string(msg.as_ptr() as _, msg.len() as _);
