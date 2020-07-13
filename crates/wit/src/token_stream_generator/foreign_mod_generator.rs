@@ -40,14 +40,14 @@ impl quote::ToTokens for fce_ast_types::AstExternModItem {
 
         let glue_code = quote! {
             #[link(wasm_import_module = #wasm_import_module_name)]
-            // #[cfg(target_arch = "wasm32")]
+            #[cfg(target_arch = "wasm32")]
             extern "C" {
                 #generated_imports
             }
 
             #wrapper_functions
 
-            // #[cfg(target_arch = "wasm32")]
+            #[cfg(target_arch = "wasm32")]
             #[doc(hidden)]
             #[allow(clippy::all)]
             #[link_section = #section_name]
@@ -113,7 +113,7 @@ fn generate_wrapper_functions(extern_item: &fce_ast_types::AstExternModItem) -> 
         let epilog = signature.output_type.generate_wrapper_epilog();
 
         let wrapper_func = quote! {
-            // #[cfg(target_arch = "wasm32")]
+            #[cfg(target_arch = "wasm32")]
             #[doc(hidden)]
             #[allow(clippy::all)]
             #visibility fn #func_name(#(#arg_names: #arg_types), *) #return_type {

@@ -24,6 +24,9 @@ fluence-sdk-main = { path = "crates/main", version = "=0.2.0" }
 # Print some internal logs by log_utf8_string
 debug = ["fluence-sdk-main/debug"]
 
+# Print some internal logs by log_utf8_string
+logger = ["fluence-sdk-main/logger"]
+
 [workspace]
 members = [
   "crates/main",

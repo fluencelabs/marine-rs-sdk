@@ -37,7 +37,6 @@ impl quote::ToTokens for fce_ast_types::AstRecordItem {
             #[allow(clippy::all)]
             #[link_section = #section_name]
             pub static #global_static_name: [u8; #data_size] = { *#data };
-
         };
 
         tokens.extend(glue_code);

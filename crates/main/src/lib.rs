@@ -32,11 +32,13 @@
 #![warn(rust_2018_idioms)]
 
 mod export_allocator;
+#[cfg(feature = "logger")]
 mod logger;
 mod result;
 
 pub use export_allocator::allocate;
 pub use export_allocator::deallocate;
+#[cfg(feature = "logger")]
 pub use logger::WasmLogger;
 pub use result::get_result_ptr;
 pub use result::get_result_size;

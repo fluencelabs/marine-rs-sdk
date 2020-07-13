@@ -68,6 +68,7 @@ impl quote::ToTokens for fce_ast_types::AstFunctionItem {
             #[doc(hidden)]
             #[allow(clippy::all)]
             pub unsafe fn #func_name(#(#raw_arg_names: #raw_arg_types),*) #fn_return_type {
+                // arguments conversation from Wasm types to Rust types
                 #prolog
 
                 // calling the original function with converted args
@@ -77,7 +78,7 @@ impl quote::ToTokens for fce_ast_types::AstFunctionItem {
                 #epilog
             }
 
-            // #[cfg(target_arch = "wasm32")]
+            #[cfg(target_arch = "wasm32")]
             #[doc(hidden)]
             #[allow(clippy::all)]
             #[link_section = #section_name]
