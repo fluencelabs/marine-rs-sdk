@@ -35,7 +35,7 @@ extern crate fluence_sdk_macro;
 extern crate fluence_sdk_main;
 
 pub use fluence_sdk_macro::fce;
-#[cfg(any(feature = "debug", feature = "logger"))]
+#[cfg(feature = "logger")]
 pub use fluence_sdk_main::WasmLogger;
 
 /// These API functions are intended for internal usage in generated code.
