@@ -35,6 +35,7 @@ impl quote::ToTokens for fce_ast_types::AstExternModItem {
         );
 
         let wasm_import_module_name = &self.namespace;
+        let original = &self.original;
         let generated_imports = generate_extern_section_items(&self);
         let wrapper_functions = generate_wrapper_functions(&self);
 
@@ -44,6 +45,9 @@ impl quote::ToTokens for fce_ast_types::AstExternModItem {
             extern "C" {
                 #generated_imports
             }
+
+            #[cfg(not(target_arch = "wasm32"))]
+            #original
 
             #wrapper_functions
 

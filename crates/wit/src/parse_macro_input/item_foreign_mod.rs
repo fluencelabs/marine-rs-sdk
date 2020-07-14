@@ -28,8 +28,8 @@ const WASM_IMPORT_MODULE_DIRECTIVE_NAME: &str = "wasm_import_module";
 
 impl ParseMacroInput for syn::ItemForeignMod {
     fn parse_macro_input(self) -> Result<FCEAst> {
-        match self.abi.name {
-            Some(ref name) if name.value() != "C" => {
+        match &self.abi.name {
+            Some(name) if name.value() != "C" => {
                 return Err(Error::new(self.span(), "only 'C' abi is allowed"))
             }
             _ => {}
@@ -39,7 +39,8 @@ impl ParseMacroInput for syn::ItemForeignMod {
 
         let imports = self
             .items
-            .into_iter()
+            .iter()
+            .cloned()
             .map(parse_raw_foreign_item)
             .collect::<Result<_>>()?;
 
@@ -47,7 +48,7 @@ impl ParseMacroInput for syn::ItemForeignMod {
         //   #[link(wasm_import_module = "host")]
         let wasm_import_module: Option<String> = self
             .attrs
-            .into_iter()
+            .iter()
             .filter_map(|attr| attr.parse_meta().ok())
             .filter(|meta| meta.path().is_ident(LINK_DIRECTIVE_NAME))
             .filter_map(|meta| {
@@ -73,7 +74,11 @@ impl ParseMacroInput for syn::ItemForeignMod {
                 "import module name should be defined by 'wasm_import_module' directive",
             )),
             Some(namespace) => {
-                let extern_mod_item = fce_ast_types::AstExternModItem { namespace, imports };
+                let extern_mod_item = fce_ast_types::AstExternModItem {
+                    namespace,
+                    imports,
+                    original: Some(self),
+                };
                 Ok(FCEAst::ExternMod(extern_mod_item))
             }
             None => Err(Error::new(

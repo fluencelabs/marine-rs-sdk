@@ -32,7 +32,7 @@ impl quote::ToTokens for fce_ast_types::AstRecordItem {
         let glue_code = quote::quote! {
             #original
 
-            // #[cfg(target_arch = "wasm32")]
+            #[cfg(target_arch = "wasm32")]
             #[doc(hidden)]
             #[allow(clippy::all)]
             #[link_section = #section_name]

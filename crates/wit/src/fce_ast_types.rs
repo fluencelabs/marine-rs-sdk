@@ -52,12 +52,16 @@ pub struct AstExternFnItem {
     pub signature: AstFunctionSignature,
 }
 
-#[derive(Debug, Clone, PartialEq, Serialize, Deserialize)]
+#[derive(Clone, Serialize, Deserialize)]
 pub struct AstExternModItem {
     pub namespace: String,
 
     // only imports are possible here
     pub imports: Vec<AstExternFnItem>,
+
+    // Option is needed only for skipping serialization/deserialization of syn::ItemFn
+    #[serde(skip)]
+    pub original: Option<syn::ItemForeignMod>,
 }
 
 #[derive(Clone, Serialize, Deserialize)]
