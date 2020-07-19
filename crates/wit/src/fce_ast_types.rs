@@ -19,8 +19,11 @@ use crate::parsed_type::ParsedType;
 use serde::Serialize;
 use serde::Deserialize;
 
-#[derive(Debug, Clone, PartialEq, Serialize, Deserialize)]
+#[derive(Clone, Serialize, Deserialize)]
 pub struct AstFunctionSignature {
+    // Option is needed only for skipping serialization/deserialization of syn::ItemFn
+    #[serde(skip)]
+    pub visibility: Option<syn::Visibility>,
     pub name: String,
     pub input_types: Vec<ParsedType>,
     // fce supports only one return value now,
@@ -45,7 +48,7 @@ pub struct AstRecordItem {
     pub original: Option<syn::ItemStruct>,
 }
 
-#[derive(Debug, Clone, PartialEq, Serialize, Deserialize)]
+#[derive(Clone, Serialize, Deserialize)]
 pub struct AstExternFnItem {
     pub link_name: Option<String>,
     // only imports are possible here

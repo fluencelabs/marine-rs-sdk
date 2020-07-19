@@ -117,7 +117,7 @@ fn parse_raw_foreign_item(raw_item: syn::ForeignItem) -> Result<fce_ast_types::A
         None => None,
     };
 
-    let function = super::item_fn::parse_function(function_item.sig, function_item.vis)?;
+    let function = super::item_fn::try_to_ast_signature(function_item.sig, function_item.vis)?;
     let ast_extern_fn_item = fce_ast_types::AstExternFnItem {
         link_name,
         signature: function,

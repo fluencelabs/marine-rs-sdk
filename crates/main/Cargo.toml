@@ -28,5 +28,5 @@ lazy_static = "1.4.0" # used in doc test
 # Print some internal logs by log_utf8_string
 debug = []
 
-# Enable logger, this will cause log_utf8_string to appear in imports
+# Enable logger (this will cause log_utf8_string to appear in imports)
 logger = []

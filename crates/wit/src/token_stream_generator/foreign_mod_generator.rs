@@ -79,7 +79,7 @@ fn generate_extern_section_items(extern_item: &fce_ast_types::AstExternModItem) 
 
         let func = quote! {
             #[link_name = #link_name]
-            pub fn #import_name(#(#raw_arg_names: #raw_arg_types),*) #fn_return_type;
+            fn #import_name(#(#raw_arg_names: #raw_arg_types),*) #fn_return_type;
         };
 
         token_stream.extend(func);
@@ -98,7 +98,7 @@ fn generate_wrapper_functions(extern_item: &fce_ast_types::AstExternModItem) -> 
     for import in &extern_item.imports {
         let signature = &import.signature;
 
-        let visibility = new_ident!("pub");
+        let visibility = &signature.visibility;
         let func_name = new_ident!(&signature.name);
 
         let return_type = signature.output_type.generate_wrapper_return_type();

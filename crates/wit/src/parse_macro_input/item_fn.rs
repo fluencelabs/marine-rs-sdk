@@ -22,24 +22,24 @@ use syn::Result;
 
 impl ParseMacroInput for syn::ItemFn {
     fn parse_macro_input(self) -> Result<FCEAst> {
-        parse_function(self.sig.clone(), self.vis.clone()).map(|f| {
+        try_to_ast_signature(self.sig.clone(), self.vis.clone()).map(|signature| {
             FCEAst::Function(AstFunctionItem {
-                signature: f,
+                signature,
                 original: Some(self),
             })
         })
     }
 }
 
-pub(super) fn parse_function(
-    function_sig: syn::Signature,
-    function_vis: syn::Visibility,
+pub(super) fn try_to_ast_signature(
+    signature: syn::Signature,
+    visibility: syn::Visibility,
 ) -> Result<fce_ast_types::AstFunctionSignature> {
     use crate::parsed_type::ParsedType;
 
-    check_func(&function_sig, function_vis)?;
+    check_function(&signature)?;
 
-    let syn::Signature { inputs, output, .. } = function_sig;
+    let syn::Signature { inputs, output, .. } = signature;
 
     let input_types = inputs
         .iter()
@@ -49,7 +49,8 @@ pub(super) fn parse_function(
     let output_type = ParsedType::from_return_type(&output)?;
 
     let ast_function_item = fce_ast_types::AstFunctionSignature {
-        name: function_sig.ident.to_string(),
+        visibility: Some(visibility),
+        name: signature.ident.to_string(),
         input_types,
         output_type,
     };
@@ -58,7 +59,7 @@ pub(super) fn parse_function(
 }
 
 /// Check whether the #[fce] macro could be applied to a function.
-fn check_func(function_sig: &syn::Signature, function_vis: syn::Visibility) -> Result<()> {
+fn check_function(signature: &syn::Signature) -> Result<()> {
     use syn::Error;
     use syn::spanned::Spanned;
 
@@ -69,7 +70,7 @@ fn check_func(function_sig: &syn::Signature, function_vis: syn::Visibility) -> R
         variadic,
         generics,
         ..
-    } = function_sig;
+    } = signature;
 
     if let Some(constness) = constness {
         return Err(Error::new(
@@ -91,7 +92,7 @@ fn check_func(function_sig: &syn::Signature, function_vis: syn::Visibility) -> R
     }
     if !generics.params.is_empty() || generics.where_clause.is_some() {
         return Err(Error::new(
-            function_sig.span(),
+            signature.span(),
             "FCE export function shouldn't use template parameters",
         ));
     }
@@ -103,12 +104,5 @@ fn check_func(function_sig: &syn::Signature, function_vis: syn::Visibility) -> R
     }
 
     // TODO: check for a lifetime
-
-    match function_vis {
-        syn::Visibility::Public(_) => Ok(()),
-        _ => Err(Error::new(
-            variadic.span(),
-            "FCE export function should be public",
-        )),
-    }
+    Ok(())
 }
