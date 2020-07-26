@@ -39,3 +39,22 @@ macro_rules! prepare_global_data {
             + &$name.replace(".", "_");
     };
 }
+
+pub fn get_record_size<'a>(
+    fields: impl Iterator<Item = &'a crate::parsed_type::ParsedType>,
+) -> usize {
+    use crate::parsed_type::ParsedType;
+
+    let mut size = 0;
+
+    for field in fields {
+        let params_count = match field {
+            ParsedType::ByteVector | ParsedType::Utf8String => 2,
+            _ => 1,
+        };
+
+        size += std::mem::size_of::<u64>() * params_count;
+    }
+
+    size
+}

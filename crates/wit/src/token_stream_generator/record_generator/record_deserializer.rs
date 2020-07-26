@@ -118,13 +118,11 @@ impl RecordDeserializerGlueCodeGenerator for fce_ast_types::AstRecordItem {
                 }
                 ParsedType::Record(record_name) => {
                     let ptr_id = value_id;
-                    let size_id = value_id + 1;
-                    value_id += 1;
                     let record_deserializer =
                         new_ident!(GENERATED_RECORD_DESERIALIZER_PREFIX.to_string() + record_name);
 
                     quote! {
-                        let #field = #record_deserializer(raw_record[#ptr_id] as _, raw_record[#size_id] as _);
+                        let #field = #record_deserializer(raw_record[#ptr_id] as _);
                     }
                 }
             };

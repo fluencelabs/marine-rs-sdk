@@ -99,9 +99,12 @@ fn generate_deserializer_fn(record: &fce_ast_types::AstRecordItem) -> proc_macro
         return_type,
     } = record.generate_deserializer(&record.name);
 
+    let record_size =
+        crate::utils::get_record_size(record.fields.iter().map(|ast_field| &ast_field.ty));
+
     quote::quote! {
-        unsafe fn #deserializer_fn_name(offset: i32, size: i32) -> #return_type {
-            let raw_record: Vec<u64> = Vec::from_raw_parts(offset as _, size as _, size as _);
+        unsafe fn #deserializer_fn_name(offset: i32) -> #return_type {
+            let raw_record: Vec<u64> = Vec::from_raw_parts(offset as _, #record_size, #record_size);
 
             #deserializer
 

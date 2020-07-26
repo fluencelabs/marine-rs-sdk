@@ -110,7 +110,7 @@ fn generate_type_prolog(
                         GENERATED_RECORD_DESERIALIZER_PREFIX.to_string() + record_name
                     );
                     quote! {
-                        let #generated_arg_id = #deserializer(#ptr, #size);
+                        let #generated_arg_id = #deserializer(#ptr);
                     }
                 }
                 _ => panic!(

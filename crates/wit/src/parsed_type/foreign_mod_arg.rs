@@ -28,8 +28,17 @@ impl ForeignModArgGlueCodeGenerator for ParsedType {
         let arg = crate::new_ident!(format!("arg_{}", arg_start_id));
 
         match self {
-            ParsedType::Utf8String | ParsedType::ByteVector | ParsedType::Record(_) => {
+            ParsedType::Utf8String | ParsedType::ByteVector => {
                 quote! { #arg.as_ptr() as _, #arg.len() as _ }
+            }
+            ParsedType::Record(record_name) => {
+                let serializer = crate::new_ident!(
+                    crate::token_stream_generator::GENERATED_RECORD_SERIALIZER_PREFIX.to_string()
+                        + record_name
+                );
+                quote! {
+                    #serializer(#arg)
+                }
             }
             _ => quote! { arg },
         }
