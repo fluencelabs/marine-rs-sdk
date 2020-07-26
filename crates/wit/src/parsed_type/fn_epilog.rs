@@ -94,7 +94,7 @@ fn generate_return_expression(ty: &Option<ParsedType>) -> proc_macro2::TokenStre
 fn generate_epilog(ty: &Option<ParsedType>) -> proc_macro2::TokenStream {
     match ty {
         None => quote!(),
-        Some(ty) if !ty.is_integral_type() => quote! {
+        Some(ty) if !ty.is_complex_type() => quote! {
             return result as _;
         },
         Some(ParsedType::Record(record_name)) => {
@@ -105,7 +105,7 @@ fn generate_epilog(ty: &Option<ParsedType>) -> proc_macro2::TokenStream {
                 fluence::internal::set_result_ptr(result_ptr as _);
             }
         }
-        Some(ty) if ty.is_integral_type() => quote! {
+        Some(ty) if ty.is_complex_type() => quote! {
             fluence::internal::set_result_ptr(result.as_ptr() as _);
             fluence::internal::set_result_size(result.len() as _);
             std::mem::forget(result);

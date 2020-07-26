@@ -88,7 +88,7 @@ fn generate_type_prolog(
     let generated_arg_id = new_ident!(format!("converted_arg_{}", generated_arg_id));
 
     match ty {
-        ty if !ty.is_integral_type() => {
+        ty if !ty.is_complex_type() => {
             let supplied_arg_start_id = new_ident!(format!("arg_{}", supplied_arg_start_id));
             quote! {
                 let #generated_arg_id = #supplied_arg_start_id as _;

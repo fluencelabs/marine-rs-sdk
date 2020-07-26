@@ -189,7 +189,7 @@ impl ParsedType {
         .into()
     }
 
-    pub fn is_integral_type(&self) -> bool {
+    pub fn is_complex_type(&self) -> bool {
         match self {
             ParsedType::Boolean
             | ParsedType::I8
