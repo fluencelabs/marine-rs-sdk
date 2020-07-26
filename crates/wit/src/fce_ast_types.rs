@@ -34,8 +34,8 @@ pub struct AstFunctionSignature {
 #[derive(Debug, Clone, PartialEq, Serialize, Deserialize)]
 pub struct AstRecordField {
     // fields of tuple structs haven't got name
-    pub field_name: Option<String>,
-    pub field_type: ParsedType,
+    pub name: Option<String>,
+    pub ty: ParsedType,
 }
 
 #[derive(Clone, Serialize, Deserialize)]

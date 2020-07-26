@@ -52,6 +52,7 @@ pub enum ParsedType {
 
 impl ParsedType {
     pub fn from_type(input_type: &syn::Type) -> syn::Result<Self> {
+        use quote::ToTokens;
         // parses generic param T in Vec<T> to string representation
         fn parse_vec_bracket(args: &syn::PathArguments) -> syn::Result<String> {
             // checks that T is angle bracketed
@@ -121,12 +122,7 @@ impl ParsedType {
             // argument can be given in full path form: ::std::string::String
             // that why the last one used
             .last()
-            .ok_or_else(|| {
-                Error::new(
-                    path.span(),
-                    "The invocation handler should have a non-empty input argument type",
-                )
-            })?;
+            .ok_or_else(|| Error::new(path.span(), "Type should be specified"))?;
 
         match type_segment.ident.to_string().as_str() {
             "i8" => Ok(ParsedType::I8),
@@ -151,10 +147,11 @@ impl ParsedType {
                 },
                 Err(e) => Err(e),
             },
-            type_name => Err(Error::new(
+            _ if !type_segment.arguments.is_empty() => Err(Error::new(
                 type_segment.span(),
-                format!("{} is unsupported", type_name),
+                "type with lifetimes or generics aren't allowed".to_string(),
             )),
+            _ => Ok(ParsedType::Record(path.into_token_stream().to_string())),
         }
     }
 

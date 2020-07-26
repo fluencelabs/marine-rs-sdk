@@ -40,8 +40,8 @@ impl ParseMacroInput for syn::ItemStruct {
                 let field_name = field.ident.as_ref().map(|ident| ident.to_string());
                 let field_type = ParsedType::from_type(&field.ty)?;
                 Ok(AstRecordField {
-                    field_name,
-                    field_type,
+                    name: field_name,
+                    ty: field_type,
                 })
             })
             .collect::<Result<Vec<_>>>()?;

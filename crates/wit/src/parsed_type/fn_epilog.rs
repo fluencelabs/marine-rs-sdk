@@ -14,8 +14,9 @@
  * limitations under the License.
  */
 
-use crate::new_ident;
 use super::ParsedType;
+use crate::new_ident;
+use crate::token_stream_generator::GENERATED_RECORD_SERIALIZER_PREFIX;
 
 use quote::quote;
 
@@ -96,6 +97,14 @@ fn generate_epilog(ty: &Option<ParsedType>) -> proc_macro2::TokenStream {
         Some(ty) if !ty.is_integral_type() => quote! {
             return result as _;
         },
+        Some(ParsedType::Record(record_name)) => {
+            let serializer =
+                crate::new_ident!(GENERATED_RECORD_SERIALIZER_PREFIX.to_string() + record_name);
+            quote! {
+                let result_ptr = #serializer(result);
+                fluence::internal::set_result_ptr(result_ptr as _);
+            }
+        }
         Some(ty) if ty.is_integral_type() => quote! {
             fluence::internal::set_result_ptr(result.as_ptr() as _);
             fluence::internal::set_result_size(result.len() as _);

@@ -40,7 +40,7 @@ mod wasm_type;
 pub use fce_ast_types::*;
 pub use fce_macro_impl::fce;
 pub use parsed_type::ParsedType;
-pub use token_stream_generator::GENERATED_FUNC_PREFIX;
+pub use token_stream_generator::GENERATED_WRAPPER_FUNC_PREFIX;
 pub use token_stream_generator::GENERATED_SECTION_PREFIX;
 pub use token_stream_generator::GENERATED_GLOBAL_PREFIX;
 pub use wasm_type::WasmType;

@@ -37,7 +37,7 @@ impl quote::ToTokens for fce_ast_types::AstFunctionItem {
         );
 
         let signature = &self.signature;
-        let func_name = new_ident!(GENERATED_FUNC_PREFIX.to_string() + &signature.name);
+        let func_name = new_ident!(GENERATED_WRAPPER_FUNC_PREFIX.to_string() + &signature.name);
         let original_func_ident = new_ident!(signature.name);
         let export_func_name = &signature.name;
 
