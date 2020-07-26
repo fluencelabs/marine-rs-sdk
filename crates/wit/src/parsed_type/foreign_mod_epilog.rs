@@ -58,7 +58,18 @@ impl ForeignModEpilogGlueCodeGenerator for Option<ParsedType> {
                     fluence::internal::get_result_size() as _
                 )
             },
-            Some(ParsedType::Record(_)) => unimplemented!(),
+            Some(ParsedType::Record(record_name)) => {
+                let record_deserializer = crate::new_ident!(
+                    crate::token_stream_generator::GENERATED_RECORD_DESERIALIZER_PREFIX.to_string()
+                        + record_name
+                );
+                quote! {
+                    #record_deserializer(
+                        fluence::internal::get_result_ptr() as _,
+                        fluence::internal::get_result_size() as _,
+                    );
+                }
+            }
             _ => panic!(
                 "perhaps new type's been added to ParsedType, and this match became incomplete"
             ),
