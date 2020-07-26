@@ -134,7 +134,7 @@ impl ParsedType {
             "u32" => Ok(ParsedType::U32),
             "u64" => Ok(ParsedType::U64),
             "f32" => Ok(ParsedType::F32),
-            "f64" => Ok(ParsedType::F32),
+            "f64" => Ok(ParsedType::F64),
             "bool" => Ok(ParsedType::Boolean),
             "String" => Ok(ParsedType::Utf8String),
             "Vec" => match parse_vec_bracket(&type_segment.arguments) {

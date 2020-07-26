@@ -45,7 +45,7 @@ impl RecordDeserializerGlueCodeGenerator for fce_ast_types::AstRecordItem {
             let field_d = match &ast_field.ty {
                 ParsedType::Boolean => {
                     quote! {
-                        let #field = raw_record[#value_id] as bool;
+                        let #field = raw_record[#value_id] != 0;
                     }
                 }
                 ParsedType::I8 => {
@@ -95,7 +95,7 @@ impl RecordDeserializerGlueCodeGenerator for fce_ast_types::AstRecordItem {
                 }
                 ParsedType::F64 => {
                     quote! {
-                        let #field = f64::from_bits(raw_record[#value_id as _]);
+                        let #field = f64::from_bits(raw_record[#value_id]);
                     }
                 }
                 ParsedType::Utf8String => {

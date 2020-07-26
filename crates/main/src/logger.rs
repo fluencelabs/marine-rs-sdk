@@ -80,6 +80,7 @@ pub struct WasmLogger {
     level: log::Level,
 }
 
+#[allow(dead_code)]
 impl WasmLogger {
     /// Initializes the global logger with a [`WasmLogger`] instance, sets
     /// `max_log_level` to a given log level.
