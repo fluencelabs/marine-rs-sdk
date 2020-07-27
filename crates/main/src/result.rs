@@ -27,14 +27,14 @@ static mut RESULT_SIZE: AtomicUsize = AtomicUsize::new(0);
 
 #[no_mangle]
 pub unsafe fn get_result_ptr() -> usize {
-    log("sdk.get_result_ptr\n");
+    log(format!("sdk.get_result_ptr, returns {}\n", *RESULT_PTR.get_mut()));
 
     *RESULT_PTR.get_mut()
 }
 
 #[no_mangle]
 pub unsafe fn get_result_size() -> usize {
-    log("sdk.get_result_size\n");
+    log(format!("sdk.get_result_size, returns {}\n", *RESULT_SIZE.get_mut()));
 
     *RESULT_SIZE.get_mut()
 }
