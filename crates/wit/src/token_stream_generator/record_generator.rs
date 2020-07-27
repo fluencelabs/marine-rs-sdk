@@ -108,8 +108,6 @@ fn generate_deserializer_fn(record: &fce_ast_types::AstRecordItem) -> proc_macro
 
             #deserializer
 
-            std::mem::forget(raw_record);
-
             #type_constructor
         }
     }
