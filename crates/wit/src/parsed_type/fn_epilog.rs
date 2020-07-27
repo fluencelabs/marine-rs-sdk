@@ -98,10 +98,10 @@ fn generate_epilog(ty: &Option<ParsedType>) -> proc_macro2::TokenStream {
             return result as _;
         },
         Some(ParsedType::Record(record_name)) => {
-            let serializer =
+            let record_serializer =
                 crate::new_ident!(GENERATED_RECORD_SERIALIZER_PREFIX.to_string() + record_name);
             quote! {
-                let result_ptr = #serializer(result);
+                let result_ptr = crate::#record_serializer(result);
                 fluence::internal::set_result_ptr(result_ptr as _);
             }
         }

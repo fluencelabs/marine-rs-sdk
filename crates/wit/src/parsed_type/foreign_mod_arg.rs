@@ -32,12 +32,12 @@ impl ForeignModArgGlueCodeGenerator for ParsedType {
                 quote! { #arg.as_ptr() as _, #arg.len() as _ }
             }
             ParsedType::Record(record_name) => {
-                let serializer = crate::new_ident!(
+                let record_serializer = crate::new_ident!(
                     crate::token_stream_generator::GENERATED_RECORD_SERIALIZER_PREFIX.to_string()
                         + record_name
                 );
                 quote! {
-                    #serializer(#arg)
+                    crate::#record_serializer(#arg)
                 }
             }
             _ => quote! { arg },

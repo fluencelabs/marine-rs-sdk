@@ -106,11 +106,11 @@ fn generate_type_prolog(
                     let #generated_arg_id = Vec::from_raw_parts(#ptr as _, #size as _, #size as _);
                 },
                 ParsedType::Record(record_name) => {
-                    let deserializer = crate::new_ident!(
+                    let record_deserializer = crate::new_ident!(
                         GENERATED_RECORD_DESERIALIZER_PREFIX.to_string() + record_name
                     );
                     quote! {
-                        let #generated_arg_id = #deserializer(#ptr);
+                        let #generated_arg_id = crate::#record_deserializer(#ptr);
                     }
                 }
                 _ => panic!(

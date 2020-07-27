@@ -64,7 +64,7 @@ impl ForeignModEpilogGlueCodeGenerator for Option<ParsedType> {
                         + record_name
                 );
                 quote! {
-                    #record_deserializer(fluence::internal::get_result_ptr() as _)
+                    crate::#record_deserializer(fluence::internal::get_result_ptr() as _)
                 }
             }
             _ => panic!(

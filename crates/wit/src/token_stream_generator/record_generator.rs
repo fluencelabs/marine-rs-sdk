@@ -76,7 +76,7 @@ fn generate_serializer_fn(record: &fce_ast_types::AstRecordItem) -> proc_macro2:
     } = record.generate_serializer(&record.name);
 
     quote::quote! {
-        pub(crate) fn #serializer_fn_name(record: #record_type) -> i32 {
+        pub(in crate) fn #serializer_fn_name(record: #record_type) -> i32 {
             let mut raw_record = Vec::new();
 
             #serializer
@@ -103,10 +103,12 @@ fn generate_deserializer_fn(record: &fce_ast_types::AstRecordItem) -> proc_macro
         crate::utils::get_record_size(record.fields.iter().map(|ast_field| &ast_field.ty));
 
     quote::quote! {
-        unsafe fn #deserializer_fn_name(offset: i32) -> #return_type {
+        pub(in crate) unsafe fn #deserializer_fn_name(offset: i32) -> #return_type {
             let raw_record: Vec<u64> = Vec::from_raw_parts(offset as _, #record_size, #record_size);
 
             #deserializer
+
+            std::mem::forget(raw_record);
 
             #type_constructor
         }
