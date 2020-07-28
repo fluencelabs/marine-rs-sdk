@@ -60,10 +60,8 @@ impl quote::ToTokens for fce_ast_types::AstFunctionItem {
         let glue_code = quote::quote! {
             #original_func
 
-            #[cfg_attr(
-                target_arch = "wasm32",
-                export_name = #export_func_name
-            )]
+            #[cfg(target_arch = "wasm32")]
+            #[attribute(export_name = #export_func_name)]
             #[no_mangle]
             #[doc(hidden)]
             #[allow(clippy::all)]
