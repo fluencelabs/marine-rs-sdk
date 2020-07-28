@@ -58,16 +58,6 @@ impl ParseMacroInput for syn::ItemStruct {
 }
 
 fn check_record(record: &syn::ItemStruct) -> Result<()> {
-    match record.vis {
-        syn::Visibility::Public(_) => {}
-        _ => {
-            return Err(Error::new(
-                record.span(),
-                "#[fce] could be applied only to public struct",
-            ))
-        }
-    };
-
     if record.generics.lt_token.is_some()
         || record.generics.gt_token.is_some()
         || record.generics.where_clause.is_some()
