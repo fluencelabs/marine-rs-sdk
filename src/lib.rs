@@ -37,8 +37,8 @@
 //! use fluence::fce;
 //!
 //! #[fce]
-//! pub fn get(url: String) -> String {
-//!    // ...
+//! pub fn get(url: String) {
+//!     // ...
 //! }
 //! ```
 //! At now, such functions could have arguments with primitive Rust types and record and only one
