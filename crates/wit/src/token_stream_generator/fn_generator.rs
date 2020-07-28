@@ -61,7 +61,7 @@ impl quote::ToTokens for fce_ast_types::AstFunctionItem {
             #original_func
 
             #[cfg(target_arch = "wasm32")]
-            #[attribute(export_name = #export_func_name)]
+            #[export_name = #export_func_name]
             #[no_mangle]
             #[doc(hidden)]
             #[allow(clippy::all)]
