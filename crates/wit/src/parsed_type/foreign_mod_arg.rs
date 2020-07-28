@@ -31,13 +31,9 @@ impl ForeignModArgGlueCodeGenerator for ParsedType {
             ParsedType::Utf8String | ParsedType::ByteVector => {
                 quote! { #arg.as_ptr() as _, #arg.len() as _ }
             }
-            ParsedType::Record(record_name) => {
-                let record_serializer = crate::new_ident!(
-                    crate::token_stream_generator::GENERATED_RECORD_SERIALIZER_PREFIX.to_string()
-                        + record_name
-                );
+            ParsedType::Record(_) => {
                 quote! {
-                    crate::#record_serializer(#arg)
+                    #arg.__fce_generated_serialize() as _
                 }
             }
             _ => quote! { arg },

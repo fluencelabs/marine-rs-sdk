@@ -16,7 +16,6 @@
 
 use super::ParsedType;
 use crate::new_ident;
-use crate::token_stream_generator::GENERATED_RECORD_SERIALIZER_PREFIX;
 
 use quote::quote;
 
@@ -97,11 +96,9 @@ fn generate_epilog(ty: &Option<ParsedType>) -> proc_macro2::TokenStream {
         Some(ty) if !ty.is_complex_type() => quote! {
             return result as _;
         },
-        Some(ParsedType::Record(record_name)) => {
-            let record_serializer =
-                crate::new_ident!(GENERATED_RECORD_SERIALIZER_PREFIX.to_string() + record_name);
+        Some(ParsedType::Record(_)) => {
             quote! {
-                let result_ptr = crate::#record_serializer(result);
+                let result_ptr = result.__fce_generated_serialize();
                 fluence::internal::set_result_ptr(result_ptr as _);
             }
         }

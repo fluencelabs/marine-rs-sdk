@@ -68,6 +68,10 @@ impl quote::ToTokens for fce_ast_types::AstFunctionItem {
             #[doc(hidden)]
             #[allow(clippy::all)]
             pub unsafe fn #func_name(#(#raw_arg_names: #raw_arg_types),*) #fn_return_type {
+                // brings serialize/deserialize methods for records
+                #[allow(dead_code)]
+                use fluence::internal::FCEStructSerializable;
+
                 // arguments conversation from Wasm types to Rust types
                 #prolog
 

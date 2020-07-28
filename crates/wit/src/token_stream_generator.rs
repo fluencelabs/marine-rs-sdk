@@ -23,8 +23,6 @@ use crate::fce_ast_types::FCEAst;
 use proc_macro2::TokenStream;
 
 pub const GENERATED_WRAPPER_FUNC_PREFIX: &str = "__fce_generated_wrapper_func_";
-pub const GENERATED_RECORD_SERIALIZER_PREFIX: &str = "__fce_generated_record_serializer_";
-pub const GENERATED_RECORD_DESERIALIZER_PREFIX: &str = "__fce_generated_record_deserializer_";
 pub const GENERATED_SECTION_PREFIX: &str = "__fce_generated_section__";
 pub const GENERATED_GLOBAL_PREFIX: &str = "__fce_generated_static_global_";
 

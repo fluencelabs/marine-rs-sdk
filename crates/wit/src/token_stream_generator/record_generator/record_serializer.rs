@@ -17,22 +17,16 @@
 use crate::new_ident;
 use crate::parsed_type::ParsedType;
 use crate::fce_ast_types;
-use crate::token_stream_generator::GENERATED_RECORD_SERIALIZER_PREFIX;
 
 use quote::quote;
 
-pub(super) struct RecordSerializerDescriptor {
-    pub(super) serializer: proc_macro2::TokenStream,
-    pub(super) record_type: syn::Ident,
-}
-
 /// This trait could be used to generate various parts of a record serializer func.
 pub(super) trait RecordSerializerGlueCodeGenerator {
-    fn generate_serializer(&self, record_name: &str) -> RecordSerializerDescriptor;
+    fn generate_serializer(&self) -> proc_macro2::TokenStream;
 }
 
 impl RecordSerializerGlueCodeGenerator for fce_ast_types::AstRecordItem {
-    fn generate_serializer(&self, record_name: &str) -> RecordSerializerDescriptor {
+    fn generate_serializer(&self) -> proc_macro2::TokenStream {
         let mut serializer = proc_macro2::TokenStream::new();
         for (id, field) in self.fields.iter().enumerate() {
             let field_ident = field_ident(field, id);
@@ -50,11 +44,9 @@ impl RecordSerializerGlueCodeGenerator for fce_ast_types::AstRecordItem {
                         std::mem::forget(#field_ident);
                     }
                 }
-                ParsedType::Record(record_name) => {
-                    let record_serializer =
-                        new_ident!(GENERATED_RECORD_SERIALIZER_PREFIX.to_string() + &record_name);
+                ParsedType::Record(_) => {
                     quote! {
-                        raw_record.push(crate::#record_serializer(#field_ident) as _);
+                        raw_record.push(#field_ident.__fce_generated_serialize() as _);
                     }
                 }
                 _ => quote! {
@@ -64,12 +56,8 @@ impl RecordSerializerGlueCodeGenerator for fce_ast_types::AstRecordItem {
 
             serializer.extend(field_serialization);
         }
-        let record_type = new_ident!(record_name);
 
-        RecordSerializerDescriptor {
-            serializer,
-            record_type,
-        }
+        serializer
     }
 }
 
@@ -77,11 +65,11 @@ fn field_ident(field: &fce_ast_types::AstRecordField, id: usize) -> proc_macro2:
     match &field.name {
         Some(name) => {
             let name = new_ident!(name);
-            quote! { record.#name }
+            quote! { self.#name }
         }
         None => {
             let id = new_ident!(format!("{}", id));
-            quote! { record.#id }
+            quote! { self.#id }
         }
     }
 }

@@ -45,6 +45,19 @@ pub use result::get_result_size;
 pub use result::set_result_ptr;
 pub use result::set_result_size;
 
+/// This trait is used to convert structs to a form compatible with
+/// record.lift_memory and record.lower_memory instructions.
+/// Normally, this trait shouldn't be used directly.
+pub trait FCEStructSerializable {
+    // Serialize the provided record to a Vec<u8>, returns pointer to it in a form compatible with
+    // record.lift_memory.
+    // The caller should manage the lifetime of returned pointer.
+    fn __fce_generated_serialize(self) -> *const u8;
+
+    // Deserialize record from a pointer (normally, come from record.lower_memory).
+    unsafe fn __fce_generated_deserialize(record_ptr: *const u8) -> Self;
+}
+
 #[allow(unused_variables)]
 pub(crate) fn log<S: AsRef<str>>(msg: S) {
     // logs will be printed only if debug feature is enabled

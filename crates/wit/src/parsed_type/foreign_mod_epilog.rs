@@ -59,12 +59,9 @@ impl ForeignModEpilogGlueCodeGenerator for Option<ParsedType> {
                 )
             },
             Some(ParsedType::Record(record_name)) => {
-                let record_deserializer = crate::new_ident!(
-                    crate::token_stream_generator::GENERATED_RECORD_DESERIALIZER_PREFIX.to_string()
-                        + record_name
-                );
+                let record_ident = new_ident!(record_name);
                 quote! {
-                    crate::#record_deserializer(fluence::internal::get_result_ptr() as _)
+                    #record_ident::__fce_generated_deserialize(fluence::internal::get_result_ptr() as _)
                 }
             }
             _ => panic!(

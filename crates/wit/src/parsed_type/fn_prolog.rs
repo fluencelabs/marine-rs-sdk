@@ -16,7 +16,6 @@
 
 use super::ParsedType;
 use super::FnArgGlueCodeGenerator;
-use crate::token_stream_generator::GENERATED_RECORD_DESERIALIZER_PREFIX;
 use crate::new_ident;
 use crate::wasm_type::WasmType;
 
@@ -106,11 +105,9 @@ fn generate_type_prolog(
                     let #generated_arg_id = Vec::from_raw_parts(#ptr as _, #size as _, #size as _);
                 },
                 ParsedType::Record(record_name) => {
-                    let record_deserializer = crate::new_ident!(
-                        GENERATED_RECORD_DESERIALIZER_PREFIX.to_string() + record_name
-                    );
+                    let record_ident = new_ident!(record_name);
                     quote! {
-                        let #generated_arg_id = crate::#record_deserializer(#ptr);
+                        let #generated_arg_id = #record_ident::__fce_generated_deserialize(#ptr as _);
                     }
                 }
                 _ => panic!(

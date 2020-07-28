@@ -20,9 +20,6 @@ mod record_deserializer;
 use record_serializer::*;
 use record_deserializer::*;
 
-use super::GENERATED_RECORD_SERIALIZER_PREFIX;
-use super::GENERATED_RECORD_DESERIALIZER_PREFIX;
-
 use crate::new_ident;
 use crate::fce_ast_types;
 
@@ -38,6 +35,7 @@ impl quote::ToTokens for fce_ast_types::AstRecordItem {
             global_static_name,
             section_name
         );
+        let record_name = new_ident!(self.name);
 
         let serializer_fn = generate_serializer_fn(self);
         let deserializer_fn = generate_deserializer_fn(self);
@@ -48,12 +46,11 @@ impl quote::ToTokens for fce_ast_types::AstRecordItem {
             #[cfg(target_arch = "wasm32")]
             #[doc(hidden)]
             #[allow(clippy::all)]
-            #serializer_fn
+            impl fluence::internal::FCEStructSerializable for #record_name {
+                #serializer_fn
 
-            #[cfg(target_arch = "wasm32")]
-            #[doc(hidden)]
-            #[allow(clippy::all)]
-            #deserializer_fn
+                #deserializer_fn
+            }
 
             #[cfg(target_arch = "wasm32")]
             #[doc(hidden)]
@@ -67,16 +64,10 @@ impl quote::ToTokens for fce_ast_types::AstRecordItem {
 }
 
 fn generate_serializer_fn(record: &fce_ast_types::AstRecordItem) -> proc_macro2::TokenStream {
-    let serializer_fn_name =
-        new_ident!(GENERATED_RECORD_SERIALIZER_PREFIX.to_string() + &record.name);
-
-    let RecordSerializerDescriptor {
-        serializer,
-        record_type,
-    } = record.generate_serializer(&record.name);
+    let serializer = record.generate_serializer();
 
     quote::quote! {
-        pub(in crate) fn #serializer_fn_name(record: #record_type) -> i32 {
+        fn __fce_generated_serialize(self) -> *const u8 {
             let mut raw_record = Vec::new();
 
             #serializer
@@ -90,21 +81,17 @@ fn generate_serializer_fn(record: &fce_ast_types::AstRecordItem) -> proc_macro2:
 }
 
 fn generate_deserializer_fn(record: &fce_ast_types::AstRecordItem) -> proc_macro2::TokenStream {
-    let deserializer_fn_name =
-        new_ident!(GENERATED_RECORD_DESERIALIZER_PREFIX.to_string() + &record.name);
-
     let RecordDeserializerDescriptor {
         deserializer,
         type_constructor,
-        return_type,
-    } = record.generate_deserializer(&record.name);
+    } = record.generate_deserializer();
 
     let record_size =
         crate::utils::get_record_size(record.fields.iter().map(|ast_field| &ast_field.ty));
 
     quote::quote! {
-        pub(in crate) unsafe fn #deserializer_fn_name(offset: i32) -> #return_type {
-            let raw_record: Vec<u64> = Vec::from_raw_parts(offset as _, #record_size, #record_size);
+        unsafe fn __fce_generated_deserialize(record_ptr: *const u8) -> Self {
+            let raw_record: Vec<u64> = Vec::from_raw_parts(record_ptr as _, #record_size, #record_size);
 
             #deserializer
 

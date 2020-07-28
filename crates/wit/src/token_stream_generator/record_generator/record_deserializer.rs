@@ -17,25 +17,21 @@
 use crate::new_ident;
 use crate::parsed_type::ParsedType;
 use crate::fce_ast_types;
-use crate::token_stream_generator::GENERATED_RECORD_DESERIALIZER_PREFIX;
 
 use quote::quote;
 
 pub(super) struct RecordDeserializerDescriptor {
     pub(super) deserializer: proc_macro2::TokenStream,
     pub(super) type_constructor: proc_macro2::TokenStream,
-    pub(super) return_type: syn::Ident,
 }
 
 /// This trait could be used to generate various parts of a record serializer func.
 pub(super) trait RecordDeserializerGlueCodeGenerator {
-    fn generate_deserializer(&self, record_name: &str) -> RecordDeserializerDescriptor;
+    fn generate_deserializer(&self) -> RecordDeserializerDescriptor;
 }
 
 impl RecordDeserializerGlueCodeGenerator for fce_ast_types::AstRecordItem {
-    fn generate_deserializer(&self, record_name: &str) -> RecordDeserializerDescriptor {
-        let return_type = new_ident!(record_name);
-
+    fn generate_deserializer(&self) -> RecordDeserializerDescriptor {
         let mut field_values = Vec::with_capacity(self.fields.len());
         let mut deserializer = proc_macro2::TokenStream::new();
         let mut value_id: usize = 0;
@@ -118,11 +114,9 @@ impl RecordDeserializerGlueCodeGenerator for fce_ast_types::AstRecordItem {
                 }
                 ParsedType::Record(record_name) => {
                     let ptr_id = value_id;
-                    let record_deserializer =
-                        new_ident!(GENERATED_RECORD_DESERIALIZER_PREFIX.to_string() + record_name);
-
+                    let record_ident = new_ident!(record_name);
                     quote! {
-                        let #field = crate::#record_deserializer(raw_record[#ptr_id] as _);
+                        let #field = #record_ident::__fce_generated_deserialize(raw_record[#ptr_id] as _);
                     }
                 }
             };
@@ -143,14 +137,14 @@ impl RecordDeserializerGlueCodeGenerator for fce_ast_types::AstRecordItem {
                     .collect::<Vec<_>>();
 
                 quote! {
-                    #return_type {
+                    Self {
                         #(#field_names: #field_values),*
                     }
                 }
             }
             Some(_) => {
                 quote! {
-                    #return_type (
+                    Self (
                         #(#field_values),*
                     )
                 }
@@ -161,7 +155,6 @@ impl RecordDeserializerGlueCodeGenerator for fce_ast_types::AstRecordItem {
         RecordDeserializerDescriptor {
             deserializer,
             type_constructor,
-            return_type,
         }
     }
 }
