@@ -14,7 +14,6 @@
  * limitations under the License.
  */
 
-use super::*;
 use crate::fce_ast_types;
 use crate::parsed_type::FnEpilogGlueCodeGenerator;
 use crate::parsed_type::FnEpilogDescriptor;
@@ -37,7 +36,11 @@ impl quote::ToTokens for fce_ast_types::AstFunctionItem {
         );
 
         let signature = &self.signature;
-        let func_name = new_ident!(GENERATED_WRAPPER_FUNC_PREFIX.to_string() + &signature.name);
+        let func_name = new_ident!(format!(
+            "{}{}",
+            super::GENERATED_WRAPPER_FUNC_PREFIX,
+            signature.name
+        ));
         let original_func_ident = new_ident!(signature.name);
         let export_func_name = &signature.name;
 

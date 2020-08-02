@@ -14,7 +14,6 @@
  * limitations under the License.
  */
 
-use super::GENERATED_WRAPPER_FUNC_PREFIX;
 use crate::fce_ast_types;
 use crate::new_ident;
 
@@ -88,8 +87,9 @@ fn generate_extern_section_items(extern_item: &fce_ast_types::AstExternModItem) 
     token_stream
 }
 
+#[rustfmt::skip]
 fn generate_import_name(import_name: &str) -> syn::Ident {
-    crate::new_ident!(format!("{}_{}", GENERATED_WRAPPER_FUNC_PREFIX, import_name))
+    crate::new_ident!(format!("{}_{}", super::GENERATED_WRAPPER_FUNC_PREFIX, import_name))
 }
 
 fn generate_wrapper_functions(extern_item: &fce_ast_types::AstExternModItem) -> TokenStream {

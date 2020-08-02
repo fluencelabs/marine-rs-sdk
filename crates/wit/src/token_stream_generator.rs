@@ -20,14 +20,12 @@ mod record_generator;
 
 use crate::fce_ast_types::FCEAst;
 
-use proc_macro2::TokenStream;
-
 pub const GENERATED_WRAPPER_FUNC_PREFIX: &str = "__fce_generated_wrapper_func_";
 pub const GENERATED_SECTION_PREFIX: &str = "__fce_generated_section__";
 pub const GENERATED_GLOBAL_PREFIX: &str = "__fce_generated_static_global_";
 
 impl quote::ToTokens for FCEAst {
-    fn to_tokens(&self, tokens: &mut TokenStream) {
+    fn to_tokens(&self, tokens: &mut proc_macro2::TokenStream) {
         match self {
             FCEAst::Function(ast_function) => ast_function.to_tokens(tokens),
             FCEAst::ExternMod(ast_extern) => ast_extern.to_tokens(tokens),

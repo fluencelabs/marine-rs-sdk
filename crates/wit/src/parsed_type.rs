@@ -32,6 +32,7 @@ use serde::Deserialize;
 use syn::parse::Error;
 use syn::spanned::Spanned;
 
+/// An internal representation of supported Rust types.
 #[derive(Debug, Clone, PartialEq, Serialize, Deserialize)]
 pub enum ParsedType {
     I8,
@@ -47,7 +48,7 @@ pub enum ParsedType {
     Boolean,
     Utf8String,
     ByteVector,
-    Record(String),
+    Record(String), // full type name
 }
 
 impl ParsedType {

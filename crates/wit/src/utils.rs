@@ -31,15 +31,20 @@ macro_rules! prepare_global_data {
         let $data_size = $data.len();
         let $data = syn::LitByteStr::new(&$data, proc_macro2::Span::call_site());
 
-        let $global_static_name = crate::new_ident!(
-            crate::token_stream_generator::GENERATED_GLOBAL_PREFIX.to_string()
-                + &$name.replace(".", "_")
+        let $global_static_name = crate::new_ident!(format!(
+            "{}{}",
+            crate::token_stream_generator::GENERATED_GLOBAL_PREFIX,
+            $name.replace(".", "_"),
+        ));
+        let $section_name = format!(
+            "{}{}",
+            crate::token_stream_generator::GENERATED_SECTION_PREFIX,
+            $name.replace(".", "_"),
         );
-        let $section_name = crate::token_stream_generator::GENERATED_SECTION_PREFIX.to_string()
-            + &$name.replace(".", "_");
     };
 }
 
+/// Calculate record size in an internal serialized view.
 pub fn get_record_size<'a>(
     fields: impl Iterator<Item = &'a crate::parsed_type::ParsedType>,
 ) -> usize {
@@ -53,6 +58,7 @@ pub fn get_record_size<'a>(
             _ => 1,
         };
 
+        // internally record is being serialized to a vector of u64.
         size += std::mem::size_of::<u64>() * params_count;
     }
 
