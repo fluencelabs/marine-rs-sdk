@@ -22,9 +22,9 @@ pub(crate) trait FnArgGlueCodeGenerator {
     fn generate_arguments(&self) -> Vec<WasmType>;
 }
 
-impl FnArgGlueCodeGenerator for ParsedType {
+impl FnArgGlueCodeGenerator for (String, ParsedType) {
     fn generate_arguments(&self) -> Vec<WasmType> {
-        match self {
+        match self.1 {
             ParsedType::Boolean
             | ParsedType::I8
             | ParsedType::I16

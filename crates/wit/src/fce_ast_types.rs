@@ -25,7 +25,7 @@ pub struct AstFunctionSignature {
     #[serde(skip)]
     pub visibility: Option<syn::Visibility>,
     pub name: String,
-    pub input_types: Vec<ParsedType>,
+    pub arguments: Vec<(String, ParsedType)>,
     // fce supports only one return value now,
     // waiting for adding multi-value support in Wasmer.
     pub output_type: Option<ParsedType>,

@@ -44,7 +44,7 @@ pub(crate) trait FnPrologGlueCodeGenerator {
     fn generate_prolog(&self) -> FnPrologDescriptor;
 }
 
-impl FnPrologGlueCodeGenerator for Vec<ParsedType> {
+impl FnPrologGlueCodeGenerator for Vec<(String, ParsedType)> {
     fn generate_prolog(&self) -> FnPrologDescriptor {
         let mut prolog = proc_macro2::TokenStream::new();
         let mut args: Vec<syn::Ident> = Vec::with_capacity(self.len());
@@ -52,9 +52,9 @@ impl FnPrologGlueCodeGenerator for Vec<ParsedType> {
         let mut raw_arg_types = Vec::with_capacity(self.len());
 
         let mut input_type_id = 0;
-        for input_type in self {
-            let type_prolog = generate_type_prolog(input_type, input_type_id, input_type_id);
-            let curr_raw_arg_types = input_type.generate_arguments();
+        for arg in self {
+            let type_prolog = generate_type_prolog(&arg.1, input_type_id, input_type_id);
+            let curr_raw_arg_types = arg.generate_arguments();
 
             args.push(new_ident!(format!("converted_arg_{}", input_type_id)));
 
