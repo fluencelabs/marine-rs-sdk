@@ -31,11 +31,15 @@
 )]
 #![warn(rust_2018_idioms)]
 
+mod call_parameters;
 mod export_allocator;
 #[cfg(any(feature = "debug", feature = "logger"))]
 mod logger;
 mod result;
 
+pub use call_parameters::CallParameters;
+#[cfg(not(feature = "fce"))]
+pub use call_parameters::get_call_parameters;
 pub use export_allocator::allocate;
 pub use export_allocator::deallocate;
 #[cfg(feature = "logger")]

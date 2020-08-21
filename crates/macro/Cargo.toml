@@ -18,3 +18,7 @@ proc-macro = true
 
 [dependencies]
 fluence-sdk-wit = { path = "../wit", version = "=0.2.0" }
+
+[features]
+# Indicates that this crate is included to the Fluence Rust sdk (it affects internal path adjusting)
+fce = ["fluence-sdk-wit/fce"]

@@ -71,6 +71,8 @@ extern crate fluence_sdk_macro;
 extern crate fluence_sdk_main;
 
 pub use fluence_sdk_macro::fce;
+pub use fluence_sdk_main::CallParameters;
+pub use fluence_sdk_main::get_call_parameters;
 #[cfg(feature = "logger")]
 pub use fluence_sdk_main::WasmLogger;
 
