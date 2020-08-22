@@ -90,7 +90,7 @@ fn generate_deserializer_fn(record: &fce_ast_types::AstRecordItem) -> proc_macro
         crate::utils::get_record_size(record.fields.iter().map(|ast_field| &ast_field.ty));
 
     quote::quote! {
-        unsafe pub fn __fce_generated_deserialize(record_ptr: *const u8) -> Self {
+        pub unsafe fn __fce_generated_deserialize(record_ptr: *const u8) -> Self {
             let raw_record: Vec<u64> = Vec::from_raw_parts(record_ptr as _, #record_size, #record_size);
 
             #deserializer
