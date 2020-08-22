@@ -41,6 +41,7 @@ impl quote::ToTokens for fce_ast_types::AstExternModItem {
         let glue_code = quote! {
             #[link(wasm_import_module = #wasm_import_module_name)]
             #[cfg(target_arch = "wasm32")]
+            #[repr(C)]
             extern "C" {
                 #generated_imports
             }
@@ -120,18 +121,16 @@ fn generate_wrapper_functions(extern_item: &fce_ast_types::AstExternModItem) -> 
             #[cfg(target_arch = "wasm32")]
             #[doc(hidden)]
             #[allow(clippy::all)]
-            #visibility fn #func_name(#(#arg_names: #arg_types), *) #return_type {
+            #visibility unsafe fn #func_name(#(#arg_names: #arg_types), *) #return_type {
                 // brings serialize/deserialize methods for records
                 #[allow(dead_code)]
                 use fluence::internal::FCEStructSerializable;
 
-                unsafe {
-                    // calling the original function with converted args
-                    #return_expression #import_func_name(#(#raw_args), *);
+                // calling the original function with converted args
+                #return_expression #import_func_name(#(#raw_args), *);
 
-                    // return value conversation from Wasm type to a Rust type
-                    #epilog
-                }
+                // return value conversation from Wasm type to a Rust type
+                #epilog
             }
         };
 
