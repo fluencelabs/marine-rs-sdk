@@ -40,25 +40,13 @@ impl quote::ToTokens for fce_ast_types::AstRecordItem {
         let serializer_fn = generate_serializer_fn(self);
         let deserializer_fn = generate_deserializer_fn(self);
 
-        #[cfg(feature = "fce")]
-        let trait_path = || {
-            quote::quote! { crate::FCEStructSerializable }
-        };
-
-        #[cfg(not(feature = "fce"))]
-        let trait_path = || {
-            quote::quote! { fluence::internal::FCEStructSerializable }
-        };
-
-        let trait_path = trait_path();
-
         let glue_code = quote::quote! {
             #original
 
             #[cfg(any(target_arch = "wasm32", feature = "fce"))]
             #[doc(hidden)]
             #[allow(clippy::all)]
-            impl #trait_path for #record_name {
+            impl #record_name {
                 #serializer_fn
 
                 #deserializer_fn

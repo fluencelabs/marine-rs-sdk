@@ -121,10 +121,6 @@ fn generate_wrapper_functions(extern_item: &fce_ast_types::AstExternModItem) -> 
             #[doc(hidden)]
             #[allow(clippy::all)]
             #visibility fn #func_name(#(#arg_names: #arg_types), *) #return_type {
-                // brings serialize/deserialize methods for records
-                #[allow(dead_code)]
-                use fluence::internal::FCEStructSerializable;
-
                 unsafe {
                     // calling the original function with converted args
                     #return_expression #import_func_name(#(#raw_args), *);
