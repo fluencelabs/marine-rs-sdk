@@ -67,7 +67,7 @@ fn generate_serializer_fn(record: &fce_ast_types::AstRecordItem) -> proc_macro2:
     let serializer = record.generate_serializer();
 
     quote::quote! {
-        fn __fce_generated_serialize(&self) -> *const u8 {
+        pub fn __fce_generated_serialize(&self) -> *const u8 {
             let mut raw_record: Vec<u64> = Vec::new();
 
             #serializer
@@ -90,7 +90,7 @@ fn generate_deserializer_fn(record: &fce_ast_types::AstRecordItem) -> proc_macro
         crate::utils::get_record_size(record.fields.iter().map(|ast_field| &ast_field.ty));
 
     quote::quote! {
-        unsafe fn __fce_generated_deserialize(record_ptr: *const u8) -> Self {
+        unsafe pub fn __fce_generated_deserialize(record_ptr: *const u8) -> Self {
             let raw_record: Vec<u64> = Vec::from_raw_parts(record_ptr as _, #record_size, #record_size);
 
             #deserializer
