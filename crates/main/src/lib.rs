@@ -56,7 +56,7 @@ pub trait FCEStructSerializable {
     // Serialize the provided record to a Vec<u8>, returns pointer to it in a form compatible with
     // record.lift_memory.
     // The caller should manage the lifetime of returned pointer.
-    fn __fce_generated_serialize(self) -> *const u8;
+    fn __fce_generated_serialize(&self) -> *const u8;
 
     // Deserialize record from a pointer (normally, come from record.lower_memory).
     unsafe fn __fce_generated_deserialize(record_ptr: *const u8) -> Self;
