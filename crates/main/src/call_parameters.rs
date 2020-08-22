@@ -18,7 +18,7 @@ use fluence_sdk_macro::fce;
 
 /// This struct contains parameters that would be accessible by Wasm modules.
 #[fce]
-#[derive(Clone, PartialEq, Default, Eq, Debug)]
+#[derive(Clone, PartialEq, Default, Eq, Debug, serde::Serialize, serde::Deserialize)]
 pub struct CallParameters {
     pub call_id: String,
     pub user_name: String,
