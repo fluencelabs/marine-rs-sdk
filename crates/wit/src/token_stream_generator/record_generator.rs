@@ -43,7 +43,7 @@ impl quote::ToTokens for fce_ast_types::AstRecordItem {
         let glue_code = quote::quote! {
             #original
 
-            #[cfg(any(target_arch = "wasm32", feature = "fce"))]
+            #[cfg(any(target_arch = "wasm32", feature = "used_in_sdk"))]
             #[doc(hidden)]
             #[allow(clippy::all)]
             impl #record_name {

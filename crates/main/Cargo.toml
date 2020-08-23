@@ -19,7 +19,7 @@ crate-type = ["rlib"]
 
 [dependencies]
 log = { version = "0.4.8", features = ["std"] }
-fluence-sdk-macro = { path = "../macro", features = ["fce"] }
+fluence-sdk-macro = { path = "../macro", features = ["used_in_sdk"] }
 serde = "1.0.115"
 
 [dev-dependencies]
@@ -32,6 +32,3 @@ debug = []
 
 # Enable logger (this will cause log_utf8_string to appear in imports)
 logger = []
-
-# Indicates that this crate is included to the Fluence Rust sdk (it affects internal path adjusting)
-fce = ["fluence-sdk-macro/fce"]

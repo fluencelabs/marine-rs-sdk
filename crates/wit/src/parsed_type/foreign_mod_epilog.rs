@@ -73,12 +73,12 @@ impl ForeignModEpilogGlueCodeGenerator for Option<ParsedType> {
     }
 }
 
-#[cfg(not(feature = "fce"))]
+#[cfg(not(feature = "used_in_sdk"))]
 fn get_crate_path() -> proc_macro2::TokenStream {
     quote! { fluence::internal }
 }
 
-#[cfg(feature = "fce")]
+#[cfg(feature = "used_in_sdk")]
 fn get_crate_path() -> proc_macro2::TokenStream {
     quote! { crate }
 }

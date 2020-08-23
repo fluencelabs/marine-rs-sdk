@@ -37,7 +37,7 @@ impl CallParameters {
     }
 }
 
-#[cfg(not(feature = "fce"))]
+#[cfg(not(feature = "used_in_sdk"))]
 #[fce]
 #[link(wasm_import_module = "host")]
 #[allow(improper_ctypes)]
