@@ -41,7 +41,6 @@ impl quote::ToTokens for fce_ast_types::AstExternModItem {
         let glue_code = quote! {
             #[link(wasm_import_module = #wasm_import_module_name)]
             #[cfg(target_arch = "wasm32")]
-            #[repr(C)]
             extern "C" {
                 #generated_imports
             }
