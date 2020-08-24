@@ -38,7 +38,7 @@ mod logger;
 mod result;
 
 pub use call_parameters::CallParameters;
-#[cfg(target_arch = "wasm")]
+#[cfg(target_arch = "wasm32")]
 pub use call_parameters::get_call_parameters;
 pub use export_allocator::allocate;
 pub use export_allocator::deallocate;

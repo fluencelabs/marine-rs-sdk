@@ -40,7 +40,7 @@ impl CallParameters {
     }
 }
 
-#[cfg(target_arch = "wasm")]
+#[cfg(target_arch = "wasm32")]
 #[fce]
 #[link(wasm_import_module = "host")]
 #[allow(improper_ctypes)]
