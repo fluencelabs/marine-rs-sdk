@@ -16,10 +16,10 @@
 
 use crate::fce_ast_types;
 use crate::new_ident;
+use crate::parsed_type::*;
 
 use proc_macro2::TokenStream;
 use quote::quote;
-use crate::parsed_type::*;
 
 impl quote::ToTokens for fce_ast_types::AstExternModItem {
     fn to_tokens(&self, tokens: &mut TokenStream) {
