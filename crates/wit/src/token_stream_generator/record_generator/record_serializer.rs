@@ -41,6 +41,7 @@ impl RecordSerializerGlueCodeGenerator for fce_ast_types::AstRecordItem {
                     quote! {
                         raw_record.push(#field_ident.as_ptr() as _);
                         raw_record.push(#field_ident.len() as _);
+                        std::mem::forget(#field_ident);
                     }
                 }
                 ParsedType::Record(_) => {

@@ -22,17 +22,20 @@ use fluence_sdk_macro::fce;
 pub struct CallParameters {
     pub call_id: String,
     pub user_name: String,
+    pub application_id: String,
 }
 
 impl CallParameters {
-    pub fn new<C, U>(call_id: C, user_name: U) -> Self
+    pub fn new<C, U, A>(call_id: C, user_name: U, application_id: A) -> Self
     where
         C: Into<String>,
         U: Into<String>,
+        A: Into<String>,
     {
         Self {
             call_id: call_id.into(),
             user_name: user_name.into(),
+            application_id: application_id.into(),
         }
     }
 }
