@@ -60,7 +60,11 @@ impl ForeignModEpilogGlueCodeGenerator for Option<ParsedType> {
             },
             Some(ParsedType::Record(record_name)) => {
                 let record_ident = new_ident!(record_name);
-                let crate_path = get_crate_path();
+                let crate_path = if cfg!(feature = "used_in_sdk") {
+                    quote! { crate }
+                } else {
+                    quote! { fluence::internal }
+                };
 
                 quote! {
                     #record_ident::__fce_generated_deserialize(#crate_path::get_result_ptr() as _)
@@ -71,14 +75,4 @@ impl ForeignModEpilogGlueCodeGenerator for Option<ParsedType> {
             ),
         }
     }
-}
-
-#[cfg(not(feature = "used_in_sdk"))]
-fn get_crate_path() -> proc_macro2::TokenStream {
-    quote! { fluence::internal }
-}
-
-#[cfg(feature = "used_in_sdk")]
-fn get_crate_path() -> proc_macro2::TokenStream {
-    quote! { crate }
 }

@@ -33,4 +33,5 @@ debug = []
 # Enable logger (this will cause log_utf8_string to appear in imports)
 logger = []
 
-fce = []
+# Indicates that this crate is used inside FCE, it allow to generate impl block for CallParameters
+used_in_fce = []

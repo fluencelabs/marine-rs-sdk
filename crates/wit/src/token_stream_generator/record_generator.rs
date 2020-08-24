@@ -43,7 +43,9 @@ impl quote::ToTokens for fce_ast_types::AstRecordItem {
         let glue_code = quote::quote! {
             #original
 
-            #[cfg(any(target_arch = "wasm32", feature = "used_in_sdk"))]
+            // used_id_fce is a special feature that indicates that this struct will be used inside
+            // FCE for some internal needs
+            #[cfg(any(target_arch = "wasm32", feature = "used_in_fce"))]
             #[doc(hidden)]
             #[allow(clippy::all)]
             impl #record_name {
