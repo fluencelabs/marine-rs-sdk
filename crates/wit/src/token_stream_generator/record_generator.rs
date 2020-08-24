@@ -67,7 +67,7 @@ fn generate_serializer_fn(record: &fce_ast_types::AstRecordItem) -> proc_macro2:
     let serializer = record.generate_serializer();
 
     quote::quote! {
-        pub fn __fce_generated_serialize(&self) -> *const u8 {
+        pub fn __fce_generated_serialize(self) -> *const u8 {
             let mut raw_record: Vec<u64> = Vec::new();
 
             #serializer
