@@ -16,10 +16,10 @@
 
 use crate::fce_ast_types;
 use crate::new_ident;
+use crate::parsed_type::*;
 
 use proc_macro2::TokenStream;
 use quote::quote;
-use crate::parsed_type::*;
 
 impl quote::ToTokens for fce_ast_types::AstExternModItem {
     fn to_tokens(&self, tokens: &mut TokenStream) {
@@ -121,10 +121,6 @@ fn generate_wrapper_functions(extern_item: &fce_ast_types::AstExternModItem) -> 
             #[doc(hidden)]
             #[allow(clippy::all)]
             #visibility unsafe fn #func_name(#(#arg_names: #arg_types), *) #return_type {
-                // brings serialize/deserialize methods for records
-                #[allow(dead_code)]
-                use fluence::internal::FCEStructSerializable;
-
                 // calling the original function with converted args
                 #return_expression #import_func_name(#(#raw_args), *);
 

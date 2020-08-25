@@ -60,6 +60,7 @@ impl ForeignModEpilogGlueCodeGenerator for Option<ParsedType> {
             },
             Some(ParsedType::Record(record_name)) => {
                 let record_ident = new_ident!(record_name);
+
                 quote! {
                     #record_ident::__fce_generated_deserialize(fluence::internal::get_result_ptr() as _)
                 }

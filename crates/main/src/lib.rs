@@ -31,11 +31,15 @@
 )]
 #![warn(rust_2018_idioms)]
 
+mod call_parameters;
 mod export_allocator;
 #[cfg(any(feature = "debug", feature = "logger"))]
 mod logger;
 mod result;
 
+pub use call_parameters::CallParameters;
+#[cfg(target_arch = "wasm32")]
+pub use call_parameters::get_call_parameters;
 pub use export_allocator::allocate;
 pub use export_allocator::deallocate;
 #[cfg(feature = "logger")]
@@ -44,19 +48,6 @@ pub use result::get_result_ptr;
 pub use result::get_result_size;
 pub use result::set_result_ptr;
 pub use result::set_result_size;
-
-/// This trait is used to convert structs to a form compatible with
-/// record.lift_memory and record.lower_memory instructions.
-/// Normally, this trait shouldn't be used directly.
-pub trait FCEStructSerializable {
-    // Serialize the provided record to a Vec<u8>, returns pointer to it in a form compatible with
-    // record.lift_memory.
-    // The caller should manage the lifetime of returned pointer.
-    fn __fce_generated_serialize(self) -> *const u8;
-
-    // Deserialize record from a pointer (normally, come from record.lower_memory).
-    unsafe fn __fce_generated_deserialize(record_ptr: *const u8) -> Self;
-}
 
 #[allow(unused_variables)]
 pub(crate) fn log<S: AsRef<str>>(msg: S) {
