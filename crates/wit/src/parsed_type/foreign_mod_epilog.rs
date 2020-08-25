@@ -60,14 +60,9 @@ impl ForeignModEpilogGlueCodeGenerator for Option<ParsedType> {
             },
             Some(ParsedType::Record(record_name)) => {
                 let record_ident = new_ident!(record_name);
-                let crate_path = if cfg!(feature = "used_in_sdk") {
-                    quote! { crate }
-                } else {
-                    quote! { fluence::internal }
-                };
 
                 quote! {
-                    #record_ident::__fce_generated_deserialize(#crate_path::get_result_ptr() as _)
+                    #record_ident::__fce_generated_deserialize(fluence::internal::get_result_ptr() as _)
                 }
             }
             _ => panic!(

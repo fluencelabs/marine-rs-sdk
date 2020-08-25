@@ -19,7 +19,7 @@ crate-type = ["rlib"]
 
 [dependencies]
 log = { version = "0.4.8", features = ["std"] }
-fluence-sdk-macro = { path = "../macro", features = ["used_in_sdk"] }
+fluence-sdk-macro = { path = "../macro" }
 serde = "1.0.115"
 
 [dev-dependencies]

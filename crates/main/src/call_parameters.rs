@@ -40,11 +40,22 @@ impl CallParameters {
     }
 }
 
+/// This functions takes from host current call parameters.
+/// Beware that this implies import function call which takes some time.
 #[cfg(target_arch = "wasm32")]
-#[fce]
+pub fn get_call_parameters() -> CallParameters {
+    // it's safe until it is executed on standard Fluence node with appropriate import function
+    unsafe {
+        let raw_call_parameters = get_call_raw_parameters();
+        CallParameters::__fce_generated_deserialize(raw_call_parameters)
+    }
+}
+
+#[cfg(target_arch = "wasm32")]
 #[link(wasm_import_module = "host")]
 #[allow(improper_ctypes)]
 extern "C" {
-    // returns current call parameters
-    pub fn get_call_parameters() -> CallParameters;
+    // returns serialized current call parameters
+    #[link_name = "get_call_parameters"]
+    fn get_call_raw_parameters() -> *const u8;
 }
