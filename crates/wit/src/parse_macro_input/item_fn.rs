@@ -50,7 +50,13 @@ pub(super) fn try_to_ast_signature(
                 _ => unimplemented!(),
             };
             Ok((
-                pat.pat.to_token_stream().to_string(),
+                pat.pat
+                    .to_token_stream()
+                    .to_string()
+                    .split(' ')
+                    .last()
+                    .unwrap_or_default()
+                    .to_string(),
                 ParsedType::from_type(pat.ty.as_ref())?,
             ))
         })
