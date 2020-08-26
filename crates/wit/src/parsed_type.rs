@@ -114,7 +114,7 @@ impl ParsedType {
             syn::Type::Path(path) => Ok(&path.path),
             _ => Err(Error::new(
                 input_type.span(),
-                "Incorrect argument type - only Vec<u8> and String are supported",
+                "Incorrect argument type - passing only by value is supported now",
             )),
         }?;
 
@@ -152,17 +152,9 @@ impl ParsedType {
                 type_segment.span(),
                 "type with lifetimes or generics aren't allowed".to_string(),
             )),
-            _ => {
-                let arg_name = (&type_segment.ident)
-                    .into_token_stream()
-                    .to_string()
-                    .split(' ')
-                    .last()
-                    .unwrap_or_default()
-                    .to_string();
-
-                Ok(ParsedType::Record(arg_name))
-            }
+            _ => Ok(ParsedType::Record(
+                (&type_segment.ident).into_token_stream().to_string(),
+            )),
         }
     }
 

@@ -37,7 +37,14 @@ impl ParseMacroInput for syn::ItemStruct {
             .iter()
             .map(|field| {
                 check_field(field)?;
-                let field_name = field.ident.as_ref().map(|ident| ident.to_string());
+                let field_name = field.ident.as_ref().map(|ident| {
+                    ident
+                        .to_string()
+                        .split(' ')
+                        .last()
+                        .unwrap_or_default()
+                        .to_string()
+                });
                 let field_type = ParsedType::from_type(&field.ty)?;
                 Ok(AstRecordField {
                     name: field_name,
