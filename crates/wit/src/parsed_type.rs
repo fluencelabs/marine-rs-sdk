@@ -48,7 +48,7 @@ pub enum ParsedType {
     Boolean,
     Utf8String,
     ByteVector,
-    Record(String), // full type name
+    Record(String), // short type name
 }
 
 impl ParsedType {
@@ -152,14 +152,14 @@ impl ParsedType {
                 type_segment.span(),
                 "type with lifetimes or generics aren't allowed".to_string(),
             )),
-            _ => Ok(ParsedType::Record(path.into_token_stream().to_string())),
+            _ => Ok(ParsedType::Record((&type_segment.ident).into_token_stream().to_string())),
         }
     }
 
     pub fn from_fn_arg(fn_arg: &syn::FnArg) -> syn::Result<Self> {
         match fn_arg {
             syn::FnArg::Typed(arg) => ParsedType::from_type(&arg.ty),
-            _ => Err(Error::new(fn_arg.span(), "Unknown argument")),
+            _ => Err(Error::new(fn_arg.span(), "`self` argument types aren't supported")),
         }
     }
 

@@ -44,17 +44,17 @@ pub(super) fn try_to_ast_signature(
 
     let arguments = inputs
         .iter()
-        .map(|arg| {
+        .map(|arg| -> Result<(String, ParsedType)> {
             let pat = match arg {
-                syn::FnArg::Typed(arg) => &arg.pat,
+                syn::FnArg::Typed(arg) => arg,
                 _ => unimplemented!(),
             };
-            (
-                pat.to_token_stream().to_string(),
-                ParsedType::from_fn_arg(arg).unwrap()
-            )
+            Ok((
+                pat.pat.to_token_stream().to_string(),
+                ParsedType::from_type(pat.ty.as_ref())?,
+            ))
         })
-        .collect::<Vec<(_,_)>>();
+        .collect::<Result<Vec<(_, _)>>>()?;
 
     let output_type = ParsedType::from_return_type(&output)?;
 
