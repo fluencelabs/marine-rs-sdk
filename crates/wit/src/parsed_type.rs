@@ -152,14 +152,27 @@ impl ParsedType {
                 type_segment.span(),
                 "type with lifetimes or generics aren't allowed".to_string(),
             )),
-            _ => Ok(ParsedType::Record((&type_segment.ident).into_token_stream().to_string())),
+            _ => {
+                let arg_name = (&type_segment.ident)
+                    .into_token_stream()
+                    .to_string()
+                    .split(' ')
+                    .last()
+                    .unwrap_or_default()
+                    .to_string();
+
+                Ok(ParsedType::Record(arg_name))
+            }
         }
     }
 
     pub fn from_fn_arg(fn_arg: &syn::FnArg) -> syn::Result<Self> {
         match fn_arg {
             syn::FnArg::Typed(arg) => ParsedType::from_type(&arg.ty),
-            _ => Err(Error::new(fn_arg.span(), "`self` argument types aren't supported")),
+            _ => Err(Error::new(
+                fn_arg.span(),
+                "`self` argument types aren't supported",
+            )),
         }
     }
 
