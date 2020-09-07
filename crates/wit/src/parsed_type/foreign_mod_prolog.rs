@@ -56,11 +56,10 @@ pub(crate) trait ForeignModPrologGlueCodeGenerator {
 impl ForeignModPrologGlueCodeGenerator for Vec<ParsedType> {
     fn generate_wrapper_prolog(&self) -> WrapperDescriptor {
         use crate::parsed_type::foreign_mod_arg::ForeignModArgGlueCodeGenerator;
-        use quote::ToTokens;
 
         let arg_types: Vec<proc_macro2::TokenStream> = self
             .iter()
-            .map(|input_type| new_ident!(input_type.to_text_type()).to_token_stream())
+            .map(|input_type| input_type.to_token_stream())
             .collect();
 
         let arg_names: Vec<syn::Ident> = arg_types

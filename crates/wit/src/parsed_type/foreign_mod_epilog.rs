@@ -31,7 +31,7 @@ impl ForeignModEpilogGlueCodeGenerator for Option<ParsedType> {
     fn generate_wrapper_return_type(&self) -> proc_macro2::TokenStream {
         match self {
             Some(ty) => {
-                let ty = new_ident!(ty.to_text_type());
+                let ty = ty.to_token_stream();
                 quote! { -> #ty }
             }
             None => quote!(),
