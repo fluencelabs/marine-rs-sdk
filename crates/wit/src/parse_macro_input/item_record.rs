@@ -71,6 +71,9 @@ fn check_record(record: &syn::ItemStruct) -> Result<()> {
     Ok(())
 }
 
+/// Check that record fields satisfy the following requirements:
+///  - all fields must be public
+///  - field must have only doc attributes
 fn check_field(field: &syn::Field) -> Result<()> {
     match field.vis {
         syn::Visibility::Public(_) => {}
@@ -82,7 +85,16 @@ fn check_field(field: &syn::Field) -> Result<()> {
         }
     };
 
-    if !field.attrs.is_empty() {
+    const DOC_ATTR_NAME: &str = "doc";
+
+    // Check that all attributes are doc attributes
+    if !field.attrs.iter().all(|attr| {
+        let meta = match attr.parse_meta() {
+            Ok(meta) => meta,
+            Err(_) => return false,
+        };
+        meta.path().is_ident(DOC_ATTR_NAME)
+    }) {
         return Err(Error::new(field.span(), "field attributes isn't allowed"));
     }
 
