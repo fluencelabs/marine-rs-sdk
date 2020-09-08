@@ -74,7 +74,7 @@ impl ForeignModPrologGlueCodeGenerator for Vec<ParsedType> {
                 arg_names.push(arg_ident.clone());
 
                 if ty.is_complex_type() {
-                    arg_transforms.extend(quote::quote! { let #arg_ident = std::mem::ManuallyDrop::new(#arg_ident); });
+                    arg_transforms.extend(quote::quote! { let mut #arg_ident = std::mem::ManuallyDrop::new(#arg_ident); });
                     arg_drops.extend(quote::quote! { std::mem::ManuallyDrop::drop(&mut #arg_ident); });
                 }
 
