@@ -29,7 +29,7 @@ impl FnArgGlueCodeGenerator for (String, ParsedType) {
             ParsedType::I8 => vec![RustType::I8],
             ParsedType::I16 => vec![RustType::I16],
             ParsedType::I32 => vec![RustType::I32],
-            ParsedType::I64  => vec![RustType::I64],
+            ParsedType::I64 => vec![RustType::I64],
             ParsedType::U8 => vec![RustType::U8],
             ParsedType::U16 => vec![RustType::U16],
             ParsedType::U32 => vec![RustType::U32],
