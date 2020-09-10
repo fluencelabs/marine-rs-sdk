@@ -36,6 +36,7 @@ pub(super) fn try_to_ast_signature(
     visibility: syn::Visibility,
 ) -> Result<fce_ast_types::AstFunctionSignature> {
     use crate::parsed_type::ParsedType;
+    use syn::spanned::Spanned;
     use quote::ToTokens;
 
     check_function(&signature)?;
@@ -47,7 +48,12 @@ pub(super) fn try_to_ast_signature(
         .map(|arg| -> Result<(String, ParsedType)> {
             let pat = match arg {
                 syn::FnArg::Typed(arg) => arg,
-                _ => unimplemented!(),
+                _ => {
+                    return Err(syn::Error::new(
+                        arg.span(),
+                        "`self` argument types aren't supported",
+                    ))
+                }
             };
             Ok((
                 pat.pat
