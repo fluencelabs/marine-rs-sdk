@@ -1,6 +1,6 @@
 [package]
 name = "fluence-sdk-macro"
-version = "0.2.1"  # remember to update html_root_url
+version = "0.2.2"  # remember to update html_root_url
 edition = "2018"
 description = "Definition of `#[invoke_handler]` attribute"
 documentation = "https://docs.rs/fluence/fluence-sdk-macro"
@@ -17,4 +17,4 @@ all-features = true
 proc-macro = true
 
 [dependencies]
-fluence-sdk-wit = { path = "../wit", version = "=0.2.1" }
+fluence-sdk-wit = { path = "../wit", version = "=0.2.2" }

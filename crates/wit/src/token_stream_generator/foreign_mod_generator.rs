@@ -108,6 +108,8 @@ fn generate_wrapper_functions(extern_item: &fce_ast_types::AstExternModItem) -> 
             arg_names,
             arg_types,
             raw_args,
+            arg_transforms,
+            arg_drops,
         } = signature.arguments.generate_wrapper_prolog();
 
         let FnEpilogDescriptor {
@@ -121,8 +123,14 @@ fn generate_wrapper_functions(extern_item: &fce_ast_types::AstExternModItem) -> 
             #[doc(hidden)]
             #[allow(clippy::all)]
             #visibility unsafe fn #func_name(#(#arg_names: #arg_types), *) #return_type {
+                // make complex arguments manually droppable
+                #arg_transforms
+
                 // calling the original function with converted args
                 #return_expression #import_func_name(#(#raw_args), *);
+
+                // drop complex arguments
+                #arg_drops
 
                 // return value conversation from Wasm type to a Rust type
                 #epilog

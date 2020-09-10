@@ -22,6 +22,8 @@ pub(crate) struct WrapperDescriptor {
     pub(crate) arg_names: Vec<syn::Ident>,
     pub(crate) arg_types: Vec<proc_macro2::TokenStream>,
     pub(crate) raw_args: Vec<proc_macro2::TokenStream>,
+    pub(crate) arg_transforms: proc_macro2::TokenStream,
+    pub(crate) arg_drops: proc_macro2::TokenStream,
 }
 
 pub(crate) struct ExternDescriptor {
@@ -34,7 +36,9 @@ pub(crate) struct ExternDescriptor {
 /// ```
 /// quote! {
 ///     fn foo(#(#arg_names: #arg_types), *) {
+///         let arg_1 = std::mem::ManuallyDrop::new(arg_1);
 ///         let result = original_foo(#(#raw_args), *);
+///         std::mem::ManuallyDrop::drop(&mut arg_1);
 ///         ...
 ///     }
 /// }
@@ -56,18 +60,26 @@ pub(crate) trait ForeignModPrologGlueCodeGenerator {
 impl ForeignModPrologGlueCodeGenerator for Vec<(String, ParsedType)> {
     fn generate_wrapper_prolog(&self) -> WrapperDescriptor {
         use crate::parsed_type::foreign_mod_arg::ForeignModArgGlueCodeGenerator;
-        use quote::ToTokens;
 
         let arg_types: Vec<proc_macro2::TokenStream> = self
             .iter()
-            .map(|(_, input_type)| new_ident!(input_type.to_text_type()).to_token_stream())
+            .map(|(_, input_type)| input_type.to_token_stream())
             .collect();
 
-        let arg_names: Vec<syn::Ident> = arg_types
+        let (arg_names, arg_transforms, arg_drops) = self
             .iter()
             .enumerate()
-            .map(|(id, _)| new_ident!(format!("arg_{}", id)))
-            .collect();
+            .fold((Vec::new(), proc_macro2::TokenStream::new(), proc_macro2::TokenStream::new()), |(mut arg_names, mut arg_transforms, mut arg_drops), (id, (_, ty))| {
+                let arg_ident = new_ident!(format!("arg_{}", id));
+                arg_names.push(arg_ident.clone());
+
+                if ty.is_complex_type() {
+                    arg_transforms.extend(quote::quote! { let mut #arg_ident = std::mem::ManuallyDrop::new(#arg_ident); });
+                    arg_drops.extend(quote::quote! { std::mem::ManuallyDrop::drop(&mut #arg_ident); });
+                }
+
+                (arg_names, arg_transforms, arg_drops)
+            });
 
         let raw_args: Vec<proc_macro2::TokenStream> = self
             .iter()
@@ -78,6 +90,8 @@ impl ForeignModPrologGlueCodeGenerator for Vec<(String, ParsedType)> {
         WrapperDescriptor {
             arg_names,
             arg_types,
+            arg_transforms,
+            arg_drops,
             raw_args,
         }
     }

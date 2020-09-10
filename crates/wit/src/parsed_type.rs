@@ -175,24 +175,28 @@ impl ParsedType {
         }
     }
 
-    pub fn to_text_type(&self) -> String {
+    pub fn to_token_stream(&self) -> proc_macro2::TokenStream {
+        use quote::quote;
+
         match self {
-            ParsedType::I8 => "i8",
-            ParsedType::I16 => "i16",
-            ParsedType::I32 => "i32",
-            ParsedType::I64 => "i64",
-            ParsedType::U8 => "u8",
-            ParsedType::U16 => "u16",
-            ParsedType::U32 => "u32",
-            ParsedType::U64 => "u64",
-            ParsedType::F32 => "f32",
-            ParsedType::F64 => "f64",
-            ParsedType::Boolean => "bool",
-            ParsedType::Utf8String => "String",
-            ParsedType::ByteVector => "Vec<u8>",
-            ParsedType::Record(name) => name,
+            ParsedType::I8 => quote! { i8 },
+            ParsedType::I16 => quote! { i16 },
+            ParsedType::I32 => quote! { i32 },
+            ParsedType::I64 => quote! { i64 },
+            ParsedType::U8 => quote! { u8 },
+            ParsedType::U16 => quote! { u16 },
+            ParsedType::U32 => quote! { u32 },
+            ParsedType::U64 => quote! { u64 },
+            ParsedType::F32 => quote! { f32 },
+            ParsedType::F64 => quote! { f64 },
+            ParsedType::Boolean => quote! { bool },
+            ParsedType::Utf8String => quote! { String },
+            ParsedType::ByteVector => quote! { Vec<u8> },
+            ParsedType::Record(name) => {
+                let ty = crate::new_ident!(name);
+                quote! { #ty }
+            }
         }
-        .into()
     }
 
     pub fn is_complex_type(&self) -> bool {
