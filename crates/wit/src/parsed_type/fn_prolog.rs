@@ -17,14 +17,14 @@
 use super::ParsedType;
 use super::FnArgGlueCodeGenerator;
 use crate::new_ident;
-use crate::wasm_type::WasmType;
+use crate::wasm_type::RustType;
 
 use quote::quote;
 
 /// Describes various parts of a function prolog.
 pub(crate) struct FnPrologDescriptor {
     pub(crate) raw_arg_names: Vec<syn::Ident>,
-    pub(crate) raw_arg_types: Vec<WasmType>,
+    pub(crate) raw_arg_types: Vec<RustType>,
     pub(crate) prolog: proc_macro2::TokenStream,
     pub(crate) args: Vec<syn::Ident>,
 }

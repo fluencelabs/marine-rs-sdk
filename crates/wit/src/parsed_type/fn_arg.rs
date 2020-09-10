@@ -15,28 +15,29 @@
  */
 
 use super::ParsedType;
-use crate::wasm_type::WasmType;
+use crate::wasm_type::RustType;
 
 /// This trait could be used to generate raw args needed to construct a export function.
 pub(crate) trait FnArgGlueCodeGenerator {
-    fn generate_arguments(&self) -> Vec<WasmType>;
+    fn generate_arguments(&self) -> Vec<RustType>;
 }
 
 impl FnArgGlueCodeGenerator for (String, ParsedType) {
-    fn generate_arguments(&self) -> Vec<WasmType> {
+    fn generate_arguments(&self) -> Vec<RustType> {
         match self.1 {
-            ParsedType::Boolean
-            | ParsedType::I8
-            | ParsedType::I16
-            | ParsedType::I32
-            | ParsedType::U8
-            | ParsedType::U16
-            | ParsedType::U32
-            | ParsedType::Record(_) => vec![WasmType::I32],
-            ParsedType::I64 | ParsedType::U64 => vec![WasmType::I64],
-            ParsedType::F32 => vec![WasmType::F32],
-            ParsedType::F64 => vec![WasmType::F64],
-            ParsedType::Utf8String | ParsedType::ByteVector => vec![WasmType::I32, WasmType::I32],
+            ParsedType::Boolean => vec![RustType::I32],
+            ParsedType::I8 => vec![RustType::I8],
+            ParsedType::I16 => vec![RustType::I16],
+            ParsedType::I32 => vec![RustType::I32],
+            ParsedType::I64  => vec![RustType::I64],
+            ParsedType::U8 => vec![RustType::U8],
+            ParsedType::U16 => vec![RustType::U16],
+            ParsedType::U32 => vec![RustType::U32],
+            ParsedType::U64 => vec![RustType::U64],
+            ParsedType::Record(_) => vec![RustType::U32],
+            ParsedType::F32 => vec![RustType::F32],
+            ParsedType::F64 => vec![RustType::F64],
+            ParsedType::Utf8String | ParsedType::ByteVector => vec![RustType::U32, RustType::U32],
         }
     }
 }

@@ -15,7 +15,7 @@
  */
 
 use super::ParsedType;
-use crate::wasm_type::WasmType;
+use crate::wasm_type::RustType;
 use crate::new_ident;
 
 pub(crate) struct WrapperDescriptor {
@@ -28,7 +28,7 @@ pub(crate) struct WrapperDescriptor {
 
 pub(crate) struct ExternDescriptor {
     pub(crate) raw_arg_names: Vec<syn::Ident>,
-    pub(crate) raw_arg_types: Vec<WasmType>,
+    pub(crate) raw_arg_types: Vec<RustType>,
 }
 
 /// This trait could be used to generate various parts needed to construct prolog of an wrapper
@@ -99,7 +99,7 @@ impl ForeignModPrologGlueCodeGenerator for Vec<(String, ParsedType)> {
     fn generate_extern_prolog(&self) -> ExternDescriptor {
         use crate::parsed_type::FnArgGlueCodeGenerator;
 
-        let raw_arg_types: Vec<WasmType> = self
+        let raw_arg_types: Vec<RustType> = self
             .iter()
             .map(|input_type| input_type.generate_arguments())
             .flatten()

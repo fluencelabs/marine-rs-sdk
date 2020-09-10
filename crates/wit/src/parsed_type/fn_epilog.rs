@@ -53,19 +53,17 @@ impl FnEpilogGlueCodeGenerator for Option<ParsedType> {
 
 fn generate_fn_return_type(ty: &Option<ParsedType>) -> proc_macro2::TokenStream {
     let ty = match ty {
-        Some(ParsedType::Boolean)
-        | Some(ParsedType::I8)
-        | Some(ParsedType::I16)
-        | Some(ParsedType::I32)
-        | Some(ParsedType::U8)
-        | Some(ParsedType::U16)
-        | Some(ParsedType::U32) => Some("i32"),
-
-        Some(ParsedType::I64) | Some(ParsedType::U64) => Some("i64"),
-
+        Some(ParsedType::Boolean) => Some("i32"),
+        Some(ParsedType::I8) => Some("i8"),
+        Some(ParsedType::I16) => Some("i16"),
+        Some(ParsedType::I32) => Some("i32"),
+        Some(ParsedType::I64) => Some("i64"),
+        Some(ParsedType::U8) => Some("u8"),
+        Some(ParsedType::U16) => Some("u16"),
+        Some(ParsedType::U32) => Some("u32"),
+        Some(ParsedType::U64) => Some("u64"),
         Some(ParsedType::F32) => Some("f32"),
         Some(ParsedType::F64) => Some("f64"),
-
         None
         | Some(ParsedType::Utf8String)
         | Some(ParsedType::ByteVector)
