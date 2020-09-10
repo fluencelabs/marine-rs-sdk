@@ -87,6 +87,12 @@ fn generate_type_prolog(
     let generated_arg_id = new_ident!(format!("converted_arg_{}", generated_arg_id));
 
     match ty {
+        ParsedType::Boolean => {
+            let supplied_arg_start_id = new_ident!(format!("arg_{}", supplied_arg_start_id));
+            quote! {
+                let #generated_arg_id = #supplied_arg_start_id != 0;
+            }
+        },
         ty if !ty.is_complex_type() => {
             let supplied_arg_start_id = new_ident!(format!("arg_{}", supplied_arg_start_id));
             quote! {
