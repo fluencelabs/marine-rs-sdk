@@ -73,9 +73,12 @@ impl ForeignModPrologGlueCodeGenerator for Vec<(String, ParsedType)> {
                 let arg_ident = new_ident!(format!("arg_{}", id));
                 arg_names.push(arg_ident.clone());
 
-                if ty.is_complex_type() {
-                    arg_transforms.extend(quote::quote! { let mut #arg_ident = std::mem::ManuallyDrop::new(#arg_ident); });
-                    arg_drops.extend(quote::quote! { std::mem::ManuallyDrop::drop(&mut #arg_ident); });
+                match ty {
+                    ParsedType::ByteVector | ParsedType::Utf8String => {
+                        arg_transforms.extend(quote::quote! { let mut #arg_ident = std::mem::ManuallyDrop::new(#arg_ident); });
+                        arg_drops.extend(quote::quote! { std::mem::ManuallyDrop::drop(&mut #arg_ident); });
+                    },
+                    _ => {}
                 }
 
                 (arg_names, arg_transforms, arg_drops)
