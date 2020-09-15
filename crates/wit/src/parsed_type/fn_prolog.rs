@@ -17,14 +17,14 @@
 use super::ParsedType;
 use super::FnArgGlueCodeGenerator;
 use crate::new_ident;
-use crate::wasm_type::WasmType;
+use crate::wasm_type::RustType;
 
 use quote::quote;
 
 /// Describes various parts of a function prolog.
 pub(crate) struct FnPrologDescriptor {
     pub(crate) raw_arg_names: Vec<syn::Ident>,
-    pub(crate) raw_arg_types: Vec<WasmType>,
+    pub(crate) raw_arg_types: Vec<RustType>,
     pub(crate) prolog: proc_macro2::TokenStream,
     pub(crate) args: Vec<syn::Ident>,
 }
@@ -44,7 +44,7 @@ pub(crate) trait FnPrologGlueCodeGenerator {
     fn generate_prolog(&self) -> FnPrologDescriptor;
 }
 
-impl FnPrologGlueCodeGenerator for Vec<ParsedType> {
+impl FnPrologGlueCodeGenerator for Vec<(String, ParsedType)> {
     fn generate_prolog(&self) -> FnPrologDescriptor {
         let mut prolog = proc_macro2::TokenStream::new();
         let mut args: Vec<syn::Ident> = Vec::with_capacity(self.len());
@@ -52,9 +52,9 @@ impl FnPrologGlueCodeGenerator for Vec<ParsedType> {
         let mut raw_arg_types = Vec::with_capacity(self.len());
 
         let mut input_type_id = 0;
-        for input_type in self {
-            let type_prolog = generate_type_prolog(input_type, input_type_id, input_type_id);
-            let curr_raw_arg_types = input_type.generate_arguments();
+        for arg in self {
+            let type_prolog = generate_type_prolog(&arg.1, input_type_id, input_type_id);
+            let curr_raw_arg_types = arg.generate_arguments();
 
             args.push(new_ident!(format!("converted_arg_{}", input_type_id)));
 
@@ -87,6 +87,12 @@ fn generate_type_prolog(
     let generated_arg_id = new_ident!(format!("converted_arg_{}", generated_arg_id));
 
     match ty {
+        ParsedType::Boolean => {
+            let supplied_arg_start_id = new_ident!(format!("arg_{}", supplied_arg_start_id));
+            quote! {
+                let #generated_arg_id = #supplied_arg_start_id != 0;
+            }
+        }
         ty if !ty.is_complex_type() => {
             let supplied_arg_start_id = new_ident!(format!("arg_{}", supplied_arg_start_id));
             quote! {

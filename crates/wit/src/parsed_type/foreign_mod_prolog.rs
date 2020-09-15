@@ -15,7 +15,7 @@
  */
 
 use super::ParsedType;
-use crate::wasm_type::WasmType;
+use crate::wasm_type::RustType;
 use crate::new_ident;
 
 pub(crate) struct WrapperDescriptor {
@@ -28,7 +28,7 @@ pub(crate) struct WrapperDescriptor {
 
 pub(crate) struct ExternDescriptor {
     pub(crate) raw_arg_names: Vec<syn::Ident>,
-    pub(crate) raw_arg_types: Vec<WasmType>,
+    pub(crate) raw_arg_types: Vec<RustType>,
 }
 
 /// This trait could be used to generate various parts needed to construct prolog of an wrapper
@@ -57,25 +57,28 @@ pub(crate) trait ForeignModPrologGlueCodeGenerator {
     fn generate_extern_prolog(&self) -> ExternDescriptor;
 }
 
-impl ForeignModPrologGlueCodeGenerator for Vec<ParsedType> {
+impl ForeignModPrologGlueCodeGenerator for Vec<(String, ParsedType)> {
     fn generate_wrapper_prolog(&self) -> WrapperDescriptor {
         use crate::parsed_type::foreign_mod_arg::ForeignModArgGlueCodeGenerator;
 
         let arg_types: Vec<proc_macro2::TokenStream> = self
             .iter()
-            .map(|input_type| input_type.to_token_stream())
+            .map(|(_, input_type)| input_type.to_token_stream())
             .collect();
 
         let (arg_names, arg_transforms, arg_drops) = self
             .iter()
             .enumerate()
-            .fold((Vec::new(), proc_macro2::TokenStream::new(), proc_macro2::TokenStream::new()), |(mut arg_names, mut arg_transforms, mut arg_drops), (id, ty)| {
+            .fold((Vec::new(), proc_macro2::TokenStream::new(), proc_macro2::TokenStream::new()), |(mut arg_names, mut arg_transforms, mut arg_drops), (id, (_, ty))| {
                 let arg_ident = new_ident!(format!("arg_{}", id));
                 arg_names.push(arg_ident.clone());
 
-                if ty.is_complex_type() {
-                    arg_transforms.extend(quote::quote! { let mut #arg_ident = std::mem::ManuallyDrop::new(#arg_ident); });
-                    arg_drops.extend(quote::quote! { std::mem::ManuallyDrop::drop(&mut #arg_ident); });
+                match ty {
+                    ParsedType::ByteVector | ParsedType::Utf8String => {
+                        arg_transforms.extend(quote::quote! { let mut #arg_ident = std::mem::ManuallyDrop::new(#arg_ident); });
+                        arg_drops.extend(quote::quote! { std::mem::ManuallyDrop::drop(&mut #arg_ident); });
+                    },
+                    _ => {}
                 }
 
                 (arg_names, arg_transforms, arg_drops)
@@ -84,7 +87,7 @@ impl ForeignModPrologGlueCodeGenerator for Vec<ParsedType> {
         let raw_args: Vec<proc_macro2::TokenStream> = self
             .iter()
             .enumerate()
-            .map(|(id, input_type)| input_type.generate_raw_args(id))
+            .map(|(id, (_, input_type))| input_type.generate_raw_args(id))
             .collect();
 
         WrapperDescriptor {
@@ -99,7 +102,7 @@ impl ForeignModPrologGlueCodeGenerator for Vec<ParsedType> {
     fn generate_extern_prolog(&self) -> ExternDescriptor {
         use crate::parsed_type::FnArgGlueCodeGenerator;
 
-        let raw_arg_types: Vec<WasmType> = self
+        let raw_arg_types: Vec<RustType> = self
             .iter()
             .map(|input_type| input_type.generate_arguments())
             .flatten()

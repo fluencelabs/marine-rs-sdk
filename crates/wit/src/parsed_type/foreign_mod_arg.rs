@@ -36,7 +36,8 @@ impl ForeignModArgGlueCodeGenerator for ParsedType {
                     #arg.__fce_generated_serialize() as _
                 }
             }
-            _ => quote! { arg },
+            ParsedType::Boolean => quote! { #arg as _ },
+            _ => quote! { #arg },
         }
     }
 }

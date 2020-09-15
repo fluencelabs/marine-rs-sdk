@@ -49,7 +49,7 @@ impl quote::ToTokens for fce_ast_types::AstFunctionItem {
             raw_arg_types,
             prolog,
             args,
-        } = &signature.input_types.generate_prolog();
+        } = &signature.arguments.generate_prolog();
 
         let FnEpilogDescriptor {
             fn_return_type,

@@ -41,6 +41,9 @@ impl ForeignModEpilogGlueCodeGenerator for Option<ParsedType> {
     fn generate_wrapper_epilog(&self) -> proc_macro2::TokenStream {
         match self {
             None => quote!(),
+            Some(ParsedType::Boolean) => quote! {
+                return result != 0;
+            },
             Some(ty) if !ty.is_complex_type() => quote! {
                 return result as _;
             },

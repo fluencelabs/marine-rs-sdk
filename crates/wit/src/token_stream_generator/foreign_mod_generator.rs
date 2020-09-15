@@ -74,7 +74,7 @@ fn generate_extern_section_items(extern_item: &fce_ast_types::AstExternModItem) 
         let ExternDescriptor {
             raw_arg_names,
             raw_arg_types,
-        } = signature.input_types.generate_extern_prolog();
+        } = signature.arguments.generate_extern_prolog();
 
         let func = quote! {
             #[link_name = #link_name]
@@ -110,7 +110,7 @@ fn generate_wrapper_functions(extern_item: &fce_ast_types::AstExternModItem) -> 
             raw_args,
             arg_transforms,
             arg_drops,
-        } = signature.input_types.generate_wrapper_prolog();
+        } = signature.arguments.generate_wrapper_prolog();
 
         let FnEpilogDescriptor {
             return_expression, ..

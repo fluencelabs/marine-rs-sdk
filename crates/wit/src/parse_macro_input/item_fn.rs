@@ -36,22 +36,44 @@ pub(super) fn try_to_ast_signature(
     visibility: syn::Visibility,
 ) -> Result<fce_ast_types::AstFunctionSignature> {
     use crate::parsed_type::ParsedType;
+    use syn::spanned::Spanned;
+    use quote::ToTokens;
 
     check_function(&signature)?;
 
     let syn::Signature { inputs, output, .. } = signature;
 
-    let input_types = inputs
+    let arguments = inputs
         .iter()
-        .map(ParsedType::from_fn_arg)
-        .collect::<Result<Vec<_>>>()?;
+        .map(|arg| -> Result<(String, ParsedType)> {
+            let pat = match arg {
+                syn::FnArg::Typed(arg) => arg,
+                _ => {
+                    return Err(syn::Error::new(
+                        arg.span(),
+                        "`self` argument types aren't supported",
+                    ))
+                }
+            };
+            Ok((
+                pat.pat
+                    .to_token_stream()
+                    .to_string()
+                    .split(' ')
+                    .last()
+                    .unwrap_or_default()
+                    .to_string(),
+                ParsedType::from_type(pat.ty.as_ref())?,
+            ))
+        })
+        .collect::<Result<Vec<(_, _)>>>()?;
 
     let output_type = ParsedType::from_return_type(&output)?;
 
     let ast_function_item = fce_ast_types::AstFunctionSignature {
         visibility: Some(visibility),
         name: signature.ident.to_string(),
-        input_types,
+        arguments,
         output_type,
     };
 
