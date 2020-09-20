@@ -37,8 +37,28 @@ impl RecordSerializerGlueCodeGenerator for fce_ast_types::AstRecordItem {
                         raw_record.push(#field_ident.to_bits());
                     }
                 }
-                ParsedType::Utf8String | ParsedType::ByteVector => {
+                ParsedType::Utf8String => {
                     quote! {
+                        raw_record.push(#field_ident.as_ptr() as _);
+                        raw_record.push(#field_ident.len() as _);
+                        std::mem::forget(#field_ident);
+                    }
+                }
+                ParsedType::Vector(ty) => {
+                    let generated_serializer_name = format!(
+                        "__fce_generated_vec_serializer_{}_{}",
+                        field.name.as_ref().unwrap(),
+                        id
+                    );
+                    let generated_serializer_ident = new_ident!(generated_serializer_name);
+                    let vector_serializer = crate::parsed_type::generate_vector_serializer(
+                        ty,
+                        &generated_serializer_name,
+                    );
+
+                    quote::quote! {
+                        #vector_serializer
+                        let #field_ident = #generated_serializer_ident(#field_ident);
                         raw_record.push(#field_ident.as_ptr() as _);
                         raw_record.push(#field_ident.len() as _);
                         std::mem::forget(#field_ident);

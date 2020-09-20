@@ -37,7 +37,7 @@ impl FnArgGlueCodeGenerator for (String, ParsedType) {
             ParsedType::Record(_) => vec![RustType::U32],
             ParsedType::F32 => vec![RustType::F32],
             ParsedType::F64 => vec![RustType::F64],
-            ParsedType::Utf8String | ParsedType::ByteVector => vec![RustType::U32, RustType::U32],
+            ParsedType::Utf8String | ParsedType::Vector(_) => vec![RustType::U32, RustType::U32],
         }
     }
 }

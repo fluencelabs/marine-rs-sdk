@@ -28,14 +28,12 @@ impl ForeignModArgGlueCodeGenerator for ParsedType {
         let arg = crate::new_ident!(format!("arg_{}", arg_start_id));
 
         match self {
-            ParsedType::Utf8String | ParsedType::ByteVector => {
+            ParsedType::Vector(_) | ParsedType::Utf8String => {
                 quote! { #arg.as_ptr() as _, #arg.len() as _ }
             }
-            ParsedType::Record(_) => {
-                quote! {
-                    #arg.__fce_generated_serialize() as _
-                }
-            }
+            ParsedType::Record(_) => quote! {
+                #arg.__fce_generated_serialize() as _
+            },
             ParsedType::Boolean => quote! { #arg as _ },
             _ => quote! { #arg },
         }

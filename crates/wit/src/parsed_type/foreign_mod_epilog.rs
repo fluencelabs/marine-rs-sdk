@@ -29,6 +29,8 @@ pub(crate) trait ForeignModEpilogGlueCodeGenerator {
 
 impl ForeignModEpilogGlueCodeGenerator for Option<ParsedType> {
     fn generate_wrapper_return_type(&self) -> proc_macro2::TokenStream {
+        use quote::ToTokens;
+
         match self {
             Some(ty) => {
                 let ty = ty.to_token_stream();
@@ -54,13 +56,22 @@ impl ForeignModEpilogGlueCodeGenerator for Option<ParsedType> {
                     fluence::internal::get_result_size() as _
                 )
             },
-            Some(ParsedType::ByteVector) => quote! {
-                Vec::from_raw_parts(
-                    fluence::internal::get_result_ptr() as _,
-                    fluence::internal::get_result_size() as _,
-                    fluence::internal::get_result_size() as _
-                )
-            },
+            Some(ParsedType::Vector(ty)) => {
+                let generated_deserializer_name = String::from("__fce_generated_vec_deserializer");
+                let generated_deserializer_ident = new_ident!(generated_deserializer_name);
+                let vector_deserializer = super::vector_utils::generate_vector_deserializer(
+                    ty,
+                    &generated_deserializer_name,
+                );
+
+                quote! {
+                    #vector_deserializer
+                    #generated_deserializer_ident(
+                        fluence::internal::get_result_ptr() as _,
+                        fluence::internal::get_result_size() as _,
+                    );
+                }
+            }
             Some(ParsedType::Record(record_name)) => {
                 let record_ident = new_ident!(record_name);
 

@@ -60,6 +60,7 @@ pub(crate) trait ForeignModPrologGlueCodeGenerator {
 impl ForeignModPrologGlueCodeGenerator for Vec<(String, ParsedType)> {
     fn generate_wrapper_prolog(&self) -> WrapperDescriptor {
         use crate::parsed_type::foreign_mod_arg::ForeignModArgGlueCodeGenerator;
+        use quote::ToTokens;
 
         let arg_types: Vec<proc_macro2::TokenStream> = self
             .iter()
@@ -70,14 +71,28 @@ impl ForeignModPrologGlueCodeGenerator for Vec<(String, ParsedType)> {
             .iter()
             .enumerate()
             .fold((Vec::new(), proc_macro2::TokenStream::new(), proc_macro2::TokenStream::new()), |(mut arg_names, mut arg_transforms, mut arg_drops), (id, (_, ty))| {
-                let arg_ident = new_ident!(format!("arg_{}", id));
+                let arg_name = format!("arg_{}", id);
+                let arg_ident = new_ident!(arg_name);
                 arg_names.push(arg_ident.clone());
 
                 match ty {
-                    ParsedType::ByteVector | ParsedType::Utf8String => {
-                        arg_transforms.extend(quote::quote! { let mut #arg_ident = std::mem::ManuallyDrop::new(#arg_ident); });
+                    ParsedType::Utf8String => {
+                        arg_transforms.extend(quote::quote! { let #arg_ident = std::mem::ManuallyDrop::new(#arg_ident); });
                         arg_drops.extend(quote::quote! { std::mem::ManuallyDrop::drop(&mut #arg_ident); });
                     },
+                    ParsedType::Vector(ty) => {
+                        let generated_serializer_name = format!("__fce_generated_vec_serializer_{}", arg_name);
+                        let generated_serializer_ident = new_ident!(generated_serializer_name);
+                        let vector_serializer = super::vector_utils::generate_vector_serializer(ty, &generated_serializer_name);
+
+                        let arg_transform = quote::quote! {
+                            #vector_serializer
+
+                            let #arg_ident = std::mem::ManuallyDrop::new(#arg_ident);
+                            let #arg_ident = #generated_serializer_ident(#arg_ident);
+                        };
+                        arg_transforms.extend(arg_transform);
+                    }
                     _ => {}
                 }
 
