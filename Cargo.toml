@@ -9,6 +9,7 @@ readme = "Readme.md"
 keywords = ["fluence", "sdk", "webassembly"]
 categories = ["api-bindings", "wasm"]
 license = "Apache-2.0"
+edition = "2018"
 
 [package.metadata.docs.rs] # https://docs.rs/about
 all-features = true
@@ -19,6 +20,7 @@ path = "src/lib.rs"
 [dependencies]
 fluence-sdk-macro = { path = "crates/macro", version = "=0.2.3" }
 fluence-sdk-main = { path = "crates/main", version = "=0.2.3" }
+safe-transmute = "0.11.0"
 
 [features]
 # Print some internal logs by log_utf8_string

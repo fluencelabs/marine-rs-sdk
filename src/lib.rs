@@ -67,9 +67,6 @@
 )]
 #![warn(rust_2018_idioms)]
 
-extern crate fluence_sdk_macro;
-extern crate fluence_sdk_main;
-
 pub use fluence_sdk_macro::fce;
 pub use fluence_sdk_main::CallParameters;
 #[cfg(target_arch = "wasm32")]
@@ -84,4 +81,5 @@ pub mod internal {
     pub use fluence_sdk_main::get_result_size;
     pub use fluence_sdk_main::set_result_ptr;
     pub use fluence_sdk_main::set_result_size;
+    pub use safe_transmute::transmute_vec;
 }

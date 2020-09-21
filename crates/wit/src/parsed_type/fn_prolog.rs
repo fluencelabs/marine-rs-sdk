@@ -107,9 +107,20 @@ fn generate_type_prolog(
                 ParsedType::Utf8String => quote! {
                     let #generated_arg_id = String::from_raw_parts(#ptr as _, #size as _ , #size as _);
                 },
-                ParsedType::ByteVector => quote! {
-                    let #generated_arg_id = Vec::from_raw_parts(#ptr as _, #size as _, #size as _);
-                },
+                ParsedType::Vector(ty) => {
+                    let generated_deserializer_name =
+                        format!("__fce_generated_vec_deserializer_{}", supplied_arg_start_id);
+                    let generated_deserializer_ident = new_ident!(generated_deserializer_name);
+                    let vector_deserializer = super::vector_utils::generate_vector_deserializer(
+                        ty,
+                        &generated_deserializer_name,
+                    );
+
+                    quote! {
+                        #vector_deserializer
+                        let #generated_arg_id = #generated_deserializer_ident(#ptr as _, #size as _);
+                    }
+                }
                 ParsedType::Record(record_name) => {
                     let record_ident = new_ident!(record_name);
                     quote! {

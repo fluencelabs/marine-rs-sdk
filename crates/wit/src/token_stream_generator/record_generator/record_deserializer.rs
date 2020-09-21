@@ -103,13 +103,22 @@ impl RecordDeserializerGlueCodeGenerator for fce_ast_types::AstRecordItem {
                         let #field = unsafe { String::from_raw_parts(raw_record[#ptr_id] as _, raw_record[#size_id] as _, raw_record[#size_id] as _) };
                     }
                 }
-                ParsedType::ByteVector => {
+                ParsedType::Vector(ty) => {
                     let ptr_id = value_id;
                     let size_id = value_id + 1;
                     value_id += 1;
 
+                    let generated_deserializer_name =
+                        String::from("__fce_generated_vec_deserializer");
+                    let generated_deserializer_ident = new_ident!(generated_deserializer_name);
+                    let vector_deserializer = crate::parsed_type::generate_vector_deserializer(
+                        ty,
+                        &generated_deserializer_name,
+                    );
+
                     quote! {
-                        let #field = unsafe { Vec::from_raw_parts(raw_record[#ptr_id] as _, raw_record[#size_id] as _, raw_record[#size_id] as _) };
+                        #vector_deserializer
+                        let #field = unsafe { #generated_deserializer_ident(raw_record[#ptr_id] as _, raw_record[#size_id] as _) };
                     }
                 }
                 ParsedType::Record(record_name) => {

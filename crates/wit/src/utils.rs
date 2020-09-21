@@ -54,7 +54,7 @@ pub fn get_record_size<'a>(
 
     for field in fields {
         let params_count = match field {
-            ParsedType::ByteVector | ParsedType::Utf8String => 2,
+            ParsedType::Vector(_) | ParsedType::Utf8String => 2,
             _ => 1,
         };
 
