@@ -118,7 +118,7 @@ impl RecordDeserializerGlueCodeGenerator for fce_ast_types::AstRecordItem {
 
                     quote! {
                         #vector_deserializer
-                        #generated_deserializer_ident(raw_record[#ptr_id] as _, raw_record[#size_id] as _);
+                        let #field = unsafe { #generated_deserializer_ident(raw_record[#ptr_id] as _, raw_record[#size_id] as _) };
                     }
                 }
                 ParsedType::Record(record_name) => {

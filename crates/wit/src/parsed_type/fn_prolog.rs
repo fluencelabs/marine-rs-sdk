@@ -118,7 +118,7 @@ fn generate_type_prolog(
 
                     quote! {
                         #vector_deserializer
-                        let #generated_arg_id = #generated_deserializer_ident(#ptr, #size);
+                        let #generated_arg_id = #generated_deserializer_ident(#ptr as _, #size as _);
                     }
                 }
                 ParsedType::Record(record_name) => {

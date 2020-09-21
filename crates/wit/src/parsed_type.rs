@@ -34,6 +34,7 @@ use serde::Deserialize;
 use syn::parse::Error;
 use syn::spanned::Spanned;
 use proc_macro2::TokenStream;
+use serde::export::Formatter;
 
 /// An internal representation of supported Rust types.
 #[derive(Debug, Clone, PartialEq, Serialize, Deserialize)]
@@ -195,5 +196,28 @@ impl quote::ToTokens for ParsedType {
                 quote! { #ty }
             }
         }
+    }
+}
+
+impl std::fmt::Display for ParsedType {
+    fn fmt(&self, f: &mut Formatter<'_>) -> Result<(), std::fmt::Error> {
+        match self {
+            ParsedType::Boolean => f.write_str("bool"),
+            ParsedType::I8 => f.write_str("i8"),
+            ParsedType::I16 => f.write_str("i16"),
+            ParsedType::I32 => f.write_str("i32"),
+            ParsedType::I64 => f.write_str("i64"),
+            ParsedType::U8 => f.write_str("u8"),
+            ParsedType::U16 => f.write_str("u16"),
+            ParsedType::U32 => f.write_str("u32"),
+            ParsedType::U64 => f.write_str("u64"),
+            ParsedType::F32 => f.write_str("f32"),
+            ParsedType::F64 => f.write_str("u64"),
+            ParsedType::Utf8String => f.write_str("String"),
+            ParsedType::Vector(_) => f.write_str("Vec"),
+            ParsedType::Record(record_name) => f.write_str(&record_name),
+        }?;
+
+        Ok(())
     }
 }

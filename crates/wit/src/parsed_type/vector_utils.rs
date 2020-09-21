@@ -22,30 +22,21 @@ pub(crate) fn generate_vector_serializer(
     arg_name: &str,
 ) -> proc_macro2::TokenStream {
     let values_serializer = match value_ty {
-        ParsedType::Boolean
-        | ParsedType::I8
-        | ParsedType::I16
-        | ParsedType::I32
-        | ParsedType::U8
-        | ParsedType::U16
-        | ParsedType::U32 => {
+        ParsedType::Boolean => {
             quote! {
-                let mut result: Vec<u32> = Vec::with_capacity(arg.len());
-                for value in arg {
-                    result.push(value as _);
-                }
-
-                fluence::internal::transmute_vec::<u64, u8>(result)
+                fluence::internal::transmute_vec::<i32, u8>(arg).unwrap()
             }
         }
-        ParsedType::I64 | ParsedType::U64 => {
+        ParsedType::I8
+        | ParsedType::I16
+        | ParsedType::I32
+        | ParsedType::I64
+        | ParsedType::U8
+        | ParsedType::U16
+        | ParsedType::U32
+        | ParsedType::U64 => {
             quote! {
-                let mut result: Vec<u64> = Vec::with_capacity(arg.len());
-                for value in arg {
-                    result.push(value as _);
-                }
-
-                fluence::internal::transmute_vec::<u64, u8>(result)
+                fluence::internal::transmute_vec::<#value_ty, u8>(arg).unwrap()
             }
         }
         ParsedType::F32 => {
@@ -55,7 +46,7 @@ pub(crate) fn generate_vector_serializer(
                     result.push(value.to_bits());
                 }
 
-                fluence::internal::transmute_vec::<u32, u8>(result)
+                fluence::internal::transmute_vec::<u32, u8>(result).unwrap()
             }
         }
         ParsedType::F64 => {
@@ -65,7 +56,7 @@ pub(crate) fn generate_vector_serializer(
                     result.push(value.to_bits());
                 }
 
-                fluence::internal::transmute_vec::<u64, u8>(result)
+                fluence::internal::transmute_vec::<u64, u8>(result).unwrap()
             }
         }
         ParsedType::Utf8String => {
@@ -77,11 +68,11 @@ pub(crate) fn generate_vector_serializer(
                     result.push(value.len() as _);
                 }
 
-                fluence::internal::transmute_vec::<u32, u8>(result)
+                fluence::internal::transmute_vec::<u32, u8>(result).unwrap()
             }
         }
         ParsedType::Vector(ty) => {
-            let serializer_name = format!("{}_{:?}", arg_name, ty);
+            let serializer_name = format!("{}_{}", arg_name, ty);
             let inner_vector_serializer = generate_vector_serializer(&*ty, &serializer_name);
             let serializer_ident = crate::new_ident!(serializer_name);
 
@@ -90,24 +81,24 @@ pub(crate) fn generate_vector_serializer(
 
                 let mut result: Vec<u32> = Vec::with_capacity(2 * arg.len());
                 for value in arg {
-                    result.push(#serializer_ident(arg, &serializer_name));
+                    let value = std::mem::ManuallyDrop::new(#serializer_ident(value));
+                    result.push(value.as_ptr() as _);
+                    result.push(value.len() as _);
                 }
 
-                fluence::internal::transmute_vec::<u32, u8>(result)
+                fluence::internal::transmute_vec::<u32, u8>(result).unwrap()
             }
         }
 
-        ParsedType::Record(record_name) => {
-            let record_ident = crate::new_ident!(record_name);
-
+        ParsedType::Record(_) => {
             quote! {
                 let mut result: Vec<u32> = Vec::with_capacity(arg.len());
 
                 for value in arg {
-                    result.push(#record_ident.__fce_generated_serialize() as _);
+                    result.push(value.__fce_generated_serialize() as _);
                 }
 
-                fluence::internal::transmute_vec::<u32, u8>(result)
+                fluence::internal::transmute_vec::<u32, u8>(result).unwrap()
             }
         }
     };
@@ -115,9 +106,7 @@ pub(crate) fn generate_vector_serializer(
     let arg = crate::new_ident!(arg_name);
 
     quote! {
-        fn serialize_vector_#arg(arg: Vec<#value_ty>) -> Vec<u8> {
-            std::mem::forget(arg);
-
+        unsafe fn #arg(arg: Vec<#value_ty>) -> Vec<u8> {
             if arg.is_empty() {
                 return vec![];
             }
@@ -134,22 +123,27 @@ pub(crate) fn generate_vector_deserializer(
     let arg = crate::new_ident!(arg_name);
 
     let values_deserializer = match value_ty {
+        ParsedType::Boolean => {
+            quote! {
+                fluence::internal::transmute_vec::<u8, i32>(arg).unwrap()
+            }
+        }
         ParsedType::F32 => {
             quote! {
-                let arg = fluence::internal::transmute_vec::<u8, u32>().unwrap();
-                arg.iter().map(f32::from_bits).collect::<Vec<_>>()
+                let mut arg = fluence::internal::transmute_vec::<u8, u32>(arg).unwrap();
+                arg.into_iter().map(f32::from_bits).collect::<Vec<_>>()
             }
         }
         ParsedType::F64 => {
             quote! {
-                let arg = fluence::internal::transmute_vec::<u8, u64>().unwrap();
-                arg.iter().map(f64::from_bits).collect::<Vec<_>>()
+                let mut arg = fluence::internal::transmute_vec::<u8, u64>(arg).unwrap();
+                arg.into_iter().map(f64::from_bits).collect::<Vec<_>>()
             }
         }
         ParsedType::Utf8String => {
             quote! {
-                let arg = fluence::internal::transmute_vec::<u8, u32>().unwrap();
-                let arg = arg.iter();
+                let mut arg = fluence::internal::transmute_vec::<u8, u32>(arg).unwrap();
+                let mut arg = arg.into_iter();
                 let mut result = Vec::with_capacity(arg.len() / 2);
                 while let Some(offset) = arg.next() {
                     let size = arg.next().unwrap();
@@ -161,18 +155,21 @@ pub(crate) fn generate_vector_deserializer(
             }
         }
         ParsedType::Vector(ty) => {
-            let deserializer_name = format!("{}_{:?}", arg_name, ty);
+            let deserializer_name = format!("{}_{}", arg_name, ty);
             let inner_vector_deserializer = generate_vector_deserializer(&*ty, &deserializer_name);
             let deserializer_ident = crate::new_ident!(deserializer_name);
 
             quote! {
                 #inner_vector_deserializer
 
-                let arg = fluence::internal::transmute_vec::<u8, u32>().unwrap();
+                let mut arg = fluence::internal::transmute_vec::<u8, u32>(arg).unwrap();
                 let mut result = Vec::with_capacity(arg.len());
 
-                for offset in arg.iter() {
-                    let value = #deserializer_ident(offset, &deserializer_name);
+                let mut arg = arg.into_iter();
+                while let Some(offset) = arg.next() {
+                    let size = arg.next().unwrap();
+
+                    let value = #deserializer_ident(offset, size);
                     result.push(value);
                 }
 
@@ -180,12 +177,14 @@ pub(crate) fn generate_vector_deserializer(
             }
         }
         ParsedType::Record(record_name) => {
+            let record_name_ident = crate::new_ident!(record_name);
+
             quote! {
-                let arg = fluence::internal::transmute_vec::<u8, u32>().unwrap();
+                let arg = fluence::internal::transmute_vec::<u8, u32>(arg).unwrap();
                 let mut result = Vec::with_capacity(arg.len());
 
                 for offset in arg {
-                    let value = #record_name.__fce_generated_deserialize(arg.as_ptr());
+                    let value = #record_name_ident::__fce_generated_deserialize(offset as _);
                     result.push(value);
                 }
 
@@ -194,14 +193,14 @@ pub(crate) fn generate_vector_deserializer(
         }
         v => {
             quote! {
-                fluence::internal::transmute_vec::<u8, #v>().unwrap()
+                fluence::internal::transmute_vec::<u8, #v>(arg).unwrap()
             }
         }
     };
 
     quote! {
-        fn deserialize_vector_#arg(offset: u32, size: u32) -> Vec<#value_ty> {
-            let arg: Vec<u8> = Vec::from_raw_parts(offset as _, size as _, size _);
+        unsafe fn #arg(offset: u32, size: u32) -> Vec<#value_ty> {
+            let arg: Vec<u8> = Vec::from_raw_parts(offset as _, size as _, size as _);
             if arg.is_empty() {
                 return vec![];
             }

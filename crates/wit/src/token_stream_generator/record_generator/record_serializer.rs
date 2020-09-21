@@ -55,13 +55,14 @@ impl RecordSerializerGlueCodeGenerator for fce_ast_types::AstRecordItem {
                         ty,
                         &generated_serializer_name,
                     );
+                    let serialized_field_ident = new_ident!(format!("serialized_arg_{}", id));
 
                     quote::quote! {
                         #vector_serializer
-                        let #field_ident = #generated_serializer_ident(#field_ident);
-                        raw_record.push(#field_ident.as_ptr() as _);
-                        raw_record.push(#field_ident.len() as _);
-                        std::mem::forget(#field_ident);
+                        let #serialized_field_ident = unsafe { #generated_serializer_ident(#field_ident) };
+                        raw_record.push(#serialized_field_ident.as_ptr() as _);
+                        raw_record.push(#serialized_field_ident.len() as _);
+                        std::mem::forget(#serialized_field_ident);
                     }
                 }
                 ParsedType::Record(_) => {
