@@ -35,7 +35,7 @@ pub(crate) fn generate_vector_serializer(
                     result.push(value as _);
                 }
 
-                fluence::transmute_vec::<u64, u8>(result)
+                fluence::internal::transmute_vec::<u64, u8>(result)
             }
         }
         ParsedType::I64 | ParsedType::U64 => {
@@ -45,7 +45,7 @@ pub(crate) fn generate_vector_serializer(
                     result.push(value as _);
                 }
 
-                fluence::transmute_vec::<u64, u8>(result)
+                fluence::internal::transmute_vec::<u64, u8>(result)
             }
         }
         ParsedType::F32 => {
@@ -55,7 +55,7 @@ pub(crate) fn generate_vector_serializer(
                     result.push(value.to_bits());
                 }
 
-                fluence::transmute_vec::<u32, u8>(result)
+                fluence::internal::transmute_vec::<u32, u8>(result)
             }
         }
         ParsedType::F64 => {
@@ -65,7 +65,7 @@ pub(crate) fn generate_vector_serializer(
                     result.push(value.to_bits());
                 }
 
-                fluence::transmute_vec::<u64, u8>(result)
+                fluence::internal::transmute_vec::<u64, u8>(result)
             }
         }
         ParsedType::Utf8String => {
@@ -77,7 +77,7 @@ pub(crate) fn generate_vector_serializer(
                     result.push(value.len() as _);
                 }
 
-                fluence::transmute_vec::<u32, u8>(result)
+                fluence::internal::transmute_vec::<u32, u8>(result)
             }
         }
         ParsedType::Vector(ty) => {
@@ -93,7 +93,7 @@ pub(crate) fn generate_vector_serializer(
                     result.push(#serializer_ident(arg, &serializer_name));
                 }
 
-                fluence::transmute_vec::<u32, u8>(result)
+                fluence::internal::transmute_vec::<u32, u8>(result)
             }
         }
 
@@ -107,7 +107,7 @@ pub(crate) fn generate_vector_serializer(
                     result.push(#record_ident.__fce_generated_serialize() as _);
                 }
 
-                fluence::transmute_vec::<u32, u8>(result)
+                fluence::internal::transmute_vec::<u32, u8>(result)
             }
         }
     };
@@ -136,19 +136,19 @@ pub(crate) fn generate_vector_deserializer(
     let values_deserializer = match value_ty {
         ParsedType::F32 => {
             quote! {
-                let arg = fluence::transmute_vec::<u8, u32>().unwrap();
+                let arg = fluence::internal::transmute_vec::<u8, u32>().unwrap();
                 arg.iter().map(f32::from_bits).collect::<Vec<_>>()
             }
         }
         ParsedType::F64 => {
             quote! {
-                let arg = fluence::transmute_vec::<u8, u64>().unwrap();
+                let arg = fluence::internal::transmute_vec::<u8, u64>().unwrap();
                 arg.iter().map(f64::from_bits).collect::<Vec<_>>()
             }
         }
         ParsedType::Utf8String => {
             quote! {
-                let arg = fluence::transmute_vec::<u8, u32>().unwrap();
+                let arg = fluence::internal::transmute_vec::<u8, u32>().unwrap();
                 let arg = arg.iter();
                 let mut result = Vec::with_capacity(arg.len() / 2);
                 while let Some(offset) = arg.next() {
@@ -168,7 +168,7 @@ pub(crate) fn generate_vector_deserializer(
             quote! {
                 #inner_vector_deserializer
 
-                let arg = fluence::transmute_vec::<u8, u32>().unwrap();
+                let arg = fluence::internal::transmute_vec::<u8, u32>().unwrap();
                 let mut result = Vec::with_capacity(arg.len());
 
                 for offset in arg.iter() {
@@ -181,7 +181,7 @@ pub(crate) fn generate_vector_deserializer(
         }
         ParsedType::Record(record_name) => {
             quote! {
-                let arg = fluence::transmute_vec::<u8, u32>().unwrap();
+                let arg = fluence::internal::transmute_vec::<u8, u32>().unwrap();
                 let mut result = Vec::with_capacity(arg.len());
 
                 for offset in arg {
@@ -194,7 +194,7 @@ pub(crate) fn generate_vector_deserializer(
         }
         v => {
             quote! {
-                fluence::transmute_vec::<u8, #v>().unwrap()
+                fluence::internal::transmute_vec::<u8, #v>().unwrap()
             }
         }
     };
