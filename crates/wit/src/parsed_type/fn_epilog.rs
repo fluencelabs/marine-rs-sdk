@@ -103,7 +103,7 @@ fn generate_epilog(ty: &Option<ParsedType>) -> proc_macro2::TokenStream {
             std::mem::forget(result);
         },
         Some(ParsedType::Vector(ty)) => {
-            let generated_serializer_name = format!("__fce_generated_vec_serializer");
+            let generated_serializer_name = String::from("__fce_generated_vec_serializer");
             let generated_serializer_ident = new_ident!(generated_serializer_name);
             let vector_serializer =
                 super::vector_utils::generate_vector_serializer(ty, &generated_serializer_name);

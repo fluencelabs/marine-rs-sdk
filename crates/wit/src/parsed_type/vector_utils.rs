@@ -223,6 +223,7 @@ pub(crate) fn generate_vector_deserializer(
                 let mut result = Vec::with_capacity(arg.len());
 
                 for value in arg {
+                    println!("value is {}", value);
                     result.push(value as _);
                 }
 
