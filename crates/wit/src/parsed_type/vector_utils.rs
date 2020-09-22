@@ -27,17 +27,28 @@ pub(crate) fn generate_vector_serializer(
                 unimplemented!()
             }
         }
-        ParsedType::I8
-        | ParsedType::I16
-        | ParsedType::I32
-        | ParsedType::I64
-        | ParsedType::U8
-        | ParsedType::U16
-        | ParsedType::U32
-        | ParsedType::U64 => {
+        ParsedType::I8 | ParsedType::U8 => {
             quote! {
                 let arg = std::mem::ManuallyDrop::new(arg);
                 (arg.as_ptr() as _, arg.len() as _)
+            }
+        }
+        ParsedType::I16 | ParsedType::U16 => {
+            quote! {
+                let arg = std::mem::ManuallyDrop::new(arg);
+                (arg.as_ptr() as _, (2 * arg.len()) as _)
+            }
+        }
+        ParsedType::I32 | ParsedType::U32 => {
+            quote! {
+                let arg = std::mem::ManuallyDrop::new(arg);
+                (arg.as_ptr() as _, (4 * arg.len()) as _)
+            }
+        }
+        ParsedType::I64 | ParsedType::U64 => {
+            quote! {
+                let arg = std::mem::ManuallyDrop::new(arg);
+                (arg.as_ptr() as _, (8 * arg.len()) as _)
             }
         }
         ParsedType::F32 => {
@@ -184,7 +195,7 @@ pub(crate) fn generate_vector_deserializer(
                 while let Some(offset) = arg.next() {
                     let size = arg.next().unwrap();
 
-                    let value = #deserializer_ident(offset, size);
+                    let value = #deserializer_ident(offset as _, size as _);
                     result.push(value);
                 }
 
@@ -212,6 +223,7 @@ pub(crate) fn generate_vector_deserializer(
                 let mut result = Vec::with_capacity(arg.len());
 
                 for value in arg {
+                    println!("value is {}", value);
                     result.push(value as _);
                 }
 
