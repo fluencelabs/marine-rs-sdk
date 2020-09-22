@@ -20,7 +20,6 @@ path = "src/lib.rs"
 [dependencies]
 fluence-sdk-macro = { path = "crates/macro", version = "=0.2.4" }
 fluence-sdk-main = { path = "crates/main", version = "=0.2.4" }
-safe-transmute = "0.11.0"
 
 [features]
 # Print some internal logs by log_utf8_string
