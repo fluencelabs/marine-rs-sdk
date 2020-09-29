@@ -45,10 +45,7 @@ impl CallParameters {
 #[cfg(target_arch = "wasm32")]
 pub fn get_call_parameters() -> CallParameters {
     // it's safe until it is executed on standard Fluence node with appropriate import function
-    unsafe {
-        let raw_call_parameters = get_call_raw_parameters();
-        CallParameters::__fce_generated_deserialize(raw_call_parameters)
-    }
+    unsafe { get_call_raw_parameters() }
 }
 
 #[cfg(target_arch = "wasm32")]
@@ -57,5 +54,5 @@ pub fn get_call_parameters() -> CallParameters {
 extern "C" {
     // returns serialized current call parameters
     #[link_name = "get_call_parameters"]
-    fn get_call_raw_parameters() -> *const u8;
+    fn get_call_raw_parameters() -> CallParameters;
 }
