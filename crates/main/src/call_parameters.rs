@@ -48,6 +48,7 @@ pub fn get_call_parameters() -> CallParameters {
     unsafe { get_call_raw_parameters() }
 }
 
+#[fce]
 #[cfg(target_arch = "wasm32")]
 #[link(wasm_import_module = "host")]
 #[allow(improper_ctypes)]
