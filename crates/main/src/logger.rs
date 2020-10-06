@@ -144,7 +144,7 @@ impl log::Log for WasmLogger {
             record.args()
         );
 
-        // this allows compiling sdk on x86_64
+        // this allows building sdk for x86_64
         if cfg!(target_arch = "wasm32") {
             unsafe { log_utf8_string(log_msg.as_ptr() as i32, log_msg.len() as i32) };
         } else {
