@@ -159,7 +159,10 @@ pub fn log_utf8_string(ptr: i32, size: i32) {
 
 #[cfg(not(target_arch = "wasm32"))]
 pub fn log_utf8_string(ptr: i32, size: i32) {
-    let msg = unsafe { from_utf8_unchecked(core::slice::from_raw_parts(ptr as _, size as _)) };
+    use std::str::from_utf8_unchecked;
+    use core::slice::from_raw_parts;
+
+    let msg = unsafe { from_utf8_unchecked(from_raw_parts(ptr as _, size as _)) };
     println!("{}", msg);
 }
 
