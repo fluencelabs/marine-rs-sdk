@@ -53,13 +53,8 @@ pub use result::set_result_size;
 pub(crate) fn log<S: AsRef<str>>(msg: S) {
     // logs will be printed only if debug feature is enabled
     #[cfg(feature = "debug")]
-    unsafe {
+    {
         let msg = msg.as_ref();
-
-        if cfg!(target_arch = "wasm32") {
-            logger::log_utf8_string(msg.as_ptr() as i32, msg.len() as i32);
-        } else {
-            println!("{}", msg);
-        }
+        logger::log_utf8_string(msg.as_ptr() as i32, msg.len() as i32);
     }
 }
