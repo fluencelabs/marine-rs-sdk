@@ -144,7 +144,12 @@ impl log::Log for WasmLogger {
             record.args()
         );
 
-        unsafe { log_utf8_string(log_msg.as_ptr() as i32, log_msg.len() as i32) };
+        // this allows compiling sdk on x86_64
+        if cfg!(target_arch = "wasm32") {
+            unsafe { log_utf8_string(log_msg.as_ptr() as i32, log_msg.len() as i32) };
+        } else {
+            println!("{}", log_msg);
+        }
     }
 
     // in our case flushing is performed by the VM itself
@@ -153,6 +158,7 @@ impl log::Log for WasmLogger {
 }
 
 /// log_utf8_string should be provided directly by a host.
+#[cfg(target_arch = "wasm32")]
 #[link(wasm_import_module = "host")]
 extern "C" {
     // Writes a byte string of size bytes that starts from ptr to a logger
