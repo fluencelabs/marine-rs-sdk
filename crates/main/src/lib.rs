@@ -57,9 +57,9 @@ pub(crate) fn log<S: AsRef<str>>(msg: S) {
         let msg = msg.as_ref();
 
         if cfg!(target_arch = "wasm32") {
-            unsafe { logger::log_utf8_string(log_msg.as_ptr() as i32, log_msg.len() as i32) };
+            logger::log_utf8_string(msg.as_ptr() as i32, msg.len() as i32);
         } else {
-            println!("{}", log_msg);
+            println!("{}", msg);
         }
     }
 }
