@@ -144,7 +144,7 @@ impl log::Log for WasmLogger {
             record.args()
         );
 
-        unsafe { log_utf8_string(log_msg.as_ptr() as i32, log_msg.len() as i32) };
+        log_utf8_string(log_msg.as_ptr() as _, log_msg.len() as _);
     }
 
     // in our case flushing is performed by the VM itself
@@ -152,9 +152,25 @@ impl log::Log for WasmLogger {
     fn flush(&self) {}
 }
 
+#[cfg(target_arch = "wasm32")]
+pub fn log_utf8_string(ptr: i32, size: i32) {
+    unsafe { log_utf8_string_impl(ptr, size) };
+}
+
+#[cfg(not(target_arch = "wasm32"))]
+pub fn log_utf8_string(ptr: i32, size: i32) {
+    use std::str::from_utf8_unchecked;
+    use core::slice::from_raw_parts;
+
+    let msg = unsafe { from_utf8_unchecked(from_raw_parts(ptr as _, size as _)) };
+    println!("{}", msg);
+}
+
 /// log_utf8_string should be provided directly by a host.
+#[cfg(target_arch = "wasm32")]
 #[link(wasm_import_module = "host")]
 extern "C" {
     // Writes a byte string of size bytes that starts from ptr to a logger
-    pub fn log_utf8_string(ptr: i32, size: i32);
+    #[link_name = "log_utf8_string"]
+    fn log_utf8_string_impl(ptr: i32, size: i32);
 }
