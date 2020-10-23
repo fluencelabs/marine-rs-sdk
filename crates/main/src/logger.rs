@@ -189,6 +189,7 @@ extern "C" {
     fn log_utf8_string_impl(level: i32, target: i64, msg_ptr: i32, msg_size: i32);
 }
 
+#[allow(dead_code)]
 fn level_from_i32(level: i32) -> log::Level {
     match level {
         1 => log::Level::Error,
