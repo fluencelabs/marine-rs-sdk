@@ -80,7 +80,7 @@ use std::collections::HashMap;
 /// [`init()`]: struct.WasmLogger.html#method.init
 pub struct WasmLogger {
     level: log::Level,
-    target_map: Option<HashMap<String, i64>>
+    target_map: Option<HashMap<&'static str, i64>>
 }
 
 #[allow(dead_code)]
@@ -109,7 +109,7 @@ impl WasmLogger {
 
     /// Sets mapping between logging targets and numbers
     /// Used to efficiently enable & disable logs per target on the host
-    pub fn with_target_map(&mut self, map: HashMap<String, i64>) {
+    pub fn with_target_map(&mut self, map: HashMap<&'static str, i64>) {
         self.target_map = Some(map);
     }
 
