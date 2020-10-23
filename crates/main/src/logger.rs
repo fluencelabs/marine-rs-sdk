@@ -80,7 +80,7 @@ use std::collections::HashMap;
 /// [`init()`]: struct.WasmLogger.html#method.init
 pub struct WasmLogger {
     level: log::Level,
-    target_map: Option<HashMap<&'static str, i64>>
+    target_map: Option<HashMap<&'static str, i64>>,
 }
 
 #[allow(dead_code)]
@@ -101,7 +101,10 @@ impl WasmLogger {
     /// # }
     /// ```
     pub fn init_with_level(level: log::Level) -> Result<(), log::SetLoggerError> {
-        let logger = WasmLogger { level, target_map: None };
+        let logger = WasmLogger {
+            level,
+            target_map: None,
+        };
         log::set_boxed_logger(Box::new(logger))?;
         log::set_max_level(level.to_level_filter());
         Ok(())
@@ -148,7 +151,8 @@ impl log::Log for WasmLogger {
 
         let level = record.metadata().level() as i32;
         let target = *self
-            .target_map.as_ref()
+            .target_map
+            .as_ref()
             .and_then(|m| m.get(record.metadata().target()))
             .unwrap_or(&0);
         let msg = record.args().to_string();
