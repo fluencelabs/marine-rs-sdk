@@ -137,14 +137,11 @@ impl log::Log for WasmLogger {
             return;
         }
 
-        let log_msg = format!(
-            "{:<5} [{}] {}\n",
-            record.level().to_string(),
-            record.module_path().unwrap_or_default(),
-            record.args()
-        );
+        let level = record.metadata().level() as i32;
+        let target = record.metadata().target();
+        let msg = record.args().to_string();
 
-        log_utf8_string(log_msg.as_ptr() as _, log_msg.len() as _);
+        log_utf8_string(level, target.as_ptr() as _, target.len() as _, msg.as_ptr() as _, msg.len() as _);
     }
 
     // in our case flushing is performed by the VM itself
@@ -153,17 +150,19 @@ impl log::Log for WasmLogger {
 }
 
 #[cfg(target_arch = "wasm32")]
-pub fn log_utf8_string(ptr: i32, size: i32) {
-    unsafe { log_utf8_string_impl(ptr, size) };
+pub fn log_utf8_string(level: i32, target_ptr: i32, target_size: i32, msg_ptr: i32, msg_size: i32) {
+    unsafe { log_utf8_string_impl(level, target_ptr, target_size, msg_ptr, msg_size) };
 }
 
 #[cfg(not(target_arch = "wasm32"))]
-pub fn log_utf8_string(ptr: i32, size: i32) {
+pub fn log_utf8_string(level: i32, target_ptr: i32, target_size: i32, msg_ptr: i32, msg_size: i32) {
     use std::str::from_utf8_unchecked;
     use core::slice::from_raw_parts;
 
-    let msg = unsafe { from_utf8_unchecked(from_raw_parts(ptr as _, size as _)) };
-    println!("{}", msg);
+    let level = level_from_i32(level);
+    let target = unsafe { from_utf8_unchecked(from_raw_parts(target_ptr as _, target_size as _)) };
+    let msg = unsafe { from_utf8_unchecked(from_raw_parts(msg_ptr as _, msg_size as _)) };
+    println!("[{}] {} {}", level, target, msg);
 }
 
 /// log_utf8_string should be provided directly by a host.
@@ -172,5 +171,16 @@ pub fn log_utf8_string(ptr: i32, size: i32) {
 extern "C" {
     // Writes a byte string of size bytes that starts from ptr to a logger
     #[link_name = "log_utf8_string"]
-    fn log_utf8_string_impl(ptr: i32, size: i32);
+    fn log_utf8_string_impl(level: i32, target_ptr: i32, target_size: i32, msg_ptr: i32, msg_size: i32);
+}
+
+fn level_from_i32(level: i32) -> log::Level {
+    match level {
+        1 => log::Level::Error,
+        2 => log::Level::Warn,
+        3 => log::Level::Info,
+        4 => log::Level::Debug,
+        5 => log::Level::Trace,
+        _ => log::Level::max(),
+    }
 }
