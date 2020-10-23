@@ -80,7 +80,7 @@ use std::collections::HashMap;
 /// [`init()`]: struct.WasmLogger.html#method.init
 pub struct WasmLogger {
     level: log::Level,
-    target_map: Option<HashMap<&'static str, u64>>
+    target_map: Option<HashMap<&'static str, i64>>
 }
 
 #[allow(dead_code)]
@@ -109,7 +109,7 @@ impl WasmLogger {
 
     /// Sets mapping between logging targets and numbers
     /// Used to efficiently enable & disable logs per target on the host
-    pub fn with_target_map(&mut self, map: HashMap<&'static str, u64>) {
+    pub fn with_target_map(&mut self, map: HashMap<&'static str, i64>) {
         self.target_map = Some(map);
     }
 
@@ -162,12 +162,12 @@ impl log::Log for WasmLogger {
 }
 
 #[cfg(target_arch = "wasm32")]
-pub fn log_utf8_string(level: i32, target: u64, msg_ptr: i32, msg_size: i32) {
+pub fn log_utf8_string(level: i32, target: i64, msg_ptr: i32, msg_size: i32) {
     unsafe { log_utf8_string_impl(level, target, msg_ptr, msg_size) };
 }
 
 #[cfg(not(target_arch = "wasm32"))]
-pub fn log_utf8_string(level: i32, target: u64, msg_ptr: i32, msg_size: i32) {
+pub fn log_utf8_string(level: i32, target: i64, msg_ptr: i32, msg_size: i32) {
     use std::str::from_utf8_unchecked;
     use core::slice::from_raw_parts;
 
@@ -182,7 +182,7 @@ pub fn log_utf8_string(level: i32, target: u64, msg_ptr: i32, msg_size: i32) {
 extern "C" {
     // Writes a byte string of size bytes that starts from ptr to a logger
     #[link_name = "log_utf8_string"]
-    fn log_utf8_string_impl(level: i32, target: u64, msg_ptr: i32, msg_size: i32);
+    fn log_utf8_string_impl(level: i32, target: i64, msg_ptr: i32, msg_size: i32);
 }
 
 fn level_from_i32(level: i32) -> log::Level {
