@@ -103,7 +103,7 @@ impl WasmLogger {
     pub fn init_with_level(level: log::Level) -> Result<(), log::SetLoggerError> {
         let logger = WasmLogger {
             level,
-            target_map: None,
+            target_map: <_>::default(),
         };
         log::set_boxed_logger(Box::new(logger))?;
         log::set_max_level(level.to_level_filter());
