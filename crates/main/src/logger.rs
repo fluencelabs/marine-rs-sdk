@@ -80,7 +80,7 @@ use std::collections::HashMap;
 /// [`init()`]: struct.WasmLogger.html#method.init
 pub struct WasmLogger {
     level: log::Level,
-    target_map: Option<HashMap<&'static str, i64>>,
+    target_map: HashMap<&'static str, i64>,
 }
 
 #[allow(dead_code)]
@@ -113,7 +113,7 @@ impl WasmLogger {
     /// Sets mapping between logging targets and numbers
     /// Used to efficiently enable & disable logs per target on the host
     pub fn with_target_map(&mut self, map: HashMap<&'static str, i64>) {
-        self.target_map = Some(map);
+        self.target_map = map;
     }
 
     /// Initializes the global logger with a [`WasmLogger`] instance, sets
@@ -152,8 +152,7 @@ impl log::Log for WasmLogger {
         let level = record.metadata().level() as i32;
         let target = *self
             .target_map
-            .as_ref()
-            .and_then(|m| m.get(record.metadata().target()))
+            .get(record.metadata().target())
             .unwrap_or(&0);
         let msg = record.args().to_string();
 
