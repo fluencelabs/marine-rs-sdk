@@ -80,7 +80,7 @@ impl WasmLogger {
     /// Set mapping between logging targets and numbers.
     /// Used to efficiently enable & disable logs per target on the host.
     pub fn with_target_map(mut self, map: TargetMap) -> Self {
-        self.map = map;
+        self.target_map = map;
         self
     }
 
