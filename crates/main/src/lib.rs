@@ -40,10 +40,15 @@ mod result;
 pub use call_parameters::CallParameters;
 #[cfg(target_arch = "wasm32")]
 pub use call_parameters::get_call_parameters;
+
 pub use export_allocator::allocate;
 pub use export_allocator::deallocate;
+
 #[cfg(feature = "logger")]
 pub use logger::WasmLogger;
+#[cfg(feature = "logger")]
+pub use logger::TargetMap;
+
 pub use result::get_result_ptr;
 pub use result::get_result_size;
 pub use result::set_result_ptr;

@@ -68,11 +68,15 @@
 #![warn(rust_2018_idioms)]
 
 pub use fluence_sdk_macro::fce;
+
 pub use fluence_sdk_main::CallParameters;
 #[cfg(target_arch = "wasm32")]
 pub use fluence_sdk_main::get_call_parameters;
+
 #[cfg(feature = "logger")]
 pub use fluence_sdk_main::WasmLogger;
+#[cfg(feature = "logger")]
+pub use fluence_sdk_main::TargetMap;
 
 /// These API functions are intended for internal usage in generated code.
 /// Normally, you shouldn't use them.
