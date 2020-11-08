@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-#![doc(html_root_url = "https://docs.rs/wit-support/0.2.8")]
+#![doc(html_root_url = "https://docs.rs/wit-support/0.2.9")]
 #![deny(
     dead_code,
     nonstandard_style,
