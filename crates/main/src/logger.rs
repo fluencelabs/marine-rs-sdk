@@ -54,26 +54,32 @@ pub type TargetMap = std::collections::HashMap<&'static str, i64>;
 ///
 /// [log-crate-url]: https://docs.rs/log/
 /// [`Log`]: https://docs.rs/log/0.4.11/log/trait.Log.html
-pub struct WasmLogger {
-    level: log::Level,
+struct WasmLogger {
     target_map: TargetMap,
 }
 
-// #[allow(dead_code)]
-impl WasmLogger {
-    /// Initializes the global logger with a [`WasmLogger`] instance with log level set to `Level::Info`.
+/// The Wasm logger builder.
+///
+/// Build logger for the Fluence network, allows specifying target map and log level while building.
+pub struct WasmLoggerBuilder {
+    target_map: TargetMap,
+    log_level: log::Level,
+}
+
+impl WasmLoggerBuilder {
+    /// Initializes a builder of the global logger with log level set to `Level::Info`.
     /// It is a initial method in this builder chain, please note, that logger wouldn't work without
     /// subsequent build() call.
     pub fn new() -> Self {
         Self {
-            level: log::Level::Info,
+            log_level: log::Level::Info,
             target_map: <_>::default(),
         }
     }
 
     /// Set the log level.
     pub fn with_log_level(mut self, level: log::Level) -> Self {
-        self.level = level;
+        self.log_level = level;
         self
     }
 
@@ -102,9 +108,14 @@ impl WasmLogger {
     /// # }
     /// ```
     pub fn build(self) -> Result<(), log::SetLoggerError> {
-        let log_level = self.level;
+        let Self {
+            log_level,
+            target_map,
+        } = self;
 
-        log::set_boxed_logger(Box::new(self))?;
+        let wasm_logger = WasmLogger { target_map };
+
+        log::set_boxed_logger(Box::new(wasm_logger))?;
         log::set_max_level(log_level.to_level_filter());
         Ok(())
     }
@@ -113,7 +124,7 @@ impl WasmLogger {
 impl log::Log for WasmLogger {
     #[inline]
     fn enabled(&self, metadata: &log::Metadata<'_>) -> bool {
-        metadata.level() <= self.level
+        metadata.level() <= log::max_level()
     }
 
     #[inline]

@@ -74,7 +74,7 @@ pub use fluence_sdk_main::CallParameters;
 pub use fluence_sdk_main::get_call_parameters;
 
 #[cfg(feature = "logger")]
-pub use fluence_sdk_main::WasmLogger;
+pub use fluence_sdk_main::WasmLoggerBuilder;
 #[cfg(feature = "logger")]
 pub use fluence_sdk_main::TargetMap;
 
