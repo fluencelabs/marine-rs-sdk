@@ -54,16 +54,18 @@ pub type TargetMap = std::collections::HashMap<&'static str, i64>;
 ///
 /// [log-crate-url]: https://docs.rs/log/
 /// [`Log`]: https://docs.rs/log/0.4.11/log/trait.Log.html
-pub struct WasmLogger {
+struct WasmLogger {
     target_map: TargetMap,
 }
 
+/// The Wasm logger builder.
+///
+/// Build logger for the Fluence network, allows specifying target map and log level while building.
 pub struct WasmLoggerBuilder {
     target_map: TargetMap,
     log_level: log::Level,
 }
 
-// #[allow(dead_code)]
 impl WasmLoggerBuilder {
     /// Initializes a builder of the global logger with log level set to `Level::Info`.
     /// It is a initial method in this builder chain, please note, that logger wouldn't work without
