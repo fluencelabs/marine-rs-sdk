@@ -45,7 +45,7 @@ pub use export_allocator::allocate;
 pub use export_allocator::deallocate;
 
 #[cfg(feature = "logger")]
-pub use logger::WasmLogger;
+pub use logger::WasmLoggerBuilder;
 #[cfg(feature = "logger")]
 pub use logger::TargetMap;
 
