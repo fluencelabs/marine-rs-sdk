@@ -75,10 +75,10 @@ impl WasmLoggerBuilder {
     pub fn new() -> Self {
         use std::str::FromStr;
 
-        const RUST_LOG_ENV_NAME: &'static str = "RUST_LOG";
+        const WASM_LOG_ENV_NAME: &'static str = "WASM_LOG";
         const RUST_DEFAULT_LOG_LEVEL: LogLevel = LogLevel::Info;
 
-        let log_level = match std::env::var(RUST_LOG_ENV_NAME) {
+        let log_level = match std::env::var(WASM_LOG_ENV_NAME) {
             Ok(log_level_str) => {
                 LogLevel::from_str(&log_level_str).unwrap_or(RUST_DEFAULT_LOG_LEVEL)
             }
