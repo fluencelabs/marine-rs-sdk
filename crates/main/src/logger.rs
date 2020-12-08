@@ -42,6 +42,8 @@
 //! [`WasmLogger`]: struct.WasmLogger.html
 //! [`log`]: https://docs.rs/log
 
+use log::Level as LogLevel;
+
 pub type TargetMap = std::collections::HashMap<&'static str, i64>;
 
 /// The Wasm Logger.
@@ -67,12 +69,24 @@ pub struct WasmLoggerBuilder {
 }
 
 impl WasmLoggerBuilder {
-    /// Initializes a builder of the global logger with log level set to `Level::Info`.
-    /// It is a initial method in this builder chain, please note, that logger wouldn't work without
-    /// subsequent build() call.
+    /// Initializes a builder of the global logger. Set log level based on the RUST_LOG environment variable if it set,
+    /// or log::Level::Info otherwise. It is a initial method in this builder chain, please note, that logger wouldn't
+    /// work without subsequent build() call.
     pub fn new() -> Self {
+        use std::str::FromStr;
+
+        const RUST_LOG_ENV_NAME: &'static str = "RUST_LOG";
+        const RUST_DEFAULT_LOG_LEVEL: LogLevel = LogLevel::Info;
+
+        let log_level = match std::env::var(RUST_LOG_ENV_NAME) {
+            Ok(log_level_str) => {
+                LogLevel::from_str(&log_level_str).unwrap_or(RUST_DEFAULT_LOG_LEVEL)
+            }
+            Err(_) => RUST_DEFAULT_LOG_LEVEL,
+        };
+
         Self {
-            log_level: log::Level::Info,
+            log_level,
             target_map: <_>::default(),
         }
     }
