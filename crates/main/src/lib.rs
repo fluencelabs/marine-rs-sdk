@@ -48,6 +48,8 @@ pub use export_allocator::deallocate;
 pub use logger::WasmLoggerBuilder;
 #[cfg(feature = "logger")]
 pub use logger::TargetMap;
+#[cfg(feature = "logger")]
+pub use logger::WASM_LOG_ENV_NAME;
 
 pub use result::get_result_ptr;
 pub use result::get_result_size;
