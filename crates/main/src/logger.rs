@@ -44,6 +44,12 @@
 
 use log::Level as LogLevel;
 
+/// By default, logger will be initialized with log level from this environment variable.
+pub const WASM_LOG_ENV_NAME: &'static str = "WASM_LOG";
+
+/// If WASM_LOG_ENV isn't set, then this level will be used as the default.
+const WASM_DEFAULT_LOG_LEVEL: LogLevel = LogLevel::Info;
+
 pub type TargetMap = std::collections::HashMap<&'static str, i64>;
 
 /// The Wasm Logger.
@@ -75,15 +81,10 @@ impl WasmLoggerBuilder {
     pub fn new() -> Self {
         use std::str::FromStr;
 
-        const WASM_LOG_ENV_NAME: &'static str = "WASM_LOG";
-        const RUST_DEFAULT_LOG_LEVEL: LogLevel = LogLevel::Info;
-
-        let log_level = match std::env::var(WASM_LOG_ENV_NAME) {
-            Ok(log_level_str) => {
-                LogLevel::from_str(&log_level_str).unwrap_or(RUST_DEFAULT_LOG_LEVEL)
-            }
-            Err(_) => RUST_DEFAULT_LOG_LEVEL,
-        };
+        let log_level = std::env::var(WASM_LOG_ENV_NAME)
+            .map_or(WASM_DEFAULT_LOG_LEVEL, |log_level_str| {
+                LogLevel::from_str(&log_level_str).unwrap_or(WASM_DEFAULT_LOG_LEVEL)
+            });
 
         Self {
             log_level,
