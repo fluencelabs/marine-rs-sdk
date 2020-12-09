@@ -76,7 +76,7 @@ pub struct WasmLoggerBuilder {
 
 impl WasmLoggerBuilder {
     /// Initializes a builder of the global logger. Set log level based on the WASM_LOG environment variable if it set,
-    /// or WASM_DEFAULT_LOG_LEVEL otherwise. It is a initial method in this builder chain, please note,
+    /// or [[WASM_DEFAULT_LOG_LEVEL]] otherwise. It is an initial method in this builder chain, please note,
     /// that logger wouldn't work without subsequent build() call.
     pub fn new() -> Self {
         use std::str::FromStr;
