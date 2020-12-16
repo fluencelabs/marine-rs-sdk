@@ -50,7 +50,7 @@ pub const WASM_LOG_ENV_NAME: &'static str = "WASM_LOG";
 /// If WASM_LOG_ENV isn't set, then this level will be used as the default.
 const WASM_DEFAULT_LOG_LEVEL: LogLevel = LogLevel::Info;
 
-pub type TargetMap = std::collections::HashMap<&'static str, i64>;
+pub type TargetMap = std::collections::HashMap<&'static str, i32>;
 
 /// The Wasm Logger.
 ///
@@ -170,7 +170,7 @@ pub fn log_utf8_string(level: i32, target: i64, msg_ptr: i32, msg_size: i32) {
 }
 
 #[cfg(not(target_arch = "wasm32"))]
-pub fn log_utf8_string(level: i32, target: i64, msg_ptr: i32, msg_size: i32) {
+pub fn log_utf8_string(level: i32, target: i32, msg_ptr: i32, msg_size: i32) {
     use std::str::from_utf8_unchecked;
     use core::slice::from_raw_parts;
 
