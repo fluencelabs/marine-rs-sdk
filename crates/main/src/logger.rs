@@ -165,7 +165,7 @@ impl log::Log for WasmLogger {
 }
 
 #[cfg(target_arch = "wasm32")]
-pub fn log_utf8_string(level: i32, target: i64, msg_ptr: i32, msg_size: i32) {
+pub fn log_utf8_string(level: i32, target: i32, msg_ptr: i32, msg_size: i32) {
     unsafe { log_utf8_string_impl(level, target, msg_ptr, msg_size) };
 }
 
@@ -185,7 +185,7 @@ pub fn log_utf8_string(level: i32, target: i32, msg_ptr: i32, msg_size: i32) {
 extern "C" {
     // Writes a byte string of size bytes that starts from ptr to a logger
     #[link_name = "log_utf8_string"]
-    fn log_utf8_string_impl(level: i32, target: i64, msg_ptr: i32, msg_size: i32);
+    fn log_utf8_string_impl(level: i32, target: i32, msg_ptr: i32, msg_size: i32);
 }
 
 #[allow(dead_code)]
