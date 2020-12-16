@@ -153,7 +153,7 @@ impl log::Log for WasmLogger {
         let target = *self
             .target_map
             .get(record.metadata().target())
-            .unwrap_or(&default_target);
+            .unwrap_or(&default_target) as i32;
         let msg = record.args().to_string();
 
         log_utf8_string(level, target, msg.as_ptr() as _, msg.len() as _);
