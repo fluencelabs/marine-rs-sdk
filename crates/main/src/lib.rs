@@ -62,7 +62,7 @@ pub(crate) fn log<S: AsRef<str>>(msg: S) {
     #[cfg(feature = "debug")]
     {
         let level = log::Level::Info as i32;
-        let target = 0i64;
+        let target = 0i32;
         let msg = msg.as_ref();
         logger::log_utf8_string(level, target, msg.as_ptr() as i32, msg.len() as i32);
     }

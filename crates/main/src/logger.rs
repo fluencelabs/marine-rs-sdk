@@ -50,7 +50,11 @@ pub const WASM_LOG_ENV_NAME: &'static str = "WASM_LOG";
 /// If WASM_LOG_ENV isn't set, then this level will be used as the default.
 const WASM_DEFAULT_LOG_LEVEL: LogLevel = LogLevel::Info;
 
-pub type TargetMap = std::collections::HashMap<&'static str, i64>;
+/// Mapping from logging namespace string to its bitmask.
+/// TODO: use i64 for bitmask when wasmpack/bindgen issue with i64 is fixed.
+///       Currently, i64 doesn't work on some versions of V8 because log_utf8_string function
+///       isn't marked as #[wasm_bindgen]. In result, TS/JS code throws 'TypeError' on every log.
+pub type TargetMap = std::collections::HashMap<&'static str, i32>;
 
 /// The Wasm Logger.
 ///
@@ -165,12 +169,12 @@ impl log::Log for WasmLogger {
 }
 
 #[cfg(target_arch = "wasm32")]
-pub fn log_utf8_string(level: i32, target: i64, msg_ptr: i32, msg_size: i32) {
+pub fn log_utf8_string(level: i32, target: i32, msg_ptr: i32, msg_size: i32) {
     unsafe { log_utf8_string_impl(level, target, msg_ptr, msg_size) };
 }
 
 #[cfg(not(target_arch = "wasm32"))]
-pub fn log_utf8_string(level: i32, target: i64, msg_ptr: i32, msg_size: i32) {
+pub fn log_utf8_string(level: i32, target: i32, msg_ptr: i32, msg_size: i32) {
     use std::str::from_utf8_unchecked;
     use core::slice::from_raw_parts;
 
@@ -179,13 +183,14 @@ pub fn log_utf8_string(level: i32, target: i64, msg_ptr: i32, msg_size: i32) {
     println!("[{}] {} {}", level, target, msg);
 }
 
+/// TODO: mark `log_utf8_string_impl` as #[wasm_bindgen], so it is polyfilled by bindgen
 /// log_utf8_string should be provided directly by a host.
 #[cfg(target_arch = "wasm32")]
 #[link(wasm_import_module = "host")]
 extern "C" {
     // Writes a byte string of size bytes that starts from ptr to a logger
     #[link_name = "log_utf8_string"]
-    fn log_utf8_string_impl(level: i32, target: i64, msg_ptr: i32, msg_size: i32);
+    fn log_utf8_string_impl(level: i32, target: i32, msg_ptr: i32, msg_size: i32);
 }
 
 #[allow(dead_code)]
