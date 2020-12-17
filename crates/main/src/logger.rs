@@ -183,6 +183,7 @@ pub fn log_utf8_string(level: i32, target: i32, msg_ptr: i32, msg_size: i32) {
     println!("[{}] {} {}", level, target, msg);
 }
 
+/// TODO: mark `log_utf8_string_impl` as #[wasm_bindgen], so it is polyfilled by bindgen
 /// log_utf8_string should be provided directly by a host.
 #[cfg(target_arch = "wasm32")]
 #[link(wasm_import_module = "host")]
