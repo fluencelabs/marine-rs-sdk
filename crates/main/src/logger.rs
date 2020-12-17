@@ -50,6 +50,10 @@ pub const WASM_LOG_ENV_NAME: &'static str = "WASM_LOG";
 /// If WASM_LOG_ENV isn't set, then this level will be used as the default.
 const WASM_DEFAULT_LOG_LEVEL: LogLevel = LogLevel::Info;
 
+/// Mapping from logging namespace string to its bitmask.
+/// TODO: use i64 for bitmask when wasmpack/bindgen issue with i64 is fixed.
+///       Currently, i64 doesn't work on some versions of V8 because log_utf8_string function
+///       isn't marked as #[wasm_bindgen]. In result, TS/JS code throws 'TypeError' on every log.
 pub type TargetMap = std::collections::HashMap<&'static str, i32>;
 
 /// The Wasm Logger.
@@ -153,7 +157,7 @@ impl log::Log for WasmLogger {
         let target = *self
             .target_map
             .get(record.metadata().target())
-            .unwrap_or(&default_target) as i32;
+            .unwrap_or(&default_target);
         let msg = record.args().to_string();
 
         log_utf8_string(level, target, msg.as_ptr() as _, msg.len() as _);
