@@ -70,6 +70,7 @@
 pub use fluence_sdk_macro::fce;
 
 pub use fluence_sdk_main::CallParameters;
+pub use fluence_sdk_main::SecurityTetraplet;
 #[cfg(target_arch = "wasm32")]
 pub use fluence_sdk_main::get_call_parameters;
 

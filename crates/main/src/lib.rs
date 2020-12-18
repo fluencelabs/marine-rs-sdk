@@ -38,6 +38,7 @@ mod logger;
 mod result;
 
 pub use call_parameters::CallParameters;
+pub use call_parameters::SecurityTetraplet;
 #[cfg(target_arch = "wasm32")]
 pub use call_parameters::get_call_parameters;
 
