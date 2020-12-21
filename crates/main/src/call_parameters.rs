@@ -16,17 +16,36 @@
 
 use fluence_sdk_macro::fce;
 
+use serde::Serialize;
+use serde::Deserialize;
+
+/// Describes an origin that set an argument.
+#[fce]
+#[derive(Clone, PartialEq, Default, Eq, Debug, Serialize, Deserialize)]
+pub struct SecurityTetraplet {
+    pub peer_pk: String,
+    pub service_id: String,
+    pub function_name: String,
+    pub json_path: String,
+}
+
 /// This struct contains parameters that would be accessible by Wasm modules.
 #[fce]
-#[derive(Clone, PartialEq, Default, Eq, Debug, serde::Serialize, serde::Deserialize)]
+#[derive(Clone, PartialEq, Default, Eq, Debug, Serialize, Deserialize)]
 pub struct CallParameters {
     pub call_id: String,
     pub user_name: String,
     pub application_id: String,
+    pub tetraplets: Vec<Vec<SecurityTetraplet>>,
 }
 
 impl CallParameters {
-    pub fn new<C, U, A>(call_id: C, user_name: U, application_id: A) -> Self
+    pub fn new<C, U, A>(
+        call_id: C,
+        user_name: U,
+        application_id: A,
+        tetraplets: Vec<Vec<SecurityTetraplet>>,
+    ) -> Self
     where
         C: Into<String>,
         U: Into<String>,
@@ -36,6 +55,7 @@ impl CallParameters {
             call_id: call_id.into(),
             user_name: user_name.into(),
             application_id: application_id.into(),
+            tetraplets,
         }
     }
 }

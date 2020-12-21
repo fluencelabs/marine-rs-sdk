@@ -18,9 +18,10 @@ path = "src/lib.rs"
 crate-type = ["rlib"]
 
 [dependencies]
-log = { version = "0.4.8", features = ["std"] }
 fluence-sdk-macro = { path = "../macro", version = "=0.2.11" }
-serde = "1.0.115"
+
+log = { version = "0.4.8", features = ["std"] }
+serde = "=1.0.118"
 
 [dev-dependencies]
 simple_logger = "1.6.0" # used in doc test
