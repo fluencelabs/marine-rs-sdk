@@ -54,7 +54,7 @@
 //!
 //! ```
 
-#![doc(html_root_url = "https://docs.rs/fluence-sdk-macro/0.2.12")]
+#![doc(html_root_url = "https://docs.rs/fluence-sdk-macro/0.2.13")]
 #![deny(
     dead_code,
     nonstandard_style,
