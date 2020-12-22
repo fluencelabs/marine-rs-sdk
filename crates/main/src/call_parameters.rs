@@ -33,31 +33,23 @@ pub struct SecurityTetraplet {
 #[fce]
 #[derive(Clone, PartialEq, Default, Eq, Debug, Serialize, Deserialize)]
 pub struct CallParameters {
-    pub call_id: String,
-    pub user_name: String,
-    pub application_id: String,
-    pub tetraplets: Vec<Vec<SecurityTetraplet>>,
-}
+    /// Peer id of the AIR script initiator.
+    pub init_peer_id: String,
 
-impl CallParameters {
-    pub fn new<C, U, A>(
-        call_id: C,
-        user_name: U,
-        application_id: A,
-        tetraplets: Vec<Vec<SecurityTetraplet>>,
-    ) -> Self
-    where
-        C: Into<String>,
-        U: Into<String>,
-        A: Into<String>,
-    {
-        Self {
-            call_id: call_id.into(),
-            user_name: user_name.into(),
-            application_id: application_id.into(),
-            tetraplets,
-        }
-    }
+    /// Id of the current service.
+    pub service_id: String,
+
+    /// Id of the service creator.
+    pub service_creator_peer_id: String,
+
+    /// Id of the host which run this service.
+    pub host_id: String,
+
+    /// Id of the particle which execution resulted a call this service.
+    pub particle_id: String,
+
+    /// Security tetraplets which described origin of the arguments.
+    pub tetraplets: Vec<Vec<SecurityTetraplet>>,
 }
 
 /// This functions takes from host current call parameters.
