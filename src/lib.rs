@@ -55,7 +55,7 @@
 //!     pub fn curl_get(url: String) -> String;
 //! }
 //! ```
-#![doc(html_root_url = "https://docs.rs/fluence/0.2.12")]
+#![doc(html_root_url = "https://docs.rs/fluence/0.2.13")]
 #![deny(
     dead_code,
     nonstandard_style,
