@@ -57,9 +57,19 @@ jobs:
           # get version from Cargo.toml
           LOCAL_VERSION="$(toml get "$CARGO_TOML" package.version | tr -d \")"
 
-          # get & increment version from crates.io
-          CRATE_VERSION="$((cargo show --json "$PKG_NAME" | jq -r .crate.max_version) 2>/dev/null || true)"
-          NEXT_CRATE_VERSION="$(semver --increment patch "$CRATE_VERSION" || true)"
+          # Define accumulator array variable
+          ALL_CRATES_VERSIONS=()
+
+          # For all crates in the workspace accumulate its max_version
+          for CRATE_NAME in $(cargo ws list)
+          do
+            CRATE_VERSION="$((cargo show --json "$PKG_NAME" | jq -r .crate.max_version) 2>/dev/null || true)"
+            ALL_CRATES_VERSIONS+=($CRATE_VERSION)
+          done
+          # Take the highest version of all
+          MAX_CRATES_VERSION="$(semver -p ${ALL_CRATES_VERSIONS[@]} | tail -n1 || true)"
+          # Increment patch octet of the highest version
+          NEXT_CRATE_VERSION="$(semver --increment patch "${MAX_CRATES_VERSION}" || true)"
 
           # take the highest version
           MAX_VERSION="$(semver "$NEXT_CRATE_VERSION" "$LOCAL_VERSION" | tail -n1)"
