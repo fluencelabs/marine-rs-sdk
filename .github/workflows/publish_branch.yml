@@ -57,6 +57,7 @@ jobs:
 
       - name: Calculate the version
         run: |
+          set -euo pipefail
           set -x
 
           # install semver and add it to PATH
@@ -84,7 +85,7 @@ jobs:
           # Take the highest version of all
           MAX_CRATES_VERSION="$(semver -p ${ALL_CRATES_VERSIONS[@]} | tail -n1 || true)"
           # Increment prerelease part of the highest version
-          PRERELEASE_CRATE_VERSION="$(semver --increment prerelease --preid "$SANITIZED_BRANCH" "${LAST_CRATE_VERSION}" || true)"
+          PRERELEASE_CRATE_VERSION="$(semver --increment prerelease --preid "$SANITIZED_BRANCH" "${MAX_CRATES_VERSION}" || true)"
 
           ### LOCAL
           ### (NOTE: the following code assumes that local versions do not contain prerelease suffix; existing suffix will be ignored)
