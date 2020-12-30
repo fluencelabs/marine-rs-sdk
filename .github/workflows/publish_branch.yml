@@ -1,6 +1,3 @@
-# run locally like this:
-# act -b -P ubuntu-latest=nektos/act-environments-ubuntu:18.04 -j publish-interpreter -s "NPM_TOKEN=uuid-uuid-uuid-uuid"
-
 name: "publish-release"
 
 on:
