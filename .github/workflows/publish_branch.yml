@@ -87,4 +87,3 @@ jobs:
 
       - name: Publish to crates.io
         run: cargo ws publish --no-git-commit --allow-dirty custom "${{ env.FINAL_VERSION }}"
-        working-directory: crates/air-interpreter-wasm
