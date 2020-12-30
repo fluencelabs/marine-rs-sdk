@@ -71,7 +71,7 @@ jobs:
         run: cargo login ${{ secrets.CRATES_IO_TOKEN }}
 
       - name: Publish to crates.io
-        run: cargo ws publish --no-git-commit --allow-dirty custom "${{ env.FINAL_VERSION }}"
+        run: cargo ws publish --no-git-commit --allow-dirty --yes custom "${{ env.FINAL_VERSION }}"
 
       ### Create a pre-release
       - name: Create Release
