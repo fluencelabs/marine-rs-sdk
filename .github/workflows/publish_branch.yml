@@ -71,20 +71,24 @@ jobs:
           PKG_NAME="$(toml get "$CARGO_TOML" package.name | tr -d \")"
 
           ### CRATES.IO
-          # Get info from crates.io
-          CRATE_VERSIONS=$(cargo show --json "$PKG_NAME")
-          # take only versions that contain branch name
-          CRATE_VERSIONS_FILTERED=$(echo $CRATE_VERSIONS | jq -r ".versions[] | .num | select(contains(\"$SANITIZED_BRANCH\"))")
-          # flatten into a single line
-          CRATE_VERSIONS_FLATTENED=$(echo $CRATE_VERSIONS_FILTERED | awk '{print}' ORS=' ')
-          # sort versions according to semver, take the highest (last)
-          LAST_CRATE_VERSION="$(semver -p $(echo $CRATE_VERSIONS_FLATTENED) | tail -n1 || true)"
-          # increment prerelease part of the version
+          # Define accumulator array variable
+          ALL_CRATES_VERSIONS=()
+
+          # For all crates in the workspace gather all versions, filtered by branch
+          for CRATE_NAME in $(cargo ws list)
+          do
+            CRATE_VERSIONS=$(cargo show --json "$CRATE_NAME")
+            CRATE_VERSIONS_FILTERED=$(echo $CRATE_VERSIONS | jq -r ".versions[] | .num | select(contains(\"$SANITIZED_BRANCH\"))")
+            ALL_CRATES_VERSIONS+=($CRATE_VERSIONS_FILTERED)
+          done
+          # Take the highest version of all
+          MAX_CRATES_VERSION="$(semver -p ${ALL_CRATES_VERSIONS[@]} | tail -n1 || true)"
+          # Increment prerelease part of the highest version
           PRERELEASE_CRATE_VERSION="$(semver --increment prerelease --preid "$SANITIZED_BRANCH" "${LAST_CRATE_VERSION}" || true)"
 
           ### LOCAL
           ### (NOTE: the following code assumes that local versions do not contain prerelease suffix; existing suffix will be ignored)
-          # take local Rust version
+          # take local Rust version of the "root" crate
           LOCAL_RUST_VERSION="$(toml get "$CARGO_TOML" package.version | tr -d \")"
           LOCAL_RUST_PRERELEASE_VERSION="$(semver --increment prerelease --preid "$SANITIZED_BRANCH" "${LOCAL_RUST_VERSION}-0")" # added '-0' here to avoid semver erroneously increment patch octet. Any suffix works, '-0' is chosen deliberately.
 
