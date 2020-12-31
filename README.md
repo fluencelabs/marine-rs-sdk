@@ -1,4 +1,4 @@
-https://img.shields.io/crates/v/fluence?color=green
+![crates.io version](https://img.shields.io/crates/v/fluence?color=green)
 
 ## Rust backend SDK
 
