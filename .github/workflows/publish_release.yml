@@ -91,7 +91,7 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
           tag_name: ${{ env.FINAL_VERSION }}
-          release_name: Fluence Network ${{ env.FINAL_VERSION }}
+          release_name: Fluence Rust SDK ${{ env.FINAL_VERSION }}
           body: |
             - [${{ env.FINAL_VERSION }} @ crates.io](https://crates.io/crates/${{ env.PKG_NAME }}/${{ env.FINAL_VERSION }})
           draft: false
