@@ -53,6 +53,18 @@ pub enum ParsedType {
     Utf8String,
     Vector(Box<ParsedType>),
     Record(String), // short type name
+    Option(String),
+    Result(String),
+}
+
+enum ArgPassingStyle {
+    ByValue,
+    ByRef
+}
+
+struct Arg {
+    passing_style: ArgPassingStyle,
+    parsed_type: ParsedType,
 }
 
 impl ParsedType {
