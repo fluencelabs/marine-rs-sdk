@@ -17,6 +17,7 @@
 use super::ParsedType;
 use crate::wasm_type::RustType;
 use crate::new_ident;
+use crate::parsed_type::PassingStyle;
 
 pub(crate) struct WrapperDescriptor {
     pub(crate) arg_names: Vec<syn::Ident>,
@@ -76,11 +77,11 @@ impl ForeignModPrologGlueCodeGenerator for Vec<(String, ParsedType)> {
                 arg_names.push(arg_ident.clone());
 
                 match ty {
-                    ParsedType::Utf8String => {
+                    ParsedType::Utf8String(PassingStyle::ByValue) => {
                         arg_transforms.extend(quote::quote! { let mut #arg_ident = std::mem::ManuallyDrop::new(#arg_ident); });
                         arg_drops.extend(quote::quote! { std::mem::ManuallyDrop::drop(&mut #arg_ident); });
                     },
-                    ParsedType::Vector(ty) => {
+                    ParsedType::Vector(ty, _) => {
                         let generated_serializer_name = format!("__fce_generated_vec_serializer_{}", arg_name);
                         let generated_serializer_ident = new_ident!(generated_serializer_name);
                         let vector_serializer = super::vector_utils::generate_vector_serializer(ty, &generated_serializer_name);

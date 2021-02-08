@@ -34,7 +34,6 @@ use serde::Serialize;
 use serde::Deserialize;
 use syn::parse::Error;
 use syn::spanned::Spanned;
-use proc_macro2::TokenStream;
 
 /// An internal representation of supported Rust types.
 #[derive(Debug, Clone, PartialEq, Serialize, Deserialize)]
@@ -56,6 +55,7 @@ pub enum ParsedType {
     Record(String, PassingStyle), // short type name
 }
 
+#[derive(Debug, Clone, PartialEq, Serialize, Deserialize)]
 pub enum PassingStyle {
     ByValue,
     ByRef,
@@ -145,9 +145,10 @@ impl ParsedType {
 
 fn type_to_path_passing_style(input_type: &syn::Type) -> syn::Result<(&syn::Path, PassingStyle)> {
     match input_type {
-        syn::Type::Path(path) => Ok((&path.path, PassingStyle::ByRef)),
+        syn::Type::Path(path) => Ok((&path.path, PassingStyle::ByValue)),
         syn::Type::Reference(type_reference) => match &*type_reference.elem {
             syn::Type::Path(path) => {
+                // TODO: support lifetimes
                 if type_reference.lifetime.is_some() {
                     return Err(Error::new(
                         input_type.span(),

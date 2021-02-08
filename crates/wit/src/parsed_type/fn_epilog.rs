@@ -53,21 +53,22 @@ impl FnEpilogGlueCodeGenerator for Option<ParsedType> {
 
 fn generate_fn_return_type(ty: &Option<ParsedType>) -> proc_macro2::TokenStream {
     let ty = match ty {
-        Some(ParsedType::Boolean) => Some("i32"),
-        Some(ParsedType::I8) => Some("i8"),
-        Some(ParsedType::I16) => Some("i16"),
-        Some(ParsedType::I32) => Some("i32"),
-        Some(ParsedType::I64) => Some("i64"),
-        Some(ParsedType::U8) => Some("u8"),
-        Some(ParsedType::U16) => Some("u16"),
-        Some(ParsedType::U32) => Some("u32"),
-        Some(ParsedType::U64) => Some("u64"),
-        Some(ParsedType::F32) => Some("f32"),
-        Some(ParsedType::F64) => Some("f64"),
+        Some(ParsedType::Boolean(_)) => Some("i32"),
+        Some(ParsedType::I8(_)) => Some("i8"),
+        Some(ParsedType::I16(_)) => Some("i16"),
+        Some(ParsedType::I32(_)) => Some("i32"),
+        Some(ParsedType::I64(_)) => Some("i64"),
+        Some(ParsedType::U8(_)) => Some("u8"),
+        Some(ParsedType::U16(_)) => Some("u16"),
+        Some(ParsedType::U32(_)) => Some("u32"),
+        Some(ParsedType::U64(_)) => Some("u64"),
+        Some(ParsedType::F32(_)) => Some("f32"),
+        Some(ParsedType::F64(_)) => Some("f64"),
         None
-        | Some(ParsedType::Utf8String)
-        | Some(ParsedType::Vector(_))
-        | Some(ParsedType::Record(_)) => None,
+        | Some(ParsedType::Utf8Str(_))
+        | Some(ParsedType::Utf8String(_))
+        | Some(ParsedType::Vector(..))
+        | Some(ParsedType::Record(..)) => None,
     };
 
     match ty {
@@ -91,18 +92,18 @@ fn generate_return_expression(ty: &Option<ParsedType>) -> proc_macro2::TokenStre
 fn generate_epilog(ty: &Option<ParsedType>) -> proc_macro2::TokenStream {
     match ty {
         None => quote!(),
-        Some(ParsedType::Record(_)) => {
+        Some(ParsedType::Record(..)) => {
             quote! {
                 let result_ptr = result.__fce_generated_serialize();
                 fluence::internal::set_result_ptr(result_ptr as _);
             }
         }
-        Some(ParsedType::Utf8String) => quote! {
+        Some(ParsedType::Utf8Str(_)) | Some(ParsedType::Utf8String(_)) => quote! {
             fluence::internal::set_result_ptr(result.as_ptr() as _);
             fluence::internal::set_result_size(result.len() as _);
             std::mem::forget(result);
         },
-        Some(ParsedType::Vector(ty)) => {
+        Some(ParsedType::Vector(ty, _)) => {
             let generated_serializer_name = String::from("__fce_generated_vec_serializer");
             let generated_serializer_ident = new_ident!(generated_serializer_name);
             let vector_serializer =

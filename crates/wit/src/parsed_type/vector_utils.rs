@@ -22,36 +22,36 @@ pub(crate) fn generate_vector_serializer(
     arg_name: &str,
 ) -> proc_macro2::TokenStream {
     let values_serializer = match value_ty {
-        ParsedType::Boolean => {
+        ParsedType::Boolean(_) => {
             quote! {
                 unimplemented!()
             }
         }
-        ParsedType::I8 | ParsedType::U8 => {
+        ParsedType::I8(_) | ParsedType::U8(_) => {
             quote! {
                 let arg = std::mem::ManuallyDrop::new(arg);
                 (arg.as_ptr() as _, arg.len() as _)
             }
         }
-        ParsedType::I16 | ParsedType::U16 => {
+        ParsedType::I16(_) | ParsedType::U16(_) => {
             quote! {
                 let arg = std::mem::ManuallyDrop::new(arg);
                 (arg.as_ptr() as _, (2 * arg.len()) as _)
             }
         }
-        ParsedType::I32 | ParsedType::U32 => {
+        ParsedType::I32(_) | ParsedType::U32(_) => {
             quote! {
                 let arg = std::mem::ManuallyDrop::new(arg);
                 (arg.as_ptr() as _, (4 * arg.len()) as _)
             }
         }
-        ParsedType::I64 | ParsedType::U64 => {
+        ParsedType::I64(_) | ParsedType::U64(_) => {
             quote! {
                 let arg = std::mem::ManuallyDrop::new(arg);
                 (arg.as_ptr() as _, (8 * arg.len()) as _)
             }
         }
-        ParsedType::F32 => {
+        ParsedType::F32(_) => {
             quote! {
                 let mut result: Vec<u32> = Vec::with_capacity(arg.len());
                 for value in arg {
@@ -62,7 +62,7 @@ pub(crate) fn generate_vector_serializer(
                 (result.as_ptr() as _, (4 * result.len()) as _)
             }
         }
-        ParsedType::F64 => {
+        ParsedType::F64(_) => {
             quote! {
                 let mut result: Vec<u64> = Vec::with_capacity(arg.len());
                 for value in arg {
@@ -73,7 +73,7 @@ pub(crate) fn generate_vector_serializer(
                 (result.as_ptr() as _, (8 * result.len()) as _)
             }
         }
-        ParsedType::Utf8String => {
+        ParsedType::Utf8Str(_) | ParsedType::Utf8String(_) => {
             quote! {
                 let mut result: Vec<u32> = Vec::with_capacity(arg.len());
 
@@ -87,7 +87,7 @@ pub(crate) fn generate_vector_serializer(
                 (result.as_ptr() as _, (4 * result.len()) as _)
             }
         }
-        ParsedType::Vector(ty) => {
+        ParsedType::Vector(ty, _) => {
             let serializer_name = format!("{}_{}", arg_name, ty);
             let inner_vector_serializer = generate_vector_serializer(&*ty, &serializer_name);
             let serializer_ident = crate::new_ident!(serializer_name);
@@ -107,7 +107,7 @@ pub(crate) fn generate_vector_serializer(
             }
         }
 
-        ParsedType::Record(_) => {
+        ParsedType::Record(..) => {
             quote! {
                 let mut result: Vec<u32> = Vec::with_capacity(arg.len());
 
@@ -137,12 +137,12 @@ pub(crate) fn generate_vector_deserializer(
     let arg = crate::new_ident!(arg_name);
 
     let values_deserializer = match value_ty {
-        ParsedType::Boolean => {
+        ParsedType::Boolean(_) => {
             quote! {
                 unimplemented!()
             }
         }
-        ParsedType::F32 => {
+        ParsedType::F32(_) => {
             quote! {
                 let mut arg: Vec<u64> = Vec::from_raw_parts(offset as _, size as _, size as _);
                 let mut result = Vec::with_capacity(arg.len());
@@ -154,7 +154,7 @@ pub(crate) fn generate_vector_deserializer(
                 result
             }
         }
-        ParsedType::F64 => {
+        ParsedType::F64(_) => {
             quote! {
                 let mut arg: Vec<u64> = Vec::from_raw_parts(offset as _, size as _, size as _);
                 let mut result = Vec::with_capacity(arg.len());
@@ -166,7 +166,7 @@ pub(crate) fn generate_vector_deserializer(
                 result
             }
         }
-        ParsedType::Utf8String => {
+        ParsedType::Utf8Str(_) | ParsedType::Utf8String(_) => {
             quote! {
                 let mut arg: Vec<u64> = Vec::from_raw_parts(offset as _, size as _, size as _);
                 let mut arg = arg.into_iter();
@@ -180,7 +180,7 @@ pub(crate) fn generate_vector_deserializer(
                 result
             }
         }
-        ParsedType::Vector(ty) => {
+        ParsedType::Vector(ty, _) => {
             let deserializer_name = format!("{}_{}", arg_name, ty);
             let inner_vector_deserializer = generate_vector_deserializer(&*ty, &deserializer_name);
             let deserializer_ident = crate::new_ident!(deserializer_name);
@@ -202,7 +202,7 @@ pub(crate) fn generate_vector_deserializer(
                 result
             }
         }
-        ParsedType::Record(record_name) => {
+        ParsedType::Record(record_name, _) => {
             let record_name_ident = crate::new_ident!(record_name);
 
             quote! {

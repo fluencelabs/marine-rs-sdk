@@ -18,8 +18,6 @@ use super::PassingStyle;
 use super::ParsedType;
 
 use quote::quote;
-use syn::parse::Error;
-use syn::spanned::Spanned;
 use proc_macro2::TokenStream;
 
 use std::fmt;
@@ -29,7 +27,7 @@ impl quote::ToTokens for PassingStyle {
         tokens.extend(self.to_token_stream());
     }
 
-    fn to_token_stream(&self) -> proc_macro2::TokenStream {
+    fn to_token_stream(&self) -> TokenStream {
         match self {
             PassingStyle::ByValue => quote! {},
             PassingStyle::ByRef => quote! { & },
