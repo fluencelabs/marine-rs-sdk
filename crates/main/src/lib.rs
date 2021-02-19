@@ -35,6 +35,7 @@ mod call_parameters;
 mod export_allocator;
 #[cfg(any(feature = "debug", feature = "logger"))]
 mod logger;
+mod mounted_binary_result;
 mod result;
 
 pub use call_parameters::CallParameters;
@@ -51,6 +52,8 @@ pub use logger::WasmLoggerBuilder;
 pub use logger::TargetMap;
 #[cfg(feature = "logger")]
 pub use logger::WASM_LOG_ENV_NAME;
+
+pub use mounted_binary_result::MountedBinaryResult;
 
 pub use result::get_result_ptr;
 pub use result::get_result_size;

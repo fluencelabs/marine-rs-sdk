@@ -79,6 +79,8 @@ pub use fluence_sdk_main::WasmLoggerBuilder;
 #[cfg(feature = "logger")]
 pub use fluence_sdk_main::TargetMap;
 
+pub use fluence_sdk_main::MountedBinaryResult;
+
 /// These API functions are intended for internal usage in generated code.
 /// Normally, you shouldn't use them.
 pub mod internal {
