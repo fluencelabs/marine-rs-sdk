@@ -54,6 +54,7 @@ pub use logger::TargetMap;
 pub use logger::WASM_LOG_ENV_NAME;
 
 pub use mounted_binary_result::MountedBinaryResult;
+pub use mounted_binary_result::SUCCESS_CODE;
 
 pub use result::get_result_ptr;
 pub use result::get_result_size;
