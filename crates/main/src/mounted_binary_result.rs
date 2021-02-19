@@ -25,39 +25,23 @@ pub const SUCCESS_CODE: i32 = 0;
 #[fce]
 #[derive(Clone, PartialEq, Default, Eq, Debug, Serialize, Deserialize)]
 pub struct MountedBinaryResult {
-    /// Return code, where SUCCESS_CODE means succes.
+    /// Return process exit code or host execution error code, where SUCCESS_CODE means success.
     pub ret_code: i32,
 
-    /// Contains error message if ret_code != SUCCESS_CODE.
-    pub error_message: String,
+    /// The data that the process wrote to stdout.
+    pub stdout: Vec<u8>,
 
-    /// Contains an output of a CLI service. Note that it could be non-empty even if
-    /// there was an error.
-    pub result: String,
+    /// The data that the process wrote to stderr.
+    pub stderr: Vec<u8>,
 }
 
 impl MountedBinaryResult {
-    /// Create a new success MountedBinaryResult from the provided result.
-    pub fn success(result: String) -> Self {
-        let ret_code = SUCCESS_CODE;
-        let error_message = String::new();
-
+    /// Create a new failure MountedBinaryResult from the provided ret_code.
+    pub fn from_err_code(ret_code: i32) -> Self {
         Self {
             ret_code,
-            error_message,
-            result,
-        }
-    }
-
-    /// Create a new failure MountedBinaryResult from the provided ret_code and error_message.
-    pub fn error(ret_code: i32, error_message: impl Into<String>) -> Self {
-        let error_message = error_message.into();
-        let result = String::new();
-
-        Self {
-            ret_code,
-            error_message,
-            result,
+            stdout: Vec::new(),
+            stderr: Vec::new(),
         }
     }
 }
