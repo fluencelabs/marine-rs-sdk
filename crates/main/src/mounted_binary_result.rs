@@ -35,3 +35,29 @@ pub struct MountedBinaryResult {
     /// there was an error.
     pub result: String,
 }
+
+impl MountedBinaryResult {
+    /// Create a new success MountedBinaryResult from the provided result.
+    pub fn success(result: String) -> Self {
+        let ret_code = SUCCESS_CODE;
+        let error_message = String::new();
+
+        Self {
+            ret_code,
+            error_message,
+            result,
+        }
+    }
+
+    /// Create a new failure MountedBinaryResult from the provided ret_code and error_message.
+    pub fn error(ret_code: i32, error_message: impl Into<String>) -> Self {
+        let error_message = error_message.into();
+        let result = String::new();
+
+        Self {
+            ret_code,
+            error_message,
+            result,
+        }
+    }
+}
