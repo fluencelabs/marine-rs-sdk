@@ -28,6 +28,9 @@ pub struct MountedBinaryResult {
     /// Return process exit code or host execution error code, where SUCCESS_CODE means success.
     pub ret_code: i32,
 
+    /// Contains the string representation of an error, if ret_code != SUCCESS_CODE.
+    pub error: String,
+
     /// The data that the process wrote to stdout.
     pub stdout: Vec<u8>,
 
@@ -37,9 +40,10 @@ pub struct MountedBinaryResult {
 
 impl MountedBinaryResult {
     /// Create a new failure MountedBinaryResult from the provided ret_code.
-    pub fn from_err_code(ret_code: i32) -> Self {
+    pub fn from_error(ret_code: i32, error: impl Into<String>) -> Self {
         Self {
             ret_code,
+            error: error.into(),
             stdout: Vec::new(),
             stderr: Vec::new(),
         }
