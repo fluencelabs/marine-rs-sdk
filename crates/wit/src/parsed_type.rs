@@ -21,6 +21,7 @@ mod foreign_mod_arg;
 mod foreign_mod_epilog;
 mod foreign_mod_prolog;
 mod traits;
+mod utils;
 mod vector_utils;
 
 pub(crate) use fn_arg::*;
@@ -28,6 +29,7 @@ pub(crate) use fn_epilog::*;
 pub(crate) use fn_prolog::*;
 pub(crate) use foreign_mod_prolog::*;
 pub(crate) use foreign_mod_epilog::*;
+pub(crate) use utils::*;
 pub(crate) use vector_utils::*;
 
 use serde::Serialize;
@@ -87,6 +89,7 @@ impl ParsedType {
             "f32" => Ok(ParsedType::F32(passing_style)),
             "f64" => Ok(ParsedType::F64(passing_style)),
             "bool" => Ok(ParsedType::Boolean(passing_style)),
+            "str" => Ok(ParsedType::Utf8Str(passing_style)),
             "String" => Ok(ParsedType::Utf8String(passing_style)),
             "Vec" => {
                 let vec_type = parse_vec_bracket(&type_segment.arguments)?;
@@ -148,13 +151,6 @@ fn type_to_path_passing_style(input_type: &syn::Type) -> syn::Result<(&syn::Path
         syn::Type::Path(path) => Ok((&path.path, PassingStyle::ByValue)),
         syn::Type::Reference(type_reference) => match &*type_reference.elem {
             syn::Type::Path(path) => {
-                // TODO: support lifetimes
-                if type_reference.lifetime.is_some() {
-                    return Err(Error::new(
-                        input_type.span(),
-                        "Lifetime is unsupported at the moment",
-                    ));
-                }
                 let passing_style = match type_reference.mutability {
                     Some(_) => PassingStyle::ByMutRef,
                     None => PassingStyle::ByRef,

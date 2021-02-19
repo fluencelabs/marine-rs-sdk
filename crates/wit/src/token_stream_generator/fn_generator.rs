@@ -48,6 +48,7 @@ impl quote::ToTokens for fce_ast_types::AstFunctionItem {
             raw_arg_names,
             raw_arg_types,
             prolog,
+            converted_arg_idents,
             args,
         } = &signature.arguments.generate_prolog();
 
@@ -55,7 +56,8 @@ impl quote::ToTokens for fce_ast_types::AstFunctionItem {
             fn_return_type,
             return_expression,
             epilog,
-        } = signature.output_type.generate_fn_epilog();
+            mem_forget,
+        } = (&signature.arguments, converted_arg_idents, &signature.output_type).generate_fn_epilog();
 
         // here this Option must be Some
         let original_func = &self.original;
@@ -77,6 +79,9 @@ impl quote::ToTokens for fce_ast_types::AstFunctionItem {
 
                 // return value conversation from Rust type to a Wasm type
                 #epilog
+
+                // forget result or arguments
+                #mem_forget
             }
 
             #[cfg(target_arch = "wasm32")]

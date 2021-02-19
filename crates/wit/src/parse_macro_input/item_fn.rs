@@ -112,7 +112,7 @@ fn check_function(signature: &syn::Signature) -> Result<()> {
             "FCE export function shouldn't have any custom linkage",
         ));
     }
-    if !generics.params.is_empty() || generics.where_clause.is_some() {
+    if generics.where_clause.is_some() {
         return Err(Error::new(
             signature.span(),
             "FCE export function shouldn't use template parameters",
