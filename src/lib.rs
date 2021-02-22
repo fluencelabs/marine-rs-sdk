@@ -79,8 +79,10 @@ pub use fluence_sdk_main::WasmLoggerBuilder;
 #[cfg(feature = "logger")]
 pub use fluence_sdk_main::TargetMap;
 
-pub use fluence_sdk_main::MountedBinaryResult;
-pub use fluence_sdk_main::SUCCESS_CODE;
+pub mod mounted_binary {
+    pub use fluence_sdk_main::mounted_binary::Result;
+    pub use fluence_sdk_main::mounted_binary::SUCCESS_CODE;
+}
 
 /// These API functions are intended for internal usage in generated code.
 /// Normally, you shouldn't use them.

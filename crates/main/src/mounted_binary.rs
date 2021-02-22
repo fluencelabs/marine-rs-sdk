@@ -24,7 +24,7 @@ pub const SUCCESS_CODE: i32 = 0;
 /// Describes result of calling a CLI service.
 #[fce]
 #[derive(Clone, PartialEq, Default, Eq, Debug, Serialize, Deserialize)]
-pub struct MountedBinaryResult {
+pub struct Result {
     /// Return process exit code or host execution error code, where SUCCESS_CODE means success.
     pub ret_code: i32,
 
@@ -38,7 +38,7 @@ pub struct MountedBinaryResult {
     pub stderr: Vec<u8>,
 }
 
-impl MountedBinaryResult {
+impl Result {
     /// Create a new failure MountedBinaryResult from the provided ret_code.
     pub fn from_error(ret_code: i32, error: impl Into<String>) -> Self {
         Self {
