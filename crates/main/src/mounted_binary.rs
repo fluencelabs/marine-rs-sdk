@@ -49,15 +49,36 @@ impl Result {
         }
     }
 
-    /// This function checks ret_code and returns either Ok if it was SUCCESS_CODE or Err otherwise.
-    ///
-    /// SAFETY:
-    /// The function relies on both stdout and stderr to contain valid UTF8 string.
-    pub unsafe fn into_std(self) -> std::result::Result<String, String> {
+    /// Return true, if this Result represents a success result, otherwise false.
+    pub fn is_success(&self) -> bool {
+        return self.ret_code == SUCCESS_CODE;
+    }
+
+    /// This function tries to transform a result to the string representation.
+    /// Internally, It checks ret_code and returns either Some(Ok(stdout)) if it was SUCCESS_CODE
+    /// or Some(Err(error)) otherwise. None is returned if stdout or stderr contains non valid
+    /// UTF8 string.
+    pub fn into_std(self) -> Option<std::result::Result<String, String>> {
         if self.ret_code == SUCCESS_CODE {
-            Ok(String::from_utf8_unchecked(self.stdout))
+            let stdout = String::from_utf8(self.stdout).ok()?;
+            Some(Ok(stdout))
         } else {
-            Err(String::from_utf8_unchecked(self.stderr))
+            let stderr = std::str::from_utf8(&self.stdout).ok()?;
+            Some(Ok(format!("error: {}, stderr: {}", self.error, stderr)))
+        }
+    }
+
+    /// This function tries to represent a result to the string representation.
+    /// Internally, It checks ret_code and returns either Some(Ok(stdout)) if it was SUCCESS_CODE
+    /// or Some(Err(error)) otherwise. None is returned if stdout or stderr contains non valid
+    /// UTF8 string.
+    pub fn as_std(&self) -> Option<std::result::Result<String, String>> {
+        if self.ret_code == SUCCESS_CODE {
+            let stdout = String::from_utf8(self.stdout.clone()).ok()?;
+            Some(Ok(stdout))
+        } else {
+            let stderr = std::str::from_utf8(&self.stdout).ok()?;
+            Some(Ok(format!("error: {}, stderr: {}", self.error, stderr)))
         }
     }
 }
