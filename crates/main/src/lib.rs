@@ -19,7 +19,7 @@
 
 #![allow(clippy::missing_safety_doc)]
 #![allow(clippy::needless_doctest_main)]
-#![doc(html_root_url = "https://docs.rs/fluence-sdk-main/0.2.18")]
+#![doc(html_root_url = "https://docs.rs/fluence-sdk-main/0.3.0")]
 #![deny(
     dead_code,
     nonstandard_style,
@@ -35,6 +35,7 @@ mod call_parameters;
 mod export_allocator;
 #[cfg(any(feature = "debug", feature = "logger"))]
 mod logger;
+pub mod mounted_binary;
 mod result;
 
 pub use call_parameters::CallParameters;
