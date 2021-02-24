@@ -53,7 +53,7 @@ impl Result {
     ///
     /// SAFETY:
     /// The function relies on both stdout and stderr to contain valid UTF8 string.
-    unsafe fn into_std(self) -> std::result::Result<String, String> {
+    pub unsafe fn into_std(self) -> std::result::Result<String, String> {
         if self.ret_code == SUCCESS_CODE {
             Ok(String::from_utf8_unchecked(self.stdout))
         } else {
