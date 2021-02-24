@@ -68,7 +68,7 @@ impl Result {
         }
     }
 
-    /// This function tries to represent a result to the string representation.
+    /// This function tries to represent a result as a string.
     /// Internally, It checks ret_code and returns either Some(Ok(stdout)) if it was SUCCESS_CODE
     /// or Some(Err(error)) otherwise. None is returned if stdout or stderr contains non valid
     /// UTF8 string.
