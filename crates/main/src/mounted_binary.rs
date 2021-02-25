@@ -94,7 +94,7 @@ impl Result {
             let stdout = String::from_utf8(self.stdout.clone()).ok()?;
             Some(Ok(stdout))
         } else {
-            let stderr = std::str::from_utf8(&self.stdout).ok()?;
+            let stderr = std::str::from_utf8(&self.stderr).ok()?;
             Some(Ok(format!("error: {}, stderr: {}", self.error, stderr)))
         }
     }
