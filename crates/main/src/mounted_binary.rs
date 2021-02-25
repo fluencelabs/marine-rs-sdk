@@ -51,7 +51,7 @@ impl Result {
 
     /// Return true, if this Result represents a success result, otherwise false.
     pub fn is_success(&self) -> bool {
-        return self.ret_code == SUCCESS_CODE;
+        self.ret_code == SUCCESS_CODE
     }
 
     /// This function tries to transform a result to the string representation.
