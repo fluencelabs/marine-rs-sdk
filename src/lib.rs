@@ -80,6 +80,7 @@ pub use fluence_sdk_main::WasmLoggerBuilder;
 pub use fluence_sdk_main::TargetMap;
 
 pub use fluence_sdk_main::mounted_binary::Result as MountedBinaryResult;
+pub use fluence_sdk_main::mounted_binary::StringResult as MountedBinaryStringResult;
 pub use fluence_sdk_main::mounted_binary::SUCCESS_CODE as BINARY_SUCCESS_CODE;
 
 /// These API functions are intended for internal usage in generated code.
