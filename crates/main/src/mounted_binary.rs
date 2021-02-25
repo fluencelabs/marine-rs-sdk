@@ -38,6 +38,23 @@ pub struct Result {
     pub stderr: Vec<u8>,
 }
 
+/// The same as the Result, but stdout and stderr are utf8 strings.
+#[fce]
+#[derive(Clone, PartialEq, Default, Eq, Debug, Serialize, Deserialize)]
+pub struct StringResult {
+    /// Return process exit code or host execution error code, where SUCCESS_CODE means success.
+    pub ret_code: i32,
+
+    /// Contains the string representation of an error, if ret_code != SUCCESS_CODE.
+    pub error: String,
+
+    /// The data that the process wrote to stdout.
+    pub stdout: String,
+
+    /// The data that the process wrote to stderr.
+    pub stderr: String,
+}
+
 impl Result {
     /// Create a new failure MountedBinaryResult from the provided ret_code.
     pub fn from_error(ret_code: i32, error: impl Into<String>) -> Self {
@@ -63,7 +80,7 @@ impl Result {
             let stdout = String::from_utf8(self.stdout).ok()?;
             Some(Ok(stdout))
         } else {
-            let stderr = std::str::from_utf8(&self.stdout).ok()?;
+            let stderr = std::str::from_utf8(&self.stderr).ok()?;
             Some(Ok(format!("error: {}, stderr: {}", self.error, stderr)))
         }
     }
@@ -77,8 +94,22 @@ impl Result {
             let stdout = String::from_utf8(self.stdout.clone()).ok()?;
             Some(Ok(stdout))
         } else {
-            let stderr = std::str::from_utf8(&self.stdout).ok()?;
+            let stderr = std::str::from_utf8(&self.stderr).ok()?;
             Some(Ok(format!("error: {}, stderr: {}", self.error, stderr)))
         }
+    }
+
+    pub fn stringify(&self) -> Option<StringResult> {
+        let stdout = String::from_utf8(self.stdout.clone()).ok()?;
+        let stderr = String::from_utf8(self.stderr.clone()).ok()?;
+
+        let string_result = StringResult {
+            ret_code: self.ret_code,
+            error: self.error.clone(),
+            stdout,
+            stderr,
+        };
+
+        Some(string_result)
     }
 }
