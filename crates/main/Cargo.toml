@@ -26,6 +26,7 @@ serde = "=1.0.118"
 [dev-dependencies]
 simple_logger = "1.6.0" # used in doc test
 lazy_static = "1.4.0" # used in doc test
+maplit = "1.0.2"
 
 [features]
 # Print some internal logs by log_utf8_string
