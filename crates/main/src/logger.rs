@@ -168,8 +168,6 @@ impl WasmLoggerBuilder {
 impl log::Log for WasmLogger {
     #[inline]
     fn enabled(&self, metadata: &log::Metadata<'_>) -> bool {
-        println!("enabled is called with {:?}", metadata);
-
         let allowed_level = match self.modules_level.get(metadata.target()) {
             Some(allowed_level) => allowed_level,
             None => &self.default_log_level,
