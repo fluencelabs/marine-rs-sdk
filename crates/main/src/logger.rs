@@ -22,13 +22,13 @@
 //! This example initializes [`WasmLogger`] with setting log level.
 //! Macros from crate [`log`] are used as a logging facade.
 //!
-//! ```
-//!     use fluence::sdk::*;
+//! ```ignore
+//!     use fluence::logger;
 //!     use log::{error, trace};
 //!     use simple_logger;
 //!
 //!     fn main() {
-//!         logger::WasmLogger::new()
+//!         logger::WasmLoggerBuilder::new()
 //!             .with_log_leve(log::Level::Info)
 //!             .build()
 //!             .unwrap();
@@ -42,19 +42,33 @@
 //! [`WasmLogger`]: struct.WasmLogger.html
 //! [`log`]: https://docs.rs/log
 
-use log::Level as LogLevel;
+use log::LevelFilter;
+use std::collections::HashMap;
 
 /// By default, logger will be initialized with log level from this environment variable.
-pub const WASM_LOG_ENV_NAME: &'static str = "WASM_LOG";
+pub const WASM_LOG_ENV_NAME: &str = "WASM_LOG";
 
 /// If WASM_LOG_ENV isn't set, then this level will be used as the default.
-const WASM_DEFAULT_LOG_LEVEL: LogLevel = LogLevel::Info;
+const WASM_DEFAULT_LOG_LEVEL: LevelFilter = LevelFilter::Info;
 
 /// Mapping from logging namespace string to its bitmask.
 /// TODO: use i64 for bitmask when wasmpack/bindgen issue with i64 is fixed.
 ///       Currently, i64 doesn't work on some versions of V8 because log_utf8_string function
 ///       isn't marked as #[wasm_bindgen]. In result, TS/JS code throws 'TypeError' on every log.
-pub type TargetMap = std::collections::HashMap<&'static str, i32>;
+pub type TargetMap = HashMap<&'static str, i32>;
+
+/// This structure is used to save information about particular log level for a particular module.
+#[derive(Debug)]
+struct LogDirective {
+    module_name: String,
+    level: LevelFilter,
+}
+
+impl LogDirective {
+    pub fn new(module_name: String, level: LevelFilter) -> Self {
+        Self { module_name, level }
+    }
+}
 
 /// The Wasm Logger.
 ///
@@ -68,14 +82,15 @@ pub type TargetMap = std::collections::HashMap<&'static str, i32>;
 /// [`Log`]: https://docs.rs/log/0.4.11/log/trait.Log.html
 struct WasmLogger {
     target_map: TargetMap,
+    modules_directives: Vec<LogDirective>,
+    default_log_level: LevelFilter,
 }
 
 /// The Wasm logger builder.
 ///
 /// Build logger for the Fluence network, allows specifying target map and log level while building.
 pub struct WasmLoggerBuilder {
-    target_map: TargetMap,
-    log_level: log::Level,
+    wasm_logger: WasmLogger,
 }
 
 impl WasmLoggerBuilder {
@@ -85,27 +100,38 @@ impl WasmLoggerBuilder {
     pub fn new() -> Self {
         use std::str::FromStr;
 
-        let log_level = std::env::var(WASM_LOG_ENV_NAME)
+        let default_log_level = std::env::var(WASM_LOG_ENV_NAME)
             .map_or(WASM_DEFAULT_LOG_LEVEL, |log_level_str| {
-                LogLevel::from_str(&log_level_str).unwrap_or(WASM_DEFAULT_LOG_LEVEL)
+                LevelFilter::from_str(&log_level_str).unwrap_or(WASM_DEFAULT_LOG_LEVEL)
             });
 
-        Self {
-            log_level,
-            target_map: <_>::default(),
-        }
+        let wasm_logger = WasmLogger {
+            target_map: HashMap::new(),
+            modules_directives: Vec::new(),
+            default_log_level,
+        };
+
+        Self { wasm_logger }
     }
 
     /// Set the log level.
-    pub fn with_log_level(mut self, level: log::Level) -> Self {
-        self.log_level = level;
+    pub fn with_log_level(mut self, level: LevelFilter) -> Self {
+        self.wasm_logger.default_log_level = level;
         self
     }
 
     /// Set mapping between logging targets and numbers.
     /// Used to efficiently enable & disable logs per target on the host.
     pub fn with_target_map(mut self, map: TargetMap) -> Self {
-        self.target_map = map;
+        self.wasm_logger.target_map = map;
+        self
+    }
+
+    pub fn filter(mut self, module_name: impl Into<String>, level: LevelFilter) -> Self {
+        let module_name = module_name.into();
+        let log_directive = LogDirective::new(module_name, level);
+
+        self.wasm_logger.modules_directives.push(log_directive);
         self
     }
 
@@ -114,36 +140,65 @@ impl WasmLoggerBuilder {
     /// This method is a last one in this builder chain and MUST be called to set logger up.
     /// Returns a error
     ///
-    /// ```
+    /// ```ignore
     /// # use fluence::logger;
     /// # use log::info;
     /// #
     /// # fn main() {
-    ///     logger::WasmLogger::new()
-    ///         .with_log_level(log::Level::Trace)
+    ///     logger::WasmLoggerBuilder::new()
+    ///         .with_log_level(log::LevelFilter::Trace)
     ///         .with_target_map(<_>::default())
     ///         .build()
     ///         .unwrap();
     /// # }
     /// ```
-    pub fn build(self) -> Result<(), log::SetLoggerError> {
-        let Self {
-            log_level,
-            target_map,
-        } = self;
+    pub fn build(mut self) -> Result<(), log::SetLoggerError> {
+        let max_level = self.max_log_level();
+        self.sort_directives();
 
-        let wasm_logger = WasmLogger { target_map };
+        let Self { wasm_logger } = self;
 
         log::set_boxed_logger(Box::new(wasm_logger))?;
-        log::set_max_level(log_level.to_level_filter());
+        log::set_max_level(max_level);
         Ok(())
+    }
+
+    /// Sort supplied directive ny length of module names to make more efficient lookup at runtime.
+    fn sort_directives(&mut self) {
+        self.wasm_logger.modules_directives.sort_by(|l, r| {
+            let llen = l.module_name.len();
+            let rlen = r.module_name.len();
+
+            rlen.cmp(&llen)
+        });
+    }
+
+    fn max_log_level(&self) -> log::LevelFilter {
+        let default_level = self.wasm_logger.default_log_level;
+        let max_filter_level = self
+            .wasm_logger
+            .modules_directives
+            .iter()
+            .map(|d| d.level)
+            .max()
+            .unwrap_or(LevelFilter::Off);
+
+        std::cmp::max(default_level, max_filter_level)
     }
 }
 
 impl log::Log for WasmLogger {
     #[inline]
     fn enabled(&self, metadata: &log::Metadata<'_>) -> bool {
-        metadata.level() <= log::max_level()
+        let target = metadata.target();
+
+        for directive in self.modules_directives.iter() {
+            if target.starts_with(&directive.module_name) {
+                return metadata.level() <= directive.level;
+            }
+        }
+
+        metadata.level() <= self.default_log_level
     }
 
     #[inline]
@@ -202,5 +257,93 @@ fn level_from_i32(level: i32) -> log::Level {
         4 => log::Level::Debug,
         5 => log::Level::Trace,
         _ => log::Level::max(),
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use super::WasmLogger;
+    use super::LogDirective;
+    use super::WasmLoggerBuilder;
+    use log::LevelFilter;
+    use log::Log;
+
+    use std::collections::HashMap;
+
+    fn create_metadata(module_name: &str, level: log::Level) -> log::Metadata<'_> {
+        log::MetadataBuilder::new()
+            .level(level)
+            .target(module_name)
+            .build()
+    }
+
+    #[test]
+    fn enabled_by_module_name() {
+        let module_1_name = "module_1";
+        let module_2_name = "module_2";
+
+        let modules_directives = vec![
+            LogDirective::new(module_1_name.to_string(), LevelFilter::Info),
+            LogDirective::new(module_2_name.to_string(), LevelFilter::Warn),
+        ];
+
+        let logger = WasmLogger {
+            target_map: HashMap::new(),
+            modules_directives,
+            default_log_level: LevelFilter::Error,
+        };
+
+        let allowed_metadata = create_metadata(module_1_name, log::Level::Info);
+        assert!(logger.enabled(&allowed_metadata));
+
+        let allowed_metadata = create_metadata(module_1_name, log::Level::Warn);
+        assert!(logger.enabled(&allowed_metadata));
+
+        let allowed_metadata = create_metadata(module_2_name, log::Level::Warn);
+        assert!(logger.enabled(&allowed_metadata));
+
+        let not_allowed_metadata = create_metadata(module_1_name, log::Level::Debug);
+        assert!(!logger.enabled(&not_allowed_metadata));
+
+        let not_allowed_metadata = create_metadata(module_2_name, log::Level::Info);
+        assert!(!logger.enabled(&not_allowed_metadata));
+    }
+
+    #[test]
+    fn default_log_level() {
+        let modules_directives = vec![LogDirective::new("module_1".to_string(), LevelFilter::Info)];
+
+        let logger = WasmLogger {
+            target_map: HashMap::new(),
+            modules_directives,
+            default_log_level: LevelFilter::Warn,
+        };
+
+        let module_name = "some_module";
+        let allowed_metadata = create_metadata(module_name, log::Level::Warn);
+        assert!(logger.enabled(&allowed_metadata));
+
+        let not_allowed_metadata = create_metadata(module_name, log::Level::Info);
+        assert!(!logger.enabled(&not_allowed_metadata));
+    }
+
+    #[test]
+    fn longest_directive_first() {
+        let module_1_name = "module_1";
+        let module_2_name = "module_1::some_name::func_name";
+
+        WasmLoggerBuilder::new()
+            .filter(module_1_name, LevelFilter::Info)
+            .filter(module_2_name, LevelFilter::Warn)
+            .build()
+            .unwrap();
+
+        let logger = log::logger();
+
+        let allowed_metadata = create_metadata(module_1_name, log::Level::Info);
+        assert!(logger.enabled(&allowed_metadata));
+
+        let not_allowed_metadata = create_metadata(module_2_name, log::Level::Info);
+        assert!(!logger.enabled(&not_allowed_metadata));
     }
 }

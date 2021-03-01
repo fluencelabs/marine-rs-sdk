@@ -35,6 +35,7 @@ mod call_parameters;
 mod export_allocator;
 #[cfg(any(feature = "debug", feature = "logger"))]
 mod logger;
+pub mod mounted_binary;
 mod result;
 
 pub use call_parameters::CallParameters;
