@@ -139,7 +139,7 @@ pub(crate) fn generate_vector_deserializer(
     let values_deserializer = match value_ty {
         ParsedType::Boolean(_) => {
             quote! {
-                unimplemented!()
+                unimplemented!("Vector of booleans is not supported")
             }
         }
         ParsedType::F32(_) => {
