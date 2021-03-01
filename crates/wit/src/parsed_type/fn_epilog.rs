@@ -44,7 +44,13 @@ pub(crate) trait FnEpilogGlueCodeGenerator {
     fn generate_fn_epilog(&self) -> FnEpilogDescriptor;
 }
 
-impl FnEpilogGlueCodeGenerator for (&Vec<(String, ParsedType)>, &Vec<syn::Ident>, &Option<ParsedType>) {
+impl FnEpilogGlueCodeGenerator
+    for (
+        &Vec<(String, ParsedType)>,
+        &Vec<syn::Ident>,
+        &Option<ParsedType>,
+    )
+{
     fn generate_fn_epilog(&self) -> FnEpilogDescriptor {
         FnEpilogDescriptor {
             fn_return_type: generate_fn_return_type(self.2),
@@ -107,7 +113,7 @@ fn generate_epilog(ty: &Option<ParsedType>) -> proc_macro2::TokenStream {
                 fluence::internal::set_result_ptr(result.as_ptr() as _);
                 fluence::internal::set_result_size(result.len() as _);
             }
-        },
+        }
         Some(ParsedType::Vector(ty, _)) => {
             let generated_serializer_name = String::from("__fce_generated_vec_serializer");
             let generated_serializer_ident = new_ident!(generated_serializer_name);
@@ -130,13 +136,18 @@ fn generate_epilog(ty: &Option<ParsedType>) -> proc_macro2::TokenStream {
 /// If an export function returns a reference, probably this reference is to one
 /// of these function arguments. In this case they should preserve after the end
 /// of the function and then deleted by IT with explicitly call of deallocate.
-fn generate_mem_forget(args: &Vec<(String, ParsedType)>, converted_args: &Vec<syn::Ident>, ret_type: &Option<ParsedType>) -> proc_macro2::TokenStream {
-
+fn generate_mem_forget(
+    args: &Vec<(String, ParsedType)>,
+    converted_args: &Vec<syn::Ident>,
+    ret_type: &Option<ParsedType>,
+) -> proc_macro2::TokenStream {
     let passing_style = ret_type.as_ref().map(passing_style_of);
 
     match passing_style {
         Some(PassingStyle::ByValue) => mem_forget_by_ret_type(ret_type),
-        Some(PassingStyle::ByRef) | Some(PassingStyle::ByMutRef) => mem_forget_by_args(args, converted_args),
+        Some(PassingStyle::ByRef) | Some(PassingStyle::ByMutRef) => {
+            mem_forget_by_args(args, converted_args)
+        }
         None => quote! {},
     }
 }
@@ -148,7 +159,10 @@ fn mem_forget_by_ret_type(ret_type: &Option<ParsedType>) -> proc_macro2::TokenSt
     }
 }
 
-fn mem_forget_by_args(args: &Vec<(String, ParsedType)>, converted_args: &Vec<syn::Ident>) -> proc_macro2::TokenStream {
+fn mem_forget_by_args(
+    args: &Vec<(String, ParsedType)>,
+    converted_args: &Vec<syn::Ident>,
+) -> proc_macro2::TokenStream {
     debug_assert!(args.len() == converted_args.len());
 
     let mut res = proc_macro2::TokenStream::new();
@@ -156,7 +170,7 @@ fn mem_forget_by_args(args: &Vec<(String, ParsedType)>, converted_args: &Vec<syn
         let arg_passing_style = passing_style_of(arg);
         match arg_passing_style {
             // such values will be deleted inside an export function because they are being moved
-            PassingStyle::ByValue => {},
+            PassingStyle::ByValue => {}
             _ => res.extend(quote! { std::mem::forget(#converted_arg); }),
         }
     }

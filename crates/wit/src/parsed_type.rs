@@ -177,14 +177,14 @@ fn parse_vec_bracket(args: &syn::PathArguments) -> syn::Result<&syn::Type> {
         syn::PathArguments::AngleBracketed(args) => Ok(args),
         _ => Err(Error::new(
             args.span(),
-            "It has to be a bracketed value after Vec",
+            "expected value in angle brackets (<>)",
         )),
     }?;
 
     let arg = generic_arg.args.first().ok_or_else(|| {
         Error::new(
             generic_arg.span(),
-            "Unsuitable type in Vec brackets, lifetimes, bindings, constraints and consts are unsupported",
+            "Invalid type in Vec brackets. (NOTE: lifetimes, bindings, constraints and consts are not supported)",
         )
     })?;
 
@@ -193,7 +193,7 @@ fn parse_vec_bracket(args: &syn::PathArguments) -> syn::Result<&syn::Type> {
         syn::GenericArgument::Type(ty) => Ok(ty),
         _ => Err(Error::new(
             arg.span(),
-            "Unsuitable type in Vec brackets, lifetimes, bindings, constraints and consts are unsupported",
+            "Invalid type in Vec brackets. (NOTE: lifetimes, bindings, constraints and consts are not supported)",
         )),
     }
 }

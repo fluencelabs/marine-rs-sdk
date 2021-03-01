@@ -76,6 +76,7 @@ impl ForeignModPrologGlueCodeGenerator for Vec<(String, ParsedType)> {
                 let arg_ident = new_ident!(arg_name);
                 arg_names.push(arg_ident.clone());
 
+                // arguments of following two types shouldn't be deleted after transformation to raw view
                 match ty {
                     ParsedType::Utf8String(PassingStyle::ByValue) => {
                         arg_transforms.extend(quote::quote! { let mut #arg_ident = std::mem::ManuallyDrop::new(#arg_ident); });

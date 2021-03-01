@@ -156,7 +156,7 @@ fn generate_type_lifting_prolog(
 
     TypeLifter {
         converted_arg_ident,
-        type_lifter_glue_code
+        type_lifter_glue_code,
     }
 }
 

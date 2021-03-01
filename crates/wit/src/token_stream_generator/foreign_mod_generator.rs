@@ -67,7 +67,8 @@ fn generate_extern_section_items(extern_item: &fce_ast_types::AstExternModItem) 
     for import in &extern_item.imports {
         let signature = &import.signature;
 
-        let FnEpilogDescriptor { fn_return_type, .. } = (&vec![], &vec![], &signature.output_type).generate_fn_epilog();
+        let FnEpilogDescriptor { fn_return_type, .. } =
+            (&vec![], &vec![], &signature.output_type).generate_fn_epilog();
 
         let link_name = import.link_name.as_ref().unwrap_or(&signature.name);
         let import_name = generate_import_name(&signature.name);

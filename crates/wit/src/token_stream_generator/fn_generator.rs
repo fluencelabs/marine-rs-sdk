@@ -57,7 +57,12 @@ impl quote::ToTokens for fce_ast_types::AstFunctionItem {
             return_expression,
             epilog,
             mem_forget,
-        } = (&signature.arguments, converted_arg_idents, &signature.output_type).generate_fn_epilog();
+        } = (
+            &signature.arguments,
+            converted_arg_idents,
+            &signature.output_type,
+        )
+            .generate_fn_epilog();
 
         // here this Option must be Some
         let original_func = &self.original;
