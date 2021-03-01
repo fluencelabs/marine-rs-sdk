@@ -16,6 +16,7 @@
 
 use super::ParseMacroInput;
 use crate::fce_ast_types;
+use crate::ParsedType;
 use crate::fce_ast_types::FCEAst;
 
 use syn::Error;
@@ -73,6 +74,15 @@ impl ParseMacroInput for syn::ItemForeignMod {
                 self_span,
                 "import module name should be defined by 'wasm_import_module' directive",
             )),
+            Some(namespace) if namespace == "host" => {
+                check_host_item(&imports)?;
+                let imports = imports.into_iter().map(|i| i.signature.name).collect::<Vec<_>>();
+                let extern_mod_item = fce_ast_types::AstExternHostItem {
+                    imports,
+                    original: Some(self),
+                };
+                Ok(FCEAst::ExternHostMod(extern_mod_item))
+            }
             Some(namespace) => {
                 let extern_mod_item = fce_ast_types::AstExternModItem {
                     namespace,
@@ -135,3 +145,30 @@ fn extract_value(nested_meta: syn::Meta) -> Option<String> {
         _ => None,
     }
 }
+
+fn check_host_item(imports: &[fce_ast_types::AstExternFnItem], span: proc_macro2::Span) -> Result<()> {
+    for import in imports {
+        check_host_arguments(&import.signature.arguments)?;
+        check_host_output(&import.signature.output_type)?;
+    }
+
+    Ok(())
+}
+
+fn check_host_arguments(args: &Vec<(String, ParsedType)>, span: proc_macro2::Span) -> Result<()> {
+    if args.len() != 1 || args[0].1 != ParsedType::Vector(Box::new(ParsedType::String)) {
+        return Err(Error::new(
+            span(),
+            "functions from the host namespace must have only one argument of Vec<String> type",
+        ))
+    }
+
+    Ok(())
+}
+
+fn check_host_output(output: &Option<ParsedType>, span: proc_macro2::Span) -> Result<()> {
+    match output {
+        Some(output) => if
+    }
+}
+

@@ -55,7 +55,7 @@
 //!     pub fn curl_get(url: String) -> String;
 //! }
 //! ```
-#![doc(html_root_url = "https://docs.rs/fluence/0.4.2")]
+#![doc(html_root_url = "https://docs.rs/fluence/0.4.3")]
 #![deny(
     dead_code,
     nonstandard_style,
@@ -79,15 +79,17 @@ pub use fluence_sdk_main::WasmLoggerBuilder;
 #[cfg(feature = "logger")]
 pub use fluence_sdk_main::TargetMap;
 
-pub use fluence_sdk_main::mounted_binary::Result as MountedBinaryResult;
-pub use fluence_sdk_main::mounted_binary::StringResult as MountedBinaryStringResult;
-pub use fluence_sdk_main::mounted_binary::SUCCESS_CODE as BINARY_SUCCESS_CODE;
+pub use fluence_sdk_main::MountedBinaryResult;
+pub use fluence_sdk_main::MountedBinaryError;
+pub use fluence_sdk_main::MountedBinaryStringResult;
+pub use fluence_sdk_main::BINARY_SUCCESS_CODE;
 
-/// These API functions are intended for internal usage in generated code.
+/// These API functions and structures are intended for internal usage in generated code.
 /// Normally, you shouldn't use them.
 pub mod internal {
     pub use fluence_sdk_main::get_result_ptr;
     pub use fluence_sdk_main::get_result_size;
     pub use fluence_sdk_main::set_result_ptr;
     pub use fluence_sdk_main::set_result_size;
+    pub use fluence_sdk_main::RawMountedBinaryResult;
 }

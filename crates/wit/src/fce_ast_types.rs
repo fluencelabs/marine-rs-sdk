@@ -76,10 +76,21 @@ pub struct AstFunctionItem {
     pub original: Option<syn::ItemFn>,
 }
 
+pub struct AstExternHostItem {
+    // only imports are possible here
+    pub imports: Vec<String>,
+
+    // Option is needed only for skipping serialization/deserialization of syn::ItemFn
+    #[serde(skip)]
+    pub original: Option<syn::ItemFn>,
+}
+
+// TODO: introduce special "export" version of Ast types without Option
 #[derive(Clone, Serialize, Deserialize)]
 #[serde(tag = "ast_type")]
 pub enum FCEAst {
     Function(AstFunctionItem),
     ExternMod(AstExternModItem),
+    ExternHostMod(AstExternHostItem),
     Record(AstRecordItem),
 }

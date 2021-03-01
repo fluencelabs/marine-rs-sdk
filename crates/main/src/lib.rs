@@ -19,7 +19,7 @@
 
 #![allow(clippy::missing_safety_doc)]
 #![allow(clippy::needless_doctest_main)]
-#![doc(html_root_url = "https://docs.rs/fluence-sdk-main/0.4.2")]
+#![doc(html_root_url = "https://docs.rs/fluence-sdk-main/0.4.3")]
 #![deny(
     dead_code,
     nonstandard_style,
@@ -35,7 +35,8 @@ mod call_parameters;
 mod export_allocator;
 #[cfg(any(feature = "debug", feature = "logger"))]
 mod logger;
-pub mod mounted_binary;
+mod mounted_binary;
+
 mod result;
 
 pub use call_parameters::CallParameters;
@@ -57,6 +58,11 @@ pub use result::get_result_ptr;
 pub use result::get_result_size;
 pub use result::set_result_ptr;
 pub use result::set_result_size;
+
+pub use mounted_binary::MountedBinaryResult;
+pub use mounted_binary::MountedBinaryStringResult;
+pub use mounted_binary::BINARY_SUCCESS_CODE;
+pub use mounted_binary::RawMountedBinaryResult;
 
 #[allow(unused_variables)]
 pub(crate) fn log<S: AsRef<str>>(msg: S) {
