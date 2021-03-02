@@ -30,7 +30,8 @@ logger = ["fluence-sdk-main/logger"]
 
 [workspace]
 members = [
-  "crates/main",
   "crates/macro",
+  "crates/macro-test",
+  "crates/main",
   "crates/wit",
   ]
