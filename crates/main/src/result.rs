@@ -21,9 +21,12 @@
 use super::log;
 
 use std::sync::atomic::AtomicUsize;
+use std::cell::RefCell;
 
 static mut RESULT_PTR: AtomicUsize = AtomicUsize::new(0);
 static mut RESULT_SIZE: AtomicUsize = AtomicUsize::new(0);
+
+thread_local!(static OBJECTS_TO_RELEASE: RefCell<Vec<Box<dyn Drop>>> = RefCell::new(Vec::new()));
 
 #[no_mangle]
 pub unsafe fn get_result_ptr() -> usize {
@@ -57,4 +60,21 @@ pub unsafe fn set_result_size(size: usize) {
     log(format!("sdk.set_result_size: {}\n", size));
 
     *RESULT_SIZE.get_mut() = size;
+}
+
+#[no_mangle]
+pub unsafe fn release_objects() {
+    OBJECTS_TO_RELEASE.with(|objects| {
+        let mut objects = objects.borrow_mut();
+        while let Some(object) = objects.pop() {
+            drop(object);
+        }
+    })
+}
+
+pub fn add_object_to_release(object: Box<dyn Drop>) {
+    OBJECTS_TO_RELEASE.with(|objects| {
+        let mut objects = objects.borrow_mut();
+        objects.push(object);
+    });
 }

@@ -90,4 +90,5 @@ pub mod internal {
     pub use fluence_sdk_main::get_result_size;
     pub use fluence_sdk_main::set_result_ptr;
     pub use fluence_sdk_main::set_result_size;
+    pub use fluence_sdk_main::add_object_to_release;
 }

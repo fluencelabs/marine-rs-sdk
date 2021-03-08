@@ -57,6 +57,8 @@ pub use result::get_result_ptr;
 pub use result::get_result_size;
 pub use result::set_result_ptr;
 pub use result::set_result_size;
+pub use result::release_objects;
+pub use result::add_object_to_release;
 
 #[allow(unused_variables)]
 pub(crate) fn log<S: AsRef<str>>(msg: S) {

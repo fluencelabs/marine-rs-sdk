@@ -133,9 +133,9 @@ fn generate_epilog(ty: &Option<ParsedType>) -> proc_macro2::TokenStream {
     }
 }
 
-/// If an export function returns a reference, probably this reference is to one
-/// of these function arguments. In this case they should preserve after the end
-/// of the function and then deleted by IT with explicitly call of deallocate.
+/// If an export function returns a reference, this is probably a reference to one
+/// of the function arguments. If that's the case, reference must be still valid after
+/// the end of the function. Their deletion will be handled by IT with calling `release_objects`.
 fn generate_mem_forget(
     args: &Vec<(String, ParsedType)>,
     converted_args: &Vec<syn::Ident>,
@@ -144,17 +144,10 @@ fn generate_mem_forget(
     let passing_style = ret_type.as_ref().map(passing_style_of);
 
     match passing_style {
-        Some(PassingStyle::ByValue) => mem_forget_by_ret_type(ret_type),
+        Some(PassingStyle::ByValue) => quote! { std::mem::forget(result); },
         Some(PassingStyle::ByRef) | Some(PassingStyle::ByMutRef) => {
             mem_forget_by_args(args, converted_args)
         }
-        None => quote! {},
-    }
-}
-
-fn mem_forget_by_ret_type(ret_type: &Option<ParsedType>) -> proc_macro2::TokenStream {
-    match ret_type {
-        Some(_) => quote! { std::mem::forget(result); },
         None => quote! {},
     }
 }
@@ -171,7 +164,10 @@ fn mem_forget_by_args(
         match arg_passing_style {
             // such values will be deleted inside an export function because they are being moved
             PassingStyle::ByValue => {}
-            _ => res.extend(quote! { std::mem::forget(#converted_arg); }),
+            _ => res.extend(quote! {
+                fluence::internal::add_object_to_release(Box::new(#converted_arg));
+                std::mem::forget(#converted_arg);
+            }),
         }
     }
 
