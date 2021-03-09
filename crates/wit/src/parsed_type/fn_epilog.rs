@@ -144,6 +144,7 @@ fn generate_mem_forget(
     let passing_style = ret_type.as_ref().map(passing_style_of);
 
     match passing_style {
+        // result will be deleted by IT side
         Some(PassingStyle::ByValue) => quote! { std::mem::forget(result); },
         Some(PassingStyle::ByRef) | Some(PassingStyle::ByMutRef) => {
             mem_forget_by_args(args, converted_args)
@@ -166,7 +167,6 @@ fn mem_forget_by_args(
             PassingStyle::ByValue => {}
             _ => res.extend(quote! {
                 fluence::internal::add_object_to_release(Box::new(#converted_arg));
-                std::mem::forget(#converted_arg);
             }),
         }
     }
