@@ -16,10 +16,12 @@ all-features = true
 
 [lib]
 path = "src/lib.rs"
+name = "fluence"
 
 [dependencies]
 fluence-sdk-macro = { path = "crates/macro", version = "=0.5.0" }
 fluence-sdk-main = { path = "crates/main", version = "=0.5.0" }
+serde = "=1.0.118"
 
 [features]
 # Print some internal logs by log_utf8_string

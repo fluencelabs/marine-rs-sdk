@@ -67,21 +67,26 @@
 )]
 #![warn(rust_2018_idioms)]
 
+mod call_parameters;
+mod mounted_binary;
+
+extern crate self as fluence;
+
 pub use fluence_sdk_macro::fce;
 
-pub use fluence_sdk_main::CallParameters;
-pub use fluence_sdk_main::SecurityTetraplet;
+pub use call_parameters::CallParameters;
+pub use call_parameters::SecurityTetraplet;
 #[cfg(target_arch = "wasm32")]
-pub use fluence_sdk_main::get_call_parameters;
+pub use call_parameters::get_call_parameters;
 
 #[cfg(feature = "logger")]
 pub use fluence_sdk_main::WasmLoggerBuilder;
 #[cfg(feature = "logger")]
 pub use fluence_sdk_main::TargetMap;
 
-pub use fluence_sdk_main::mounted_binary::Result as MountedBinaryResult;
-pub use fluence_sdk_main::mounted_binary::StringResult as MountedBinaryStringResult;
-pub use fluence_sdk_main::mounted_binary::SUCCESS_CODE as BINARY_SUCCESS_CODE;
+pub use mounted_binary::Result as MountedBinaryResult;
+pub use mounted_binary::StringResult as MountedBinaryStringResult;
+pub use mounted_binary::SUCCESS_CODE as BINARY_SUCCESS_CODE;
 
 /// These API functions are intended for internal usage in generated code.
 /// Normally, you shouldn't use them.

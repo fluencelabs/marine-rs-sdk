@@ -31,17 +31,10 @@
 )]
 #![warn(rust_2018_idioms)]
 
-mod call_parameters;
 mod export_allocator;
 #[cfg(any(feature = "debug", feature = "logger"))]
 mod logger;
-pub mod mounted_binary;
 mod result;
-
-pub use call_parameters::CallParameters;
-pub use call_parameters::SecurityTetraplet;
-#[cfg(target_arch = "wasm32")]
-pub use call_parameters::get_call_parameters;
 
 pub use export_allocator::allocate;
 pub use export_allocator::deallocate;

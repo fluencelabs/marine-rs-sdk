@@ -71,7 +71,7 @@ fn check_record(record: &syn::ItemStruct) -> Result<()> {
     {
         return Err(Error::new(
             record.span(),
-            "#[fce] couldn't be applied to a struct with generics",
+            "#[fce] couldn't be applied to a struct with generics or lifetimes",
         ));
     }
 
