@@ -21,6 +21,17 @@ pub(crate) fn generate_vector_serializer(
     value_ty: &ParsedType,
     arg_name: &str,
 ) -> proc_macro2::TokenStream {
+    let serializer_func = generate_vector_serializer_impl(value_ty, arg_name);
+
+    quote! {
+        #serializer_func
+    }
+}
+
+fn generate_vector_serializer_impl(
+    value_ty: &ParsedType,
+    arg_name: &str,
+) -> proc_macro2::TokenStream {
     let values_serializer = match value_ty {
         ParsedType::Boolean(_) => {
             quote! {
@@ -29,25 +40,21 @@ pub(crate) fn generate_vector_serializer(
         }
         ParsedType::I8(_) | ParsedType::U8(_) => {
             quote! {
-                let arg = std::mem::ManuallyDrop::new(arg);
                 (arg.as_ptr() as _, arg.len() as _)
             }
         }
         ParsedType::I16(_) | ParsedType::U16(_) => {
             quote! {
-                let arg = std::mem::ManuallyDrop::new(arg);
                 (arg.as_ptr() as _, (2 * arg.len()) as _)
             }
         }
         ParsedType::I32(_) | ParsedType::U32(_) => {
             quote! {
-                let arg = std::mem::ManuallyDrop::new(arg);
                 (arg.as_ptr() as _, (4 * arg.len()) as _)
             }
         }
         ParsedType::I64(_) | ParsedType::U64(_) => {
             quote! {
-                let arg = std::mem::ManuallyDrop::new(arg);
                 (arg.as_ptr() as _, (8 * arg.len()) as _)
             }
         }
@@ -58,7 +65,6 @@ pub(crate) fn generate_vector_serializer(
                     result.push(value.to_bits());
                 }
 
-                let result = std::mem::ManuallyDrop::new(result);
                 (result.as_ptr() as _, (4 * result.len()) as _)
             }
         }
@@ -69,7 +75,6 @@ pub(crate) fn generate_vector_serializer(
                     result.push(value.to_bits());
                 }
 
-                let result = std::mem::ManuallyDrop::new(result);
                 (result.as_ptr() as _, (8 * result.len()) as _)
             }
         }
@@ -78,12 +83,10 @@ pub(crate) fn generate_vector_serializer(
                 let mut result: Vec<u32> = Vec::with_capacity(arg.len());
 
                 for value in arg {
-                    let value = std::mem::ManuallyDrop::new(value);
                     result.push(value.as_ptr() as _);
                     result.push(value.len() as _);
                 }
 
-                let result = std::mem::ManuallyDrop::new(result);
                 (result.as_ptr() as _, (4 * result.len()) as _)
             }
         }
@@ -102,7 +105,6 @@ pub(crate) fn generate_vector_serializer(
                     result.push(size as _);
                 }
 
-                let result = std::mem::ManuallyDrop::new(result);
                 (result.as_ptr() as _, (4 * result.len()) as _)
             }
         }
@@ -115,7 +117,6 @@ pub(crate) fn generate_vector_serializer(
                     result.push(value.__fce_generated_serialize() as _);
                 }
 
-                let result = std::mem::ManuallyDrop::new(result);
                 (result.as_ptr() as _, (4 * result.len()) as _)
             }
         }
