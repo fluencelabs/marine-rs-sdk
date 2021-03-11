@@ -67,6 +67,8 @@
 )]
 #![warn(rust_2018_idioms)]
 
+mod sdk_version_embedder;
+
 pub use fluence_sdk_macro::fce;
 
 pub use fluence_sdk_main::CallParameters;
@@ -83,6 +85,8 @@ pub use fluence_sdk_main::mounted_binary::Result as MountedBinaryResult;
 pub use fluence_sdk_main::mounted_binary::StringResult as MountedBinaryStringResult;
 pub use fluence_sdk_main::mounted_binary::SUCCESS_CODE as BINARY_SUCCESS_CODE;
 
+pub use fluence_sdk_main::module_manifest;
+
 /// These API functions are intended for internal usage in generated code.
 /// Normally, you shouldn't use them.
 pub mod internal {
@@ -91,24 +95,3 @@ pub mod internal {
     pub use fluence_sdk_main::set_result_ptr;
     pub use fluence_sdk_main::set_result_size;
 }
-
-const PKG_VERSION: &str = env!("CARGO_PKG_VERSION");
-const VERSION_SIZE: usize = PKG_VERSION.len();
-
-const fn sdk_version() -> [u8; VERSION_SIZE] {
-    let version_as_str = PKG_VERSION.as_bytes();
-
-    let mut version_as_array: [u8; VERSION_SIZE] = [0; VERSION_SIZE];
-    let mut byte_id = 0;
-    while byte_id < VERSION_SIZE {
-        version_as_array[byte_id] = version_as_str[byte_id];
-        byte_id += 1;
-    }
-
-    version_as_array
-}
-
-#[cfg(target_arch = "wasm32")]
-#[link_section = "__fluence_sdk_version"]
-#[doc(hidden)]
-pub static FLUENCE_SDK_VERSION: [u8; VERSION_SIZE]  = sdk_version();
