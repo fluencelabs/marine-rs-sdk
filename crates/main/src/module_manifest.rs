@@ -74,7 +74,7 @@ macro_rules! module_manifest {
         #[cfg(target_arch = "wasm32")]
         #[link_section = "__fluence_wasm_module_manifest"]
         #[doc(hidden)]
-        pub static __FCE_SDK_WASM_MODULE_MANIFEST: [u8; __FCE_MANIFEST_SIZE] = generate_manifest();
+        pub static __FCE_WASM_MODULE_MANIFEST: [u8; __FCE_MANIFEST_SIZE] = generate_manifest();
     };
 
     () => {
