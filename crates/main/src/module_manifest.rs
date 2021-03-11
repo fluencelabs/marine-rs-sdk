@@ -80,6 +80,11 @@ macro_rules! module_manifest {
     };
 
     () => {
-        module_manifest!(env!("CARGO_PKG_AUTHORS"), env!("CARGO_PKG_VERSION"), env!("CARGO_PKG_DESCRIPTION"), env!("CARGO_PKG_REPOSITORY"));
-    }
+        module_manifest!(
+            env!("CARGO_PKG_AUTHORS"),
+            env!("CARGO_PKG_VERSION"),
+            env!("CARGO_PKG_DESCRIPTION"),
+            env!("CARGO_PKG_REPOSITORY")
+        );
+    };
 }
