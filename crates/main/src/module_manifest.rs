@@ -57,18 +57,13 @@ macro_rules! module_manifest {
         }
 
         const fn generate_manifest() -> [u8; __FCE_MANIFEST_SIZE] {
-            let authors = $authors;
-            let version = $version;
-            let description = $description;
-            let repository = $repository;
-
             let manifest: [u8; __FCE_MANIFEST_SIZE] = [0; __FCE_MANIFEST_SIZE];
 
             let offset = 0;
-            let (manifest, offset) = append_data(manifest, authors, offset);
-            let (manifest, offset) = append_data(manifest, version, offset);
-            let (manifest, offset) = append_data(manifest, description, offset);
-            let (manifest, _) = append_data(manifest, repository, offset);
+            let (manifest, offset) = append_data(manifest, $authors, offset);
+            let (manifest, offset) = append_data(manifest, $version, offset);
+            let (manifest, offset) = append_data(manifest, $description, offset);
+            let (manifest, _) = append_data(manifest, $repository, offset);
 
             manifest
         }
