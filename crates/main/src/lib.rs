@@ -38,6 +38,7 @@ mod logger;
 mod module_manifest;
 pub mod mounted_binary;
 mod result;
+mod sdk_version_embedder;
 
 pub use call_parameters::CallParameters;
 pub use call_parameters::SecurityTetraplet;
@@ -58,6 +59,9 @@ pub use result::get_result_ptr;
 pub use result::get_result_size;
 pub use result::set_result_ptr;
 pub use result::set_result_size;
+
+pub use module_manifest::MANIFEST_SECTION_NAME;
+pub use sdk_version_embedder::VERSION_SECTION_NAME;
 
 #[allow(unused_variables)]
 pub(crate) fn log<S: AsRef<str>>(msg: S) {

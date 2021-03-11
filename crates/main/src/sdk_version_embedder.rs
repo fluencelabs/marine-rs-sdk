@@ -32,6 +32,9 @@ const fn sdk_version() -> [u8; VERSION_SIZE] {
     version_as_array
 }
 
+// TODO: avoid duplication with the link_section when key-value attributes become stable
+pub const VERSION_SECTION_NAME: &str = "__fluence_sdk_version";
+
 #[cfg(target_arch = "wasm32")]
 #[link_section = "__fluence_sdk_version"]
 #[doc(hidden)]

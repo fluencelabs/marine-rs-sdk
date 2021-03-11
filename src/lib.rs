@@ -67,8 +67,6 @@
 )]
 #![warn(rust_2018_idioms)]
 
-mod sdk_version_embedder;
-
 pub use fluence_sdk_macro::fce;
 
 pub use fluence_sdk_main::CallParameters;
