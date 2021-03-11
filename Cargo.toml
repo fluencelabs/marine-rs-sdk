@@ -21,8 +21,6 @@ path = "src/lib.rs"
 fluence-sdk-macro = { path = "crates/macro", version = "=0.5.0" }
 fluence-sdk-main = { path = "crates/main", version = "=0.5.0" }
 
-static_assertions = "1.1.0"
-
 [features]
 # Print some internal logs by log_utf8_string
 debug = ["fluence-sdk-main/debug"]
