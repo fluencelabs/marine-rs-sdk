@@ -35,4 +35,4 @@ const fn sdk_version() -> [u8; VERSION_SIZE] {
 #[cfg(target_arch = "wasm32")]
 #[link_section = "__fluence_sdk_version"]
 #[doc(hidden)]
-pub static FLUENCE_SDK_VERSION: [u8; VERSION_SIZE] = sdk_version();
+pub static __FCE_SDK_VERSION: [u8; VERSION_SIZE] = sdk_version();
