@@ -24,13 +24,13 @@ macro_rules! module_manifest {
         const __FCE_SDK_VERSION_SIZE: usize = $version.as_bytes().len();
         const __FCE_SDK_DESCRIPTION_SIZE: usize = $description.as_bytes().len();
         const __FCE_SDK_REPOSITORY_SIZE: usize = $repository.as_bytes().len();
-        const __FCE_SDK_FEILD_PREFIX_SIZE: usize = std::mem::size_of::<u64>();
+        const __FCE_SDK_FIELD_PREFIX_SIZE: usize = std::mem::size_of::<u64>();
 
         const __FCE_MANIFEST_SIZE: usize = __FCE_SDK_AUTHORS_SIZE
             + __FCE_SDK_VERSION_SIZE
             + __FCE_SDK_DESCRIPTION_SIZE
             + __FCE_SDK_REPOSITORY_SIZE
-            + __FCE_SDK_FEILD_PREFIX_SIZE * 4;
+            + __FCE_SDK_FIELD_PREFIX_SIZE * 4;
 
         const fn append_data(
             mut manifest: [u8; __FCE_MANIFEST_SIZE],
@@ -43,20 +43,20 @@ macro_rules! module_manifest {
             // write data prefix with data size in LE
             let data_len_u64 = data_len as u64;
             let data_len_le_bytes = data_len_u64.to_le_bytes();
-            let mut byte_id = 0;
-            while byte_id < __FCE_SDK_FEILD_PREFIX_SIZE {
-                manifest[offset + byte_id] = data_len_le_bytes[byte_id];
-                byte_id += 1;
+            let mut byte_idx = 0;
+            while byte_idx < __FCE_SDK_FIELD_PREFIX_SIZE {
+                manifest[offset + byte_idx] = data_len_le_bytes[byte_idx];
+                byte_idx += 1;
             }
 
             // write data
-            let mut byte_id = 0;
-            while byte_id < data_len {
-                manifest[__FCE_SDK_FEILD_PREFIX_SIZE + offset + byte_id] = data_as_bytes[byte_id];
-                byte_id += 1;
+            let mut byte_idx = 0;
+            while byte_idx < data_len {
+                manifest[__FCE_SDK_FIELD_PREFIX_SIZE + offset + byte_idx] = data_as_bytes[byte_idx];
+                byte_idx += 1;
             }
 
-            (manifest, offset + __FCE_SDK_FEILD_PREFIX_SIZE + data_len)
+            (manifest, offset + __FCE_SDK_FIELD_PREFIX_SIZE + data_len)
         }
 
         const fn generate_manifest() -> [u8; __FCE_MANIFEST_SIZE] {
