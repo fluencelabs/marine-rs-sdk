@@ -68,6 +68,8 @@
 #![warn(rust_2018_idioms)]
 
 pub use fluence_sdk_macro::fce;
+#[cfg(feature = "fce-test")]
+pub use fluence_sdk_test_macro::fce_test;
 
 pub use fluence_sdk_main::CallParameters;
 pub use fluence_sdk_main::SecurityTetraplet;
@@ -92,4 +94,10 @@ pub mod internal {
     pub use fluence_sdk_main::get_result_size;
     pub use fluence_sdk_main::set_result_ptr;
     pub use fluence_sdk_main::set_result_size;
+
+    #[cfg(feature = "fce-test")]
+    pub mod test {
+        pub use fluence_app_service::AppService;
+        pub use fluence_app_service::AppServiceConfig;
+    }
 }

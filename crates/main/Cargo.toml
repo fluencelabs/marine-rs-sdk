@@ -18,7 +18,7 @@ path = "src/lib.rs"
 crate-type = ["rlib"]
 
 [dependencies]
-fluence-sdk-macro = { path = "../macro", version = "=0.5.0" }
+fluence-sdk-macro = { path = "../fce-macro", version = "=0.5.0" }
 
 log = { version = "0.4.8", features = ["std"] }
 serde = "=1.0.118"

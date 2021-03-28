@@ -56,11 +56,11 @@ fn generate_fce_ctor(config_path: &str) -> TokenStream {
     let tmp_file_path = new_ident(&tmp_file_path);
 
     quote! {
-        let mut __fce__generated_fce_config = fluence_faas::TomlAppServiceConfig::load(#config_path)
+        let mut __fce__generated_fce_config = fluence::internal::test::TomlAppServiceConfig::load(#config_path)
             .unwrap_or_else(|e| panic!("app service located at `{}` config can't be loaded: {}", #config_path, e));
         __fce__generated_fce_config.service_base_dir = Some(#tmp_file_path);
 
-        let fce = fce_app_service::AppService::new_with_empty_facade(__fce__generated_fce_config, #service_id, std::collections::HashMap::new())
+        let fce = fluence::internal::test::AppService::new_with_empty_facade(__fce__generated_fce_config, #service_id, std::collections::HashMap::new())
             .unwrap_or_else(|e| panic!("app service can't be created: {}", e));
     }
 }

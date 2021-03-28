@@ -18,8 +18,11 @@ all-features = true
 path = "src/lib.rs"
 
 [dependencies]
-fluence-sdk-macro = { path = "crates/macro", version = "=0.5.0" }
+fluence-sdk-macro = { path = "crates/fce-macro", version = "=0.5.0" }
+fluence-sdk-test-macro = { path = "crates/fce-test-macro", version = "=0.5.0", optional = true }
 fluence-sdk-main = { path = "crates/main", version = "=0.5.0" }
+
+fluence-app-service= { version = "0.5.2", features = ["raw-module-api"], optional = true }
 
 [features]
 # Print some internal logs by log_utf8_string
@@ -28,10 +31,13 @@ debug = ["fluence-sdk-main/debug"]
 # Enable logger (this will cause log_utf8_string to appear in imports)
 logger = ["fluence-sdk-main/logger"]
 
+# Enable the fce-test features (it'll bring fluence-app-service as a dependency)
+fce-test = ["fluence-sdk-test-macro", "fluence-app-service"]
+
 [workspace]
 members = [
-  "crates/macro",
-  "crates/macro-test",
+  "crates/fce-macro",
+  "crates/fce-test-macro",
   "crates/main",
   "crates/wit",
   ]

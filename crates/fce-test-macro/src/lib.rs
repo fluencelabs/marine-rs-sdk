@@ -53,7 +53,6 @@ use proc_macro::TokenStream;
 ///     assert_eq!(&service_result, "Hi, name!");
 /// }
 ///```
-
 #[proc_macro_attribute]
 pub fn fce_test(attrs: TokenStream, input: TokenStream) -> TokenStream {
     let func_input = syn::parse_macro_input!(input as syn::ItemFn);
