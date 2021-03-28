@@ -34,7 +34,7 @@ use fce_test::fce_test_impl;
 use proc_macro::TokenStream;
 
 /// This macro allows user to write tests for services in the following form:
-///```rust
+///```ignore
 /// #[fce_test(config = "/path/to/Config.toml")]
 /// fn test() {
 ///     let service_result = fce.call("greeting", "name");
@@ -43,7 +43,7 @@ use proc_macro::TokenStream;
 ///```
 ///
 /// This function is desugrated in the following way:
-///```rust
+///```ignore
 /// #[test]
 /// fn test() {
 ///     let fce = fluence_faas::FluenceFaaS::with_raw_config("/path/to/Config.toml")

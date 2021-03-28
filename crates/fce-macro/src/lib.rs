@@ -23,7 +23,7 @@
 //! # Examples
 //!
 //! This example shows how a function could be exported:
-//! ```
+//! ```ignore
 //! #[fce]
 //! pub fn greeting(name: String) -> String {
 //!     format!("Hi {}", name)
@@ -33,7 +33,7 @@
 //! This more complex example shows how a function could be imported from another Wasm module
 //! and how a struct could be passed:
 //!
-//! ```
+//! ```ignore
 //! use fluence::MountedBinaryResult;
 //!
 //! #[fce]
