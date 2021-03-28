@@ -15,6 +15,7 @@
  */
 
 #![doc(html_root_url = "https://docs.rs/fluence-sdk-macro/0.4.2")]
+/*
 #![deny(
     dead_code,
     nonstandard_style,
@@ -23,21 +24,40 @@
     unused_unsafe,
     unreachable_patterns
 )]
+ */
 #![warn(rust_2018_idioms)]
 #![recursion_limit = "1024"]
 
+mod attributes;
 mod fce_test;
 
+use fce_test::fce_test_impl;
 use proc_macro::TokenStream;
 
+/// This macro allows user to write tests for services in the following form:
+///```rust
+/// #[fce_test(config = "/path/to/Config.toml")]
+/// fn test() {
+///     let service_result = fce.call("greeting", "name");
+///     assert_eq!(&service_result, "Hi, name!");
+/// }
+///```
+///
+/// This function is desugrated in the following way:
+///```rust
+/// #[test]
+/// fn test() {
+///     let fce = fluence_faas::FluenceFaaS::with_raw_config("/path/to/Config.toml")
+///         .unwrap_or_else(|e| panic!("test instance can't be instantiated: {}", e));
+///     let service_result = fce.call("greeting", "name");
+///     assert_eq!(&service_result, "Hi, name!");
+/// }
+///```
+
 #[proc_macro_attribute]
-pub fn fce_test(attr: TokenStream, input: TokenStream) -> TokenStream {
-    // into converts proc_macro::TokenStream to proc_macro2::TokenStream
-    match fce_impl(input.into()) {
-        Ok(v) => v,
-        // converts syn:error to proc_macro2::TokenStream
-        Err(e) => e.to_compile_error(),
-    }
-    // converts proc_macro2::TokenStream to proc_macro::TokenStream
-    .into()
+pub fn fce_test(attrs: TokenStream, input: TokenStream) -> TokenStream {
+    let func_input = syn::parse_macro_input!(input as syn::ItemFn);
+    let result = fce_test_impl(attrs.into(), func_input).unwrap_or_else(std::convert::identity);
+
+    result.into()
 }
