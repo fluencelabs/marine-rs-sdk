@@ -15,16 +15,15 @@
  */
 
 #![doc(html_root_url = "https://docs.rs/fluence-sdk-macro/0.4.2")]
-/*
 #![deny(
     dead_code,
     nonstandard_style,
     unused_imports,
     unused_mut,
+    unused_variables,
     unused_unsafe,
     unreachable_patterns
 )]
- */
 #![warn(rust_2018_idioms)]
 #![recursion_limit = "1024"]
 
@@ -56,7 +55,5 @@ use proc_macro::TokenStream;
 #[proc_macro_attribute]
 pub fn fce_test(attrs: TokenStream, input: TokenStream) -> TokenStream {
     let func_input = syn::parse_macro_input!(input as syn::ItemFn);
-    let result = fce_test_impl(attrs.into(), func_input).unwrap_or_else(std::convert::identity);
-
-    result.into()
+    fce_test_impl(attrs.into(), func_input)
 }

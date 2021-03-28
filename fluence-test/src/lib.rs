@@ -14,9 +14,23 @@
  * limitations under the License.
  */
 
-use darling::FromMeta;
+#![doc(html_root_url = "https://docs.rs/fluence/0.5.0")]
+#![deny(
+    dead_code,
+    nonstandard_style,
+    unused_imports,
+    unused_mut,
+    unused_variables,
+    unused_unsafe,
+    unreachable_patterns
+)]
+#![warn(rust_2018_idioms)]
 
-#[derive(Debug, Default, Clone, FromMeta)]
-pub(crate) struct FCETestAttributes {
-    pub(crate) config_path: String,
+pub use fluence_sdk_test_macro::fce_test;
+
+/// These API functions are intended for internal usage in generated code.
+/// Normally, you shouldn't use them.
+pub mod internal {
+    pub use fluence_app_service::AppService;
+    pub use fluence_app_service::TomlAppServiceConfig;
 }

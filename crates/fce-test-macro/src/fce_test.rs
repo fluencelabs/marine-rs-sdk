@@ -14,22 +14,27 @@
  * limitations under the License.
  */
 
-use proc_macro2::TokenStream;
+use crate::attributes::FCETestAttributes;
+
+use proc_macro::TokenStream;
+use proc_macro2::TokenStream as TokenStream2;
 use quote::quote;
 
-pub(super) fn fce_test_impl(
-    attr: TokenStream,
-    func_input: syn::ItemFn,
-) -> Result<TokenStream, TokenStream> {
-    use crate::attributes::FCETestAttributes;
+pub(super) fn fce_test_impl(attrs: TokenStream, func_input: syn::ItemFn) -> TokenStream {
+    use darling::FromMeta;
 
-    let attrs = syn::parse2::<FCETestAttributes>(attr).map_err(|e| e.into_compile_error())?;
-    let generated_test = generate_test_glue_code(func_input, &attrs.config_path);
+    let attrs = syn::parse_macro_input!(attrs as syn::AttributeArgs);
+    let attrs = match FCETestAttributes::from_list(&attrs) {
+        Ok(v) => v,
+        Err(e) => {
+            return TokenStream::from(e.write_errors());
+        }
+    };
 
-    Ok(generated_test)
+    generate_test_glue_code(func_input, &attrs.config_path).into()
 }
 
-fn generate_test_glue_code(func: syn::ItemFn, config_path: &str) -> TokenStream {
+fn generate_test_glue_code(func: syn::ItemFn, config_path: &str) -> TokenStream2 {
     let fce_ctor = generate_fce_ctor(config_path);
     let original_block = func.block;
     let signature = func.sig;
@@ -44,27 +49,23 @@ fn generate_test_glue_code(func: syn::ItemFn, config_path: &str) -> TokenStream 
     }
 }
 
-fn generate_fce_ctor(config_path: &str) -> TokenStream {
-    let config_path = new_ident(config_path);
+fn generate_fce_ctor(config_path: &str) -> TokenStream2 {
+    let config_path = quote! { #config_path };
 
     let tmp_file_path = std::env::temp_dir();
     let random_uuid = uuid::Uuid::new_v4().to_string();
-    let service_id = new_ident(&random_uuid);
+    let service_id = quote! { #random_uuid };
 
     let tmp_file_path = tmp_file_path.join(random_uuid);
     let tmp_file_path = tmp_file_path.to_string_lossy().to_string();
-    let tmp_file_path = new_ident(&tmp_file_path);
+    let tmp_file_path = quote! { #tmp_file_path };
 
     quote! {
-        let mut __fce__generated_fce_config = fluence::internal::test::TomlAppServiceConfig::load(#config_path)
+        let mut __fce__generated_fce_config = fluence_test::internal::TomlAppServiceConfig::load(#config_path.to_string())
             .unwrap_or_else(|e| panic!("app service located at `{}` config can't be loaded: {}", #config_path, e));
-        __fce__generated_fce_config.service_base_dir = Some(#tmp_file_path);
+        __fce__generated_fce_config.service_base_dir = Some(#tmp_file_path.to_string());
 
-        let fce = fluence::internal::test::AppService::new_with_empty_facade(__fce__generated_fce_config, #service_id, std::collections::HashMap::new())
+        let mut fce = fluence_test::internal::AppService::new_with_empty_facade(__fce__generated_fce_config, #service_id, std::collections::HashMap::new())
             .unwrap_or_else(|e| panic!("app service can't be created: {}", e));
     }
-}
-
-fn new_ident(name: &str) -> syn::Ident {
-    syn::Ident::new(name, proc_macro2::Span::call_site())
 }
