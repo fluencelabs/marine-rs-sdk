@@ -19,7 +19,7 @@
 
 #![allow(clippy::missing_safety_doc)]
 #![allow(clippy::needless_doctest_main)]
-#![doc(html_root_url = "https://docs.rs/fluence-sdk-main/0.4.2")]
+#![doc(html_root_url = "https://docs.rs/fluence-sdk-main/0.5.0")]
 #![deny(
     dead_code,
     nonstandard_style,
@@ -35,8 +35,10 @@ mod call_parameters;
 mod export_allocator;
 #[cfg(any(feature = "debug", feature = "logger"))]
 mod logger;
+mod module_manifest;
 pub mod mounted_binary;
 mod result;
+mod sdk_version_embedder;
 
 pub use call_parameters::CallParameters;
 pub use call_parameters::SecurityTetraplet;
@@ -57,6 +59,9 @@ pub use result::get_result_ptr;
 pub use result::get_result_size;
 pub use result::set_result_ptr;
 pub use result::set_result_size;
+
+pub use module_manifest::MANIFEST_SECTION_NAME;
+pub use sdk_version_embedder::VERSION_SECTION_NAME;
 
 #[allow(unused_variables)]
 pub(crate) fn log<S: AsRef<str>>(msg: S) {
