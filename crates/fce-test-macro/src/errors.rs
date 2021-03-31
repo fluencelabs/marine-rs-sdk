@@ -15,7 +15,9 @@
  */
 
 use fce_wit_parser::WITParserError;
+use fluence_app_service::AppServiceError;
 
+use darling::Error as DarlingError;
 use syn::Error as SynError;
 use thiserror::Error as ThisError;
 
@@ -29,10 +31,25 @@ pub(crate) enum TestGeneratorError {
 
     #[error("{0}")]
     SynError(#[from] SynError),
+
+    #[error("{0}")]
+    ConfigLoadError(#[from] AppServiceError),
+
+    #[error("{0}")]
+    AttributesError(#[from] DarlingError),
 }
 
 #[derive(Debug, ThisError)]
 pub(crate) enum CorruptedITSection {
     #[error("record with {0} is absent in embedded IT section")]
     AbsentRecord(u64),
+}
+
+use proc_macro2::TokenStream;
+
+impl quote::ToTokens for TestGeneratorError {
+    fn to_tokens(&self, tokens: &mut TokenStream) {
+        let error_as_text = format!("Error was encountered inside fce_test: {}", self);
+        error_as_text.to_tokens(tokens);
+    }
 }

@@ -33,6 +33,7 @@ mod fce_test;
 
 use fce_test::fce_test_impl;
 use proc_macro::TokenStream;
+use proc_macro_error::proc_macro_error;
 
 pub(crate) type TResult<T> = std::result::Result<T, errors::TestGeneratorError>;
 
@@ -55,8 +56,12 @@ pub(crate) type TResult<T> = std::result::Result<T, errors::TestGeneratorError>;
 ///     assert_eq!(&service_result, "Hi, name!");
 /// }
 ///```
+#[proc_macro_error]
 #[proc_macro_attribute]
 pub fn fce_test(attrs: TokenStream, input: TokenStream) -> TokenStream {
     let func_input = syn::parse_macro_input!(input as syn::ItemFn);
-    fce_test_impl(attrs.into(), func_input)
+    match fce_test_impl(attrs.into(), func_input) {
+        Ok(stream) => stream.into(),
+        Err(e) => proc_macro_error::abort_call_site!(format!("{}", e)),
+    }
 }

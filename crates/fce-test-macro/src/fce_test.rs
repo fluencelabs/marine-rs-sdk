@@ -18,37 +18,48 @@ use crate::attributes::FCETestAttributes;
 use crate::TResult;
 
 use fluence_app_service::TomlAppServiceConfig;
-use proc_macro::TokenStream;
 use proc_macro2::TokenStream as TokenStream2;
 use quote::quote;
 
-pub(super) fn fce_test_impl(attrs: TokenStream, func_input: syn::ItemFn) -> TokenStream {
+pub(super) fn fce_test_impl(attrs: TokenStream2, func_input: syn::ItemFn) -> TResult<TokenStream2> {
     use darling::FromMeta;
 
-    let attrs = syn::parse_macro_input!(attrs as syn::AttributeArgs);
-    let attrs = match FCETestAttributes::from_list(&attrs) {
-        Ok(v) => v,
-        Err(e) => {
-            return TokenStream::from(e.write_errors());
-        }
-    };
+    // from https://github.com/dtolnay/syn/issues/788
+    let parser = syn::punctuated::Punctuated::<syn::NestedMeta, syn::Token![,]>::parse_terminated;
+    let attrs = parser.parse2(attrs)?;
+    let attrs: Vec<syn::NestedMeta> = attrs.into_iter().collect();
+    let attrs = FCETestAttributes::from_list(&attrs)?;
 
-    generate_test_glue_code(func_input, &attrs.config_path).into()
+    generate_test_glue_code(func_input, &attrs.config_path)
 }
 
-fn generate_test_glue_code(func: syn::ItemFn, config_path: &str) -> TokenStream2 {
+fn generate_test_glue_code(func: syn::ItemFn, config_path: &str) -> TResult<TokenStream2> {
+    let fce_config = TomlAppServiceConfig::load(config_path)?;
+    let module_interfaces = collect_module_interfaces(&fce_config)?;
+
+    let module_definitions = generate_module_definitions(module_interfaces.iter())?;
     let fce_ctor = generate_fce_ctor(config_path);
+    let module_iter = module_interfaces
+        .iter()
+        .map(|(module_name, _)| *module_name);
+    let module_ctors = generate_module_ctors(module_iter)?;
     let original_block = func.block;
     let signature = func.sig;
 
-    quote! {
+    let glue_code = quote! {
         #[test]
         #signature {
+            #module_definitions
+
             #fce_ctor
+
+            #module_ctors
 
             #original_block
         }
-    }
+    };
+
+    Ok(glue_code)
 }
 
 fn generate_fce_ctor(config_path: &str) -> TokenStream2 {
@@ -67,9 +78,30 @@ fn generate_fce_ctor(config_path: &str) -> TokenStream2 {
             .unwrap_or_else(|e| panic!("app service located at `{}` config can't be loaded: {}", #config_path, e));
         __fce__generated_fce_config.service_base_dir = Some(#tmp_file_path.to_string());
 
-        let mut fce = fluence_test::internal::AppService::new_with_empty_facade(__fce__generated_fce_config, #service_id, std::collections::HashMap::new())
+        let fce = fluence_test::internal::AppService::new_with_empty_facade(__fce__generated_fce_config, #service_id, std::collections::HashMap::new())
             .unwrap_or_else(|e| panic!("app service can't be created: {}", e));
+
+        let fce = std::rc::Rc::new(std::cell::RefCell::new(fce));
     }
+}
+
+fn generate_module_ctors<'n>(
+    module_names: impl ExactSizeIterator<Item = &'n str>,
+) -> TResult<TokenStream2> {
+    let mut module_ctors = Vec::with_capacity(module_names.len());
+    for name in module_names {
+        // TODO: optimize these two call because they are called twice for each module name
+        // and internally allocate memory in format
+        let module_name = generate_module_name(&name)?;
+        let struct_name = generate_struct_name(&name)?;
+
+        let module_ctor = quote! { #module_name::#struct_name { fce: fce.clone() }};
+        module_ctors.push(module_ctor);
+    }
+
+    let module_ctors = quote! { #(#module_ctors)*, };
+
+    Ok(module_ctors)
 }
 
 use fce_wit_parser::module_raw_interface;
@@ -81,12 +113,29 @@ use fce_wit_parser::interface::it::IRecordFieldType;
 use fce_wit_parser::interface::it::IType;
 
 use std::path::PathBuf;
+use syn::parse::Parser;
+
+fn generate_module_definitions<'i>(
+    module_interfaces: impl ExactSizeIterator<Item = &'i (&'i str, FCEModuleInterface)>,
+) -> TResult<TokenStream2> {
+    let mut module_definitions = Vec::with_capacity(module_interfaces.len());
+
+    for interface in module_interfaces {
+        let module_definition = generate_module_definition(&interface.0, &interface.1)?;
+        module_definitions.push(module_definition);
+    }
+
+    let module_definitions = quote! { #(#module_definitions)*,};
+
+    Ok(module_definitions)
+}
 
 fn generate_module_definition(
     module_name: &str,
     module_interface: &FCEModuleInterface,
 ) -> TResult<TokenStream2> {
-    let module_name_ident = new_ident(module_name)?;
+    let module_name_ident = generate_module_name(module_name)?;
+    let struct_name_ident = generate_struct_name(module_name)?;
     let module_records = generate_records(&module_interface.record_types)?;
     let module_functions = generate_module_methods(
         module_name,
@@ -98,11 +147,11 @@ fn generate_module_definition(
         pub mod #module_name_ident {
             #module_records
 
-            struct #module_name_ident {
-                pub fce: fluence_test::internal::AppService,
+            struct #struct_name_ident {
+                pub fce: std::rc::Rc<std::cell::RefCell<fluence_test::internal::AppService>>,
             }
 
-            impl #module_name_ident {
+            impl #struct_name_ident {
                 #(#module_functions)*
             }
         }
@@ -151,6 +200,8 @@ fn generate_fce_call(
     let ret = generate_ret(&output_type);
 
     let function_call = quote! {
+        use std::ops::DerefMut;
+
         #convert_arguments
 
         #set_result #function_call
@@ -179,7 +230,7 @@ fn generate_arguments_converter<'a>(
 }
 
 fn generate_function_call(module_name: &str, method_name: &str) -> TokenStream2 {
-    quote! { self.call_module(#module_name, #method_name, arguments, <_>::default()).expect("call to FCE failed"); }
+    quote! { self.fce.as_ref.borrow_mut().call_with_module_name(#module_name, #method_name, arguments, <_>::default()).expect("call to FCE failed"); }
 }
 
 fn generate_set_result(output_type: &Option<&IType>) -> TokenStream2 {
@@ -197,7 +248,7 @@ fn generate_convert_to_output(
         Some(ty) => {
             let ty = itype_to_tokens(ty, records)?;
             quote! {
-                let result: #ty = serde_json::from_value(result).expect("default deserializer shouldn't fail");
+                let result: #ty = serde_json::from_value(result).expect("the default deserializer shouldn't fail");
             }
         }
         None => TokenStream2::new(),
@@ -256,12 +307,12 @@ fn generate_records(records: &FCERecordTypes) -> TResult<TokenStream2> {
     let mut result = TokenStream2::new();
 
     for (_, record) in records.iter() {
-        let name = new_ident(&record.name)?;
+        let record_name_ident = generate_record_name(&record.name)?;
         let fields = prepare_field(record.fields.deref(), records)?;
 
         let record = quote! {
             #[derive(Clone, fluence_test::internal::Serialize, fluence_test::internal::Deserialize)]
-            struct #name {
+            struct #record_name_ident {
                 #fields
             }
         };
@@ -283,6 +334,21 @@ fn prepare_field(fields: &[IRecordFieldType], records: &FCERecordTypes) -> TResu
     }
 
     Ok(result)
+}
+
+fn generate_module_name(module_name: &str) -> TResult<syn::Ident> {
+    let extended_module_name = format!("__fce_generated_{}", module_name);
+    new_ident(&extended_module_name)
+}
+
+fn generate_record_name(record_name: &str) -> TResult<syn::Ident> {
+    let extended_record_name = format!("FCEGeneratedRecord{}", record_name);
+    new_ident(&extended_record_name)
+}
+
+fn generate_struct_name(struct_name: &str) -> TResult<syn::Ident> {
+    let extended_struct_name = format!("FCEGeneratedStruct{}", struct_name);
+    new_ident(&extended_struct_name)
 }
 
 fn new_ident(ident_str: &str) -> TResult<syn::Ident> {
