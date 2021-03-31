@@ -15,7 +15,9 @@
  */
 
 use crate::attributes::FCETestAttributes;
+use crate::TResult;
 
+use fluence_app_service::TomlAppServiceConfig;
 use proc_macro::TokenStream;
 use proc_macro2::TokenStream as TokenStream2;
 use quote::quote;
@@ -68,4 +70,222 @@ fn generate_fce_ctor(config_path: &str) -> TokenStream2 {
         let mut fce = fluence_test::internal::AppService::new_with_empty_facade(__fce__generated_fce_config, #service_id, std::collections::HashMap::new())
             .unwrap_or_else(|e| panic!("app service can't be created: {}", e));
     }
+}
+
+use fce_wit_parser::module_raw_interface;
+use fce_wit_parser::interface::FCEModuleInterface;
+use fce_wit_parser::interface::FCERecordTypes;
+use fce_wit_parser::interface::FCEFunctionSignature;
+use fce_wit_parser::interface::it::IFunctionArg;
+use fce_wit_parser::interface::it::IRecordFieldType;
+use fce_wit_parser::interface::it::IType;
+
+use std::path::PathBuf;
+
+fn generate_module_definition(
+    module_name: &str,
+    module_interface: &FCEModuleInterface,
+) -> TResult<TokenStream2> {
+    let module_name = new_ident(module_name)?;
+    let module_records = generate_records(&module_interface.record_types)?;
+    let module_functions = generate_module_methods(
+        module_interface.function_signatures.iter(),
+        &module_interface.record_types,
+    )?;
+
+    let module_definition = quote! {
+        pub mod #module_name {
+            #module_records
+
+            struct #module_name {
+                pub fce: fluence_test::internal::AppService,
+            }
+
+            impl #module_name {
+                #(#module_functions)*
+            }
+        }
+    };
+
+    Ok(module_definition)
+}
+
+fn generate_module_methods<'m, 'r>(
+    method_signatures: impl ExactSizeIterator<Item = &'m FCEFunctionSignature>,
+    records: &'r FCERecordTypes,
+) -> TResult<Vec<TokenStream2>> {
+    let mut result = Vec::with_capacity(method_signatures.len());
+
+    for signature in method_signatures {
+        let func_name = new_ident(&signature.name)?;
+        let arguments = generate_arguments(signature.arguments.iter(), records)?;
+        let output_type = generate_output_type(&signature.outputs, records)?;
+
+        let module_method = quote! {
+            pub fn #func_name(&self, #(#arguments),*) #output_type {
+                let result
+            }
+        };
+
+        result.push(module_method);
+    }
+
+    Ok(result)
+}
+
+fn generate_fce_call(method_signature: &FCEFunctionSignature) -> TokenStream2 {
+    let output_type = get_output_type(&method_signature.outputs);
+
+    quote! {
+        #convert_arguments
+
+        #set_result #function_call
+
+        #convert_result_to_output_type
+
+        #ret
+    }
+}
+
+fn generate_arguments<'a, 'r>(
+    arguments: impl ExactSizeIterator<Item = &'a IFunctionArg>,
+    records: &'r FCERecordTypes,
+) -> TResult<Vec<TokenStream2>> {
+    let mut result = Vec::with_capacity(arguments.len());
+    for argument in arguments {
+        let arg_name = new_ident(&argument.name)?;
+        let arg_type = itype_to_tokens(&argument.ty, records)?;
+
+        let arg = quote! { #arg_name: #arg_type };
+        result.push(arg);
+    }
+
+    Ok(result)
+}
+
+fn generate_output_type(output_types: &[IType], records: &FCERecordTypes) -> TResult<TokenStream2> {
+    let output_type = get_output_type(output_types);
+    match output_type {
+        None => Ok(TokenStream2::new()),
+        Some(ty) => {
+            let output_type = itype_to_tokens(&ty, records)?;
+            let output_type = quote! { -> #output_type };
+
+            Ok(output_type)
+        }
+    }
+}
+
+fn get_output_type(output_types: &[IType]) -> Option<&IType> {
+    match output_types.len() {
+        0 => None,
+        1 => Some(&output_types[0]),
+        _ => unimplemented!("function with more than 1 arguments aren't supported now"),
+    }
+}
+
+fn generate_records(records: &FCERecordTypes) -> TResult<TokenStream2> {
+    use std::ops::Deref;
+
+    let mut result = TokenStream2::new();
+
+    for (_, record) in records.iter() {
+        let name = new_ident(&record.name)?;
+        let fields = prepare_field(record.fields.deref(), records)?;
+
+        let record = quote! {
+            struct #name {
+                #fields
+            }
+        };
+        result.extend(record);
+    }
+
+    Ok(result)
+}
+
+fn prepare_field(fields: &[IRecordFieldType], records: &FCERecordTypes) -> TResult<TokenStream2> {
+    let mut result = TokenStream2::new();
+
+    for field in fields {
+        let field_name = new_ident(&field.name)?;
+        let field_type = itype_to_tokens(&field.ty, records)?;
+
+        let field = quote! { #field_name: #field_type };
+        result.extend(field);
+    }
+
+    Ok(result)
+}
+
+fn new_ident(ident_str: &str) -> TResult<syn::Ident> {
+    syn::parse_str::<syn::Ident>(ident_str).map_err(Into::into)
+}
+
+fn itype_to_tokens(itype: &IType, records: &FCERecordTypes) -> TResult<TokenStream2> {
+    let token_stream = match itype {
+        IType::Record(record_id) => {
+            let record = records
+                .get(record_id)
+                .ok_or_else(|| crate::errors::CorruptedITSection::AbsentRecord(*record_id))?;
+            let record_name = new_ident(&record.name)?;
+            let token_stream = quote! { #record_name };
+            token_stream
+        }
+        IType::Array(ty) => {
+            let inner_ty_token_stream = itype_to_tokens(ty, records)?;
+            let token_stream = quote! { Vec<#inner_ty_token_stream> };
+            token_stream
+        }
+        IType::String => quote! { String },
+        IType::S8 => quote! { i8 },
+        IType::S16 => quote! { i16 },
+        IType::S32 => quote! { i32 },
+        IType::S64 => quote! { i64 },
+        IType::U8 => quote! { u8 },
+        IType::U16 => quote! { u16 },
+        IType::U32 => quote! { u32 },
+        IType::U64 => quote! { u64 },
+        IType::I32 => quote! { i32 },
+        IType::I64 => quote! { i64 },
+        IType::F32 => quote! { f32 },
+        IType::F64 => quote! { f64 },
+        IType::Anyref => unimplemented!("anyref isn't supported and will be delete from IType"),
+    };
+
+    Ok(token_stream)
+}
+
+fn collect_module_interfaces(
+    config: &TomlAppServiceConfig,
+) -> TResult<Vec<(&str, FCEModuleInterface)>> {
+    let module_paths = collect_module_paths(config);
+
+    module_paths
+        .into_iter()
+        .map(|(name, path)| module_raw_interface(path).map(|interface| (name, interface)))
+        .collect::<Result<Vec<_>, _>>()
+        .map_err(Into::into)
+}
+
+fn collect_module_paths(config: &TomlAppServiceConfig) -> Vec<(&str, PathBuf)> {
+    let base_dir = config
+        .toml_faas_config
+        .modules_dir
+        .as_ref()
+        .map(|p| PathBuf::from(p))
+        .unwrap_or_default();
+
+    config
+        .toml_faas_config
+        .module
+        .iter()
+        .map(|m| {
+            let module_file_name = m.file_name.as_ref().unwrap_or_else(|| &m.name);
+            let module_file_name = PathBuf::from(module_file_name);
+            let module_path = base_dir.join(module_file_name);
+
+            (m.name.as_str(), module_path)
+        })
+        .collect::<Vec<_>>()
 }

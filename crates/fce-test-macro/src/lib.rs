@@ -16,7 +16,7 @@
 
 #![doc(html_root_url = "https://docs.rs/fluence-sdk-macro/0.4.2")]
 #![deny(
-    dead_code,
+    // dead_code,
     nonstandard_style,
     unused_imports,
     unused_mut,
@@ -28,10 +28,13 @@
 #![recursion_limit = "1024"]
 
 mod attributes;
+mod errors;
 mod fce_test;
 
 use fce_test::fce_test_impl;
 use proc_macro::TokenStream;
+
+pub(crate) type TResult<T> = std::result::Result<T, errors::TestGeneratorError>;
 
 /// This macro allows user to write tests for services in the following form:
 ///```ignore

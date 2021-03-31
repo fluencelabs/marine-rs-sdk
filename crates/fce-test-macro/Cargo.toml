@@ -16,8 +16,12 @@ all-features = true
 proc-macro = true
 
 [dependencies]
+fluence-app-service = { version = "0.5.2", features = ["raw-module-api"] }
+fce-wit-parser = "0.4.0"
+
+darling = "0.12.2"
 quote = "1.0.9"
 proc-macro2 = "1.0.24"
 syn = { version = '1.0.64', features = ['full'] }
+thiserror = "1.0.24"
 uuid = { version = "0.8.2", features = ["v4"] }
-darling = "0.12.2"
