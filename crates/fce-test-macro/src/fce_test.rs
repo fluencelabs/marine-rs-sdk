@@ -86,22 +86,23 @@ fn generate_module_definition(
     module_name: &str,
     module_interface: &FCEModuleInterface,
 ) -> TResult<TokenStream2> {
-    let module_name = new_ident(module_name)?;
+    let module_name_ident = new_ident(module_name)?;
     let module_records = generate_records(&module_interface.record_types)?;
     let module_functions = generate_module_methods(
+        module_name,
         module_interface.function_signatures.iter(),
         &module_interface.record_types,
     )?;
 
     let module_definition = quote! {
-        pub mod #module_name {
+        pub mod #module_name_ident {
             #module_records
 
-            struct #module_name {
+            struct #module_name_ident {
                 pub fce: fluence_test::internal::AppService,
             }
 
-            impl #module_name {
+            impl #module_name_ident {
                 #(#module_functions)*
             }
         }
@@ -111,6 +112,7 @@ fn generate_module_definition(
 }
 
 fn generate_module_methods<'m, 'r>(
+    module_name: &str,
     method_signatures: impl ExactSizeIterator<Item = &'m FCEFunctionSignature>,
     records: &'r FCERecordTypes,
 ) -> TResult<Vec<TokenStream2>> {
@@ -120,10 +122,11 @@ fn generate_module_methods<'m, 'r>(
         let func_name = new_ident(&signature.name)?;
         let arguments = generate_arguments(signature.arguments.iter(), records)?;
         let output_type = generate_output_type(&signature.outputs, records)?;
+        let fce_call = generate_fce_call(module_name, &signature, records)?;
 
         let module_method = quote! {
-            pub fn #func_name(&self, #(#arguments),*) #output_type {
-                let result
+            pub fn #func_name(&mut self, #(#arguments),*) #output_type {
+                #fce_call
             }
         };
 
@@ -133,10 +136,21 @@ fn generate_module_methods<'m, 'r>(
     Ok(result)
 }
 
-fn generate_fce_call(method_signature: &FCEFunctionSignature) -> TokenStream2 {
-    let output_type = get_output_type(&method_signature.outputs);
+fn generate_fce_call(
+    module_name: &str,
+    method_signature: &FCEFunctionSignature,
+    records: &FCERecordTypes,
+) -> TResult<TokenStream2> {
+    let args = method_signature.arguments.iter().map(|a| a.name.as_str());
+    let convert_arguments = generate_arguments_converter(args)?;
 
-    quote! {
+    let output_type = get_output_type(&method_signature.outputs);
+    let set_result = generate_set_result(&output_type);
+    let function_call = generate_function_call(module_name, &method_signature.name);
+    let convert_result_to_output_type = generate_convert_to_output(&output_type, records)?;
+    let ret = generate_ret(&output_type);
+
+    let function_call = quote! {
         #convert_arguments
 
         #set_result #function_call
@@ -144,6 +158,58 @@ fn generate_fce_call(method_signature: &FCEFunctionSignature) -> TokenStream2 {
         #convert_result_to_output_type
 
         #ret
+    };
+
+    Ok(function_call)
+}
+
+fn generate_arguments_converter<'a>(
+    args: impl ExactSizeIterator<Item = &'a str>,
+) -> TResult<TokenStream2> {
+    let mut arguments = Vec::with_capacity(args.len());
+
+    for arg in args {
+        let arg_ident = new_ident(arg)?;
+        arguments.push(arg_ident);
+    }
+
+    let arguments_serializer =
+        quote! { let arguments = fluence_test::internal::json!([#(#arguments)*,]) };
+    Ok(arguments_serializer)
+}
+
+fn generate_function_call(module_name: &str, method_name: &str) -> TokenStream2 {
+    quote! { self.call_module(#module_name, #method_name, arguments, <_>::default()).expect("call to FCE failed"); }
+}
+
+fn generate_set_result(output_type: &Option<&IType>) -> TokenStream2 {
+    match output_type {
+        Some(_) => quote! { let result = },
+        None => TokenStream2::new(),
+    }
+}
+
+fn generate_convert_to_output(
+    output_type: &Option<&IType>,
+    records: &FCERecordTypes,
+) -> TResult<TokenStream2> {
+    let result_stream = match output_type {
+        Some(ty) => {
+            let ty = itype_to_tokens(ty, records)?;
+            quote! {
+                let result: #ty = serde_json::from_value(result).expect("default deserializer shouldn't fail");
+            }
+        }
+        None => TokenStream2::new(),
+    };
+
+    Ok(result_stream)
+}
+
+fn generate_ret(output_type: &Option<&IType>) -> TokenStream2 {
+    match output_type {
+        Some(_) => quote! { result },
+        None => TokenStream2::new(),
     }
 }
 
@@ -194,6 +260,7 @@ fn generate_records(records: &FCERecordTypes) -> TResult<TokenStream2> {
         let fields = prepare_field(record.fields.deref(), records)?;
 
         let record = quote! {
+            #[derive(Clone, fluence_test::internal::Serialize, fluence_test::internal::Deserialize)]
             struct #name {
                 #fields
             }
@@ -250,7 +317,7 @@ fn itype_to_tokens(itype: &IType, records: &FCERecordTypes) -> TResult<TokenStre
         IType::I64 => quote! { i64 },
         IType::F32 => quote! { f32 },
         IType::F64 => quote! { f64 },
-        IType::Anyref => unimplemented!("anyref isn't supported and will be delete from IType"),
+        IType::Anyref => unimplemented!("anyref isn't supported and will be deleted from IType"),
     };
 
     Ok(token_stream)
