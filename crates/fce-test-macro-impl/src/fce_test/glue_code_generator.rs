@@ -118,12 +118,13 @@ pub(super) fn generate_test_glue_code(
     let glue_code = quote! {
         #[test]
         #signature {
+            // definitions for wasm modules specified in config
             #(#module_definitions)*
-
+            // AppService constructor and instantiation to implicit `fce` variable
             #app_service_ctor
-
+            // constructors of all modules of the tested service
             #(#module_ctors)*
-
+            // original test function as is
             #original_block
         }
     };
