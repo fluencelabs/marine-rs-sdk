@@ -34,7 +34,9 @@
 mod export_allocator;
 #[cfg(any(feature = "debug", feature = "logger"))]
 mod logger;
+mod module_manifest;
 mod result;
+mod sdk_version_embedder;
 
 pub use export_allocator::allocate;
 pub use export_allocator::deallocate;
@@ -52,6 +54,9 @@ pub use result::set_result_ptr;
 pub use result::set_result_size;
 pub use result::release_objects;
 pub use result::add_object_to_release;
+
+pub use module_manifest::MANIFEST_SECTION_NAME;
+pub use sdk_version_embedder::VERSION_SECTION_NAME;
 
 #[allow(unused_variables)]
 pub(crate) fn log<S: AsRef<str>>(msg: S) {

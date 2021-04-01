@@ -1,0 +1,17 @@
+error: types with lifetimes or generics aren't allowed
+ --> $DIR/struct_with_improper_types.rs:9:12
+  |
+9 |     pub a: Box<i32>,
+  |            ^^^^^^^^
+
+error: types with lifetimes or generics aren't allowed
+  --> $DIR/struct_with_improper_types.rs:14:21
+   |
+14 |     pub a: std::rc::Rc<i32>,
+   |                     ^^^^^^^
+
+error: types with lifetimes or generics aren't allowed
+  --> $DIR/struct_with_improper_types.rs:19:30
+   |
+19 |     pub a: std::collections::HashMap<i32, String>,
+   |                              ^^^^^^^^^^^^^^^^^^^^

@@ -34,7 +34,7 @@ pub(crate) struct ExternDescriptor {
 
 /// This trait could be used to generate various parts needed to construct prolog of an wrapper
 /// function or extern block. They are marked with # in the following examples:
-/// ```
+/// ```ignore
 /// quote! {
 ///     fn foo(#(#arg_names: #arg_types), *) {
 ///         let arg_1 = std::mem::ManuallyDrop::new(arg_1);
@@ -45,7 +45,7 @@ pub(crate) struct ExternDescriptor {
 /// }
 /// ```
 ///
-/// ```
+/// ```ignore
 /// quote! {
 ///     extern "C" {
 ///         #[link_name = "foo_link_name"]

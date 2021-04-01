@@ -12,16 +12,20 @@ jobs:
           keys:
             - backendsdk01-{{ checksum "Cargo.toml" }}
       - run: | #TODO: enable 'stable' and 'beta' once `allocator_api` becomes stable
-          rustup toolchain install nightly-2020-04-20
-          rustup default nightly-2020-04-20
-          rustup override set nightly-2020-04-20
-          rustup target add wasm32-unknown-unknown
+          rustup toolchain install nightly-2021-02-27
+          rustup default nightly-2021-02-27
+          rustup override set nightly-2021-02-27
+          rustup target add wasm32-wasi
           rustup component add rustfmt
           rustup component add clippy
           cargo fmt --all -- --check --color always
-          cargo build -v --target wasm32-unknown-unknown --all-features
+
+          (cd fluence; cargo build -v --target wasm32-wasi --all-features)
+          (cd fluence; cargo clippy -v --target wasm32-wasi)
+          (cd fluence-test; cargo build)
+
           cargo test -v --all-features
-          cargo clippy -v --target wasm32-unknown-unknown
+
       - save_cache:
           paths:
             - ~/.cargo

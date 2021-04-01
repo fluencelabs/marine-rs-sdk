@@ -70,9 +70,11 @@
 mod call_parameters;
 mod mounted_binary;
 
-extern crate self as fluence;
+// extern crate self as fluence;
 
 pub use fluence_sdk_macro::fce;
+#[cfg(feature = "fce-test")]
+pub use fluence_sdk_test_macro::fce_test;
 
 pub use call_parameters::CallParameters;
 pub use call_parameters::SecurityTetraplet;
@@ -87,6 +89,8 @@ pub use fluence_sdk_main::TargetMap;
 pub use mounted_binary::Result as MountedBinaryResult;
 pub use mounted_binary::StringResult as MountedBinaryStringResult;
 pub use mounted_binary::SUCCESS_CODE as BINARY_SUCCESS_CODE;
+
+pub use fluence_sdk_main::module_manifest;
 
 /// These API functions are intended for internal usage in generated code.
 /// Normally, you shouldn't use them.

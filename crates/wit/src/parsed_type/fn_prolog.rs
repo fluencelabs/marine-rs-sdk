@@ -34,7 +34,7 @@ pub(crate) struct FnPrologDescriptor {
 
 /// This trait could be used to generate various parts needed to construct prolog of an export
 /// function. They are marked with # in the following example:
-/// ```
+/// ```ignore
 /// quote! {
 ///     fn foo(#(#raw_arg_names: #raw_arg_types),*) {
 ///        #prolog

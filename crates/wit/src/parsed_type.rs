@@ -99,7 +99,7 @@ impl ParsedType {
             }
             _ if !type_segment.arguments.is_empty() => Err(Error::new(
                 type_segment.span(),
-                "type with lifetimes or generics aren't allowed".to_string(),
+                "types with lifetimes or generics aren't allowed".to_string(),
             )),
             _ => Ok(ParsedType::Record(
                 (&type_segment.ident).into_token_stream().to_string(),
