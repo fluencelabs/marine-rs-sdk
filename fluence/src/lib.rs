@@ -68,6 +68,8 @@
 #![warn(rust_2018_idioms)]
 
 pub use fluence_sdk_macro::fce;
+#[cfg(feature = "fce-test")]
+pub use fluence_sdk_test_macro::fce_test;
 
 pub use fluence_sdk_main::CallParameters;
 pub use fluence_sdk_main::SecurityTetraplet;

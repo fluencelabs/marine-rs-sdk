@@ -32,7 +32,7 @@ macro_rules! module_manifest {
             + __FCE_SDK_REPOSITORY_SIZE
             + __FCE_SDK_FIELD_PREFIX_SIZE * 4;
 
-        const fn append_data(
+        const fn __fce_sdk_append_data(
             mut manifest: [u8; __FCE_MANIFEST_SIZE],
             data: &'static str,
             offset: usize,
@@ -63,10 +63,10 @@ macro_rules! module_manifest {
             let manifest: [u8; __FCE_MANIFEST_SIZE] = [0; __FCE_MANIFEST_SIZE];
 
             let offset = 0;
-            let (manifest, offset) = append_data(manifest, $authors, offset);
-            let (manifest, offset) = append_data(manifest, $version, offset);
-            let (manifest, offset) = append_data(manifest, $description, offset);
-            let (manifest, _) = append_data(manifest, $repository, offset);
+            let (manifest, offset) = __fce_sdk_append_data(manifest, $authors, offset);
+            let (manifest, offset) = __fce_sdk_append_data(manifest, $version, offset);
+            let (manifest, offset) = __fce_sdk_append_data(manifest, $description, offset);
+            let (manifest, _) = __fce_sdk_append_data(manifest, $repository, offset);
 
             manifest
         }

@@ -1,0 +1,88 @@
+/*
+ * Copyright 2021 Fluence Labs Limited
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
+use crate::TResult;
+
+use fluence_app_service::TomlAppServiceConfig;
+use fce_wit_parser::module_raw_interface;
+use fce_wit_parser::interface::FCEModuleInterface;
+
+use std::path::PathBuf;
+
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub(super) struct Module<'m> {
+    pub name: &'m str,
+    pub interface: FCEModuleInterface,
+}
+
+impl<'m> Module<'m> {
+    fn new(name: &'m str, interface: FCEModuleInterface) -> Self {
+        Self { name, interface }
+    }
+}
+
+/// Returns all modules the provided config consists of.
+pub(super) fn collect_modules(
+    config: &TomlAppServiceConfig,
+    modules_dir: PathBuf,
+) -> TResult<Vec<Module<'_>>> {
+    let module_paths = collect_module_paths(config, modules_dir);
+
+    module_paths
+        .into_iter()
+        .map(|(name, path)| {
+            module_raw_interface(path).map(|interface| Module::new(name, interface))
+        })
+        .collect::<Result<Vec<_>, _>>()
+        .map_err(Into::into)
+}
+
+fn collect_module_paths(
+    config: &TomlAppServiceConfig,
+    modules_dir: PathBuf,
+) -> Vec<(&str, PathBuf)> {
+    config
+        .toml_faas_config
+        .module
+        .iter()
+        .map(|m| {
+            let module_file_name = m.file_name.as_ref().unwrap_or_else(|| &m.name);
+            let module_file_name = PathBuf::from(module_file_name);
+            // TODO: is it correct to always have .wasm extension?
+            let module_path = modules_dir.join(module_file_name).with_extension("wasm");
+
+            (m.name.as_str(), module_path)
+        })
+        .collect::<Vec<_>>()
+}
+
+/// Tries to determine a dir with compiled Wasm modules according to the following rules:
+///  - if the modules_dir attribute is specified (by user) it will be chosen,
+///  - otherwise if modules_dir is specified in AppService config it will be chosen,
+///  - otherwise None will be returned.
+pub(super) fn resolve_modules_dir(
+    config: &TomlAppServiceConfig,
+    modules_dir: Option<String>,
+) -> Option<PathBuf> {
+    match modules_dir {
+        Some(modules_dir) => Some(PathBuf::from(modules_dir)),
+        None => config
+            .toml_faas_config
+            .modules_dir
+            .as_ref()
+            .map(|p| PathBuf::from(p)),
+    }
+}

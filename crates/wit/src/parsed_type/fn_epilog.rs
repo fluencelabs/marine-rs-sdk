@@ -28,7 +28,7 @@ pub(crate) struct FnEpilogDescriptor {
 
 /// This trait could be used to generate various parts needed to construct epilog of an export
 /// function. They are marked with # in the following example:
-/// ```
+/// ```ignore
 /// quote! {
 ///     pub unsafe fn foo(...) #fn_return_type {
 ///         ...

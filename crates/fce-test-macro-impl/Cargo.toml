@@ -1,0 +1,24 @@
+[package]
+name = "fluence-sdk-test-macro-impl"
+version = "0.5.0"  # remember to update html_root_url
+edition = "2018"
+description = "Implementation of the `#[fce_test]` macro"
+repository = "https://github.com/fluencelabs/rust-sdk/crates/macro-test"
+authors = ["Fluence Labs"]
+keywords = ["fluence", "sdk", "webassembly", "procedural_macros"]
+categories = ["api-bindings", "wasm"]
+license = "Apache-2.0"
+
+[package.metadata.docs.rs]
+all-features = true
+
+[dependencies]
+fluence-app-service = { version = "0.5.2", features = ["raw-module-api"] }
+fce-wit-parser = "0.4.0"
+
+darling = "0.12.2"
+quote = "1.0.9"
+proc-macro2 = "1.0.24"
+proc-macro-error = { version = "1.0.4", default-features = false }
+syn = { version = '1.0.64', features = ['full'] }
+thiserror = "1.0.24"
