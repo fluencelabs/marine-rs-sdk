@@ -28,7 +28,19 @@ use quote::ToTokens;
 use std::path::PathBuf;
 
 /// Generates glue code for tests.
-/// F.e. for the greeting service the following glue code would be generated:
+/// F.e. for this test for the greeting service
+///```ignore
+/// #[fce_test(
+///     config_path = "/path/to/service/config/Config.toml",
+///     modules_dir = "/path/to/modules/dir"
+/// )]
+/// fn test() {
+///     let result = greeting.greeting("John".to_string());
+///     assert_eq(result.as_str(), "Hi, John!");
+/// }
+/// ```
+///
+/// the following glue code would be generated:
 ///```ignore
 /// // (0)
 ///  pub mod __fce_generated_greeting {
@@ -87,6 +99,11 @@ use std::path::PathBuf;
 /// let mut greeting = __fce_generated_greeting::FCEGeneratedStructgreeting::new(fce);
 ///
 /// // (3)
+///
+/// let result = greeting.greeting("John".to_string());
+/// assert_eq(result.as_str(), "Hi, John!");
+///
+/// // (4)
 ///```
 ///
 /// Example code above corresponds to the macro definition in the following way:
@@ -121,10 +138,13 @@ pub(super) fn generate_test_glue_code(
         #signature {
             // definitions for wasm modules specified in config
             #(#module_definitions)*
+
             // AppService constructor and instantiation to implicit `fce` variable
             #app_service_ctor
+
             // constructors of all modules of the tested service
             #(#module_ctors)*
+
             // original test function as is
             #original_block
         }
