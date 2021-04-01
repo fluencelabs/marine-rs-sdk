@@ -69,7 +69,7 @@ fn collect_module_paths(
         .collect::<Vec<_>>()
 }
 
-/// Tries to determine a dir with compiled Wasm modules according to the following
+/// Tries to determine a dir with compiled Wasm modules according to the following rules:
 ///  - if the modules_dir attribute is specified (by user) it will be chosen,
 ///  - otherwise if modules_dir is specified in AppService config it will be chosen,
 ///  - otherwise None will be returned.
