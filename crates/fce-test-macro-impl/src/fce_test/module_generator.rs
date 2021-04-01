@@ -59,7 +59,13 @@ fn generate_module_definition(
             #module_records
 
             pub struct #struct_name_ident {
-                pub fce: std::rc::Rc<std::cell::RefCell<fluence_test::internal::AppService>>,
+                fce: std::rc::Rc<std::cell::RefCell<fluence_test::internal::AppService>>,
+            }
+
+            impl #struct_name_ident {
+                pub fn new(fce: std::rc::Rc<std::cell::RefCell<fluence_test::internal::AppService>>) -> Self {
+                    Self { fce }
+                }
             }
 
             impl #struct_name_ident {

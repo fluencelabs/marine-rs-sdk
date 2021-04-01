@@ -99,7 +99,8 @@ fn generate_module_ctors<'n>(
         let name_for_user = fce_test::utils::new_ident(&name)?;
 
         let module_ctor =
-            quote! { let mut #name_for_user = #module_name::#struct_name { fce: fce.clone() }; };
+            quote! { let mut #name_for_user = #module_name::#struct_name::new(fce.clone()); };
+
         module_ctors.push(module_ctor);
     }
 
