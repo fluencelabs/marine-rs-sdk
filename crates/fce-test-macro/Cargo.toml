@@ -9,7 +9,7 @@ keywords = ["fluence", "sdk", "webassembly", "procedural_macros"]
 categories = ["api-bindings", "wasm"]
 license = "Apache-2.0"
 
-[package.metadata.docs.rs] # https://docs.rs/about
+[package.metadata.docs.rs]
 all-features = true
 
 [lib]
