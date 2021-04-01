@@ -23,7 +23,7 @@
 //! # Examples
 //!
 //! This example shows how a function could be exported:
-//! ```
+//! ```ignore
 //! #[fce]
 //! pub fn greeting(name: String) -> String {
 //!     format!("Hi {}", name)
@@ -33,23 +33,19 @@
 //! This more complex example shows how a function could be imported from another Wasm module
 //! and how a struct could be passed:
 //!
-//! ```
-//! #[fce]
-//! struct HostReturnValue {
-//!     pub error_code: i32,
-//!     pub outcome: Vec<u8>
-//! }
+//! ```ignore
+//! use fluence::MountedBinaryResult;
 //!
 //! #[fce]
-//! pub fn read_ipfs_file(file_path: String) -> HostReturnValue {
+//! pub fn read_ipfs_file(file_path: String) -> MountedBinaryResult {
 //!     let hash = calculate_hash(file_path);
-//!     ipfs(hash)
+//!     ipfs(vec![hash])
 //! }
 //!
 //! #[fce]
-//! #[link(wasm_import_module = "ipfs_node.wasm")]
+//! #[link(wasm_import_module = "ipfs_node")]
 //! extern "C" {
-//!     pub fn ipfs(file_hash: String) -> HostReturnValue;
+//!     pub fn ipfs(file_hash: Vec<String>) -> MountedBinaryResult;
 //! }
 //!
 //! ```
