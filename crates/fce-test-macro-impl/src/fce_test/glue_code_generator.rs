@@ -56,6 +56,13 @@ use std::path::PathBuf;
 ///     }
 ///}
 /// // (1)
+/// let tmp_dir = std::env::temp_dir();
+/// let service_id = fluence_test::internal::Uuid::new_v4().to_string();
+///
+/// let tmp_dir = tmp_dir.join(&service_id);
+/// let tmp_dir = tmp_dir.to_string_lossy().to_string();
+/// std::fs::create_dir(&tmp_dir).expect("can't create a directory for service in tmp");
+///
 /// let mut __fce__generated_fce_config = fluence_test::internal::TomlAppServiceConfig::load("/path/to/greeting/Config.toml".to_string())
 ///     .unwrap_or_else(|e| {
 ///         panic!(
