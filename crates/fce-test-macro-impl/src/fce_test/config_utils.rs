@@ -34,7 +34,7 @@ impl<'m> Module<'m> {
     }
 }
 
-/// Returns all modules the provided config consist of.
+/// Returns all modules the provided config consists of.
 pub(super) fn collect_modules(
     config: &TomlAppServiceConfig,
     modules_dir: PathBuf,
