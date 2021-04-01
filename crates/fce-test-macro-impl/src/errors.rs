@@ -42,6 +42,9 @@ pub enum TestGeneratorError {
         "neither modules_dir attribute specified nor service config contains modules_dir, please specify one of them"
     )]
     ModulesDirUnspecified,
+
+    #[error("a Wasm file compiled with newer version of sdk that supports multi-value")]
+    ManyFnOutputsUnsupported,
 }
 
 #[derive(Debug, ThisError)]

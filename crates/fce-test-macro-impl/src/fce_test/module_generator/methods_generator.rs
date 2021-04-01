@@ -16,6 +16,7 @@
 
 use crate::fce_test::utils;
 use crate::TResult;
+use crate::TestGeneratorError;
 
 use fce_wit_parser::interface::it::IType;
 use fce_wit_parser::interface::it::IFunctionArg;
@@ -56,7 +57,7 @@ fn generate_fce_call(
     let args = method_signature.arguments.iter().map(|a| a.name.as_str());
     let convert_arguments = generate_arguments_converter(args)?;
 
-    let output_type = get_output_type(&method_signature.outputs);
+    let output_type = get_output_type(&method_signature.outputs)?;
     let set_result = generate_set_result(&output_type);
     let function_call = generate_function_call(module_name, &method_signature.name);
     let convert_result_to_output_type = generate_convert_to_output(&output_type, records)?;
@@ -140,7 +141,7 @@ fn generate_arguments<'a, 'r>(
 }
 
 fn generate_output_type(output_types: &[IType], records: &FCERecordTypes) -> TResult<TokenStream> {
-    let output_type = get_output_type(output_types);
+    let output_type = get_output_type(output_types)?;
     match output_type {
         None => Ok(TokenStream::new()),
         Some(ty) => {
@@ -152,10 +153,10 @@ fn generate_output_type(output_types: &[IType], records: &FCERecordTypes) -> TRe
     }
 }
 
-fn get_output_type(output_types: &[IType]) -> Option<&IType> {
+fn get_output_type(output_types: &[IType]) -> TResult<Option<&IType>> {
     match output_types.len() {
-        0 => None,
-        1 => Some(&output_types[0]),
-        _ => unimplemented!("function with more than 1 arguments aren't supported now"),
+        0 => Ok(None),
+        1 => Ok(Some(&output_types[0])),
+        _ => Err(TestGeneratorError::ManyFnOutputsUnsupported),
     }
 }
