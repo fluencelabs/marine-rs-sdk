@@ -22,7 +22,7 @@ use syn::Error as SynError;
 use thiserror::Error as ThisError;
 
 #[derive(Debug, ThisError)]
-pub(crate) enum TestGeneratorError {
+pub enum TestGeneratorError {
     #[error("{0}")]
     WITParserError(#[from] WITParserError),
 
@@ -37,10 +37,15 @@ pub(crate) enum TestGeneratorError {
 
     #[error("{0}")]
     AttributesError(#[from] DarlingError),
+
+    #[error(
+        "neither attribute specified nor service config contains modules_dir, please specify it"
+    )]
+    ModulesDirUnspecified,
 }
 
 #[derive(Debug, ThisError)]
-pub(crate) enum CorruptedITSection {
+pub enum CorruptedITSection {
     #[error("record with {0} is absent in embedded IT section")]
     AbsentRecord(u64),
 }

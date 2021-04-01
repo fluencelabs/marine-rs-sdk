@@ -14,9 +14,9 @@
  * limitations under the License.
  */
 
-#![doc(html_root_url = "https://docs.rs/fluence-sdk-macro/0.4.2")]
+#![doc(html_root_url = "https://docs.rs/fluence-sdk-macro/0.5.0")]
 #![deny(
-    // dead_code,
+    dead_code,
     nonstandard_style,
     unused_imports,
     unused_mut,
@@ -27,15 +27,10 @@
 #![warn(rust_2018_idioms)]
 #![recursion_limit = "1024"]
 
-mod attributes;
-mod errors;
-mod fce_test;
-
-use fce_test::fce_test_impl;
+use fluence_sdk_test_macro_impl::fce_test_impl;
 use proc_macro::TokenStream;
 use proc_macro_error::proc_macro_error;
-
-pub(crate) type TResult<T> = std::result::Result<T, errors::TestGeneratorError>;
+use syn::spanned::Spanned;
 
 /// This macro allows user to write tests for services in the following form:
 ///```ignore
@@ -59,9 +54,11 @@ pub(crate) type TResult<T> = std::result::Result<T, errors::TestGeneratorError>;
 #[proc_macro_error]
 #[proc_macro_attribute]
 pub fn fce_test(attrs: TokenStream, input: TokenStream) -> TokenStream {
-    let func_input = syn::parse_macro_input!(input as syn::ItemFn);
-    match fce_test_impl(attrs.into(), func_input) {
+    let attrs: proc_macro2::TokenStream = attrs.into();
+    let attrs_span = attrs.span();
+
+    match fce_test_impl(attrs, input.into()) {
         Ok(stream) => stream.into(),
-        Err(e) => proc_macro_error::abort_call_site!(format!("{}", e)),
+        Err(e) => proc_macro_error::abort!(attrs_span, format!("{}", e)),
     }
 }

@@ -19,4 +19,6 @@ use darling::FromMeta;
 #[derive(Debug, Default, Clone, FromMeta)]
 pub(crate) struct FCETestAttributes {
     pub(crate) config_path: String,
+    #[darling(default)]
+    pub(crate) modules_dir: Option<String>,
 }

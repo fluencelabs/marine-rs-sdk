@@ -14,9 +14,9 @@
  * limitations under the License.
  */
 
-#![doc(html_root_url = "https://docs.rs/fluence/0.5.0")]
+#![doc(html_root_url = "https://docs.rs/fluence-sdk-macro/0.5.0")]
 #![deny(
-    dead_code,
+    // dead_code,
     nonstandard_style,
     unused_imports,
     unused_mut,
@@ -25,19 +25,13 @@
     unreachable_patterns
 )]
 #![warn(rust_2018_idioms)]
+#![recursion_limit = "1024"]
 
-pub use fluence_sdk_test_macro::fce_test;
-pub use fluence_sdk_test_macro_impl::fce_test_impl;
+mod attributes;
+mod errors;
+mod fce_test;
 
-/// These API functions are intended for internal usage in generated code.
-/// Normally, you shouldn't use them.
-pub mod internal {
-    pub use fluence_app_service::AppService;
-    pub use fluence_app_service::TomlAppServiceConfig;
+pub use fce_test::fce_test_impl;
+pub use errors::TestGeneratorError;
 
-    pub use serde::Serialize;
-    pub use serde::Deserialize;
-    pub use serde_json::json;
-
-    pub use uuid::Uuid;
-}
+pub(crate) type TResult<T> = std::result::Result<T, TestGeneratorError>;

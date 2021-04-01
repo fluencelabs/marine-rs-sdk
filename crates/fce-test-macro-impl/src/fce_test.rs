@@ -15,13 +15,14 @@
  */
 
 use crate::attributes::FCETestAttributes;
-use crate::TResult;
+use crate::{TResult, TestGeneratorError};
 
 use fluence_app_service::TomlAppServiceConfig;
 use proc_macro2::TokenStream as TokenStream2;
 use quote::quote;
+use quote::ToTokens;
 
-pub(super) fn fce_test_impl(attrs: TokenStream2, func_input: syn::ItemFn) -> TResult<TokenStream2> {
+pub fn fce_test_impl(attrs: TokenStream2, input: TokenStream2) -> TResult<TokenStream2> {
     use darling::FromMeta;
 
     // from https://github.com/dtolnay/syn/issues/788
@@ -30,21 +31,31 @@ pub(super) fn fce_test_impl(attrs: TokenStream2, func_input: syn::ItemFn) -> TRe
     let attrs: Vec<syn::NestedMeta> = attrs.into_iter().collect();
     let attrs = FCETestAttributes::from_list(&attrs)?;
 
-    generate_test_glue_code(func_input, &attrs.config_path)
+    let func_item = syn::parse2::<syn::ItemFn>(input)?;
+
+    generate_test_glue_code(func_item, attrs)
 }
 
-fn generate_test_glue_code(func: syn::ItemFn, config_path: &str) -> TResult<TokenStream2> {
-    let fce_config = TomlAppServiceConfig::load(config_path)?;
-    let module_interfaces = collect_module_interfaces(&fce_config)?;
+fn generate_test_glue_code(
+    func_item: syn::ItemFn,
+    attrs: FCETestAttributes,
+) -> TResult<TokenStream2> {
+    let fce_config = TomlAppServiceConfig::load(&attrs.config_path)?;
+    let modules_dir = match determine_modules_dir(&fce_config, attrs.modules_dir) {
+        Some(modules_dir) => modules_dir,
+        None => return Err(TestGeneratorError::ModulesDirUnspecified),
+    };
+
+    let fce_ctor = generate_fce_ctor(&attrs.config_path, &modules_dir);
+    let module_interfaces = collect_module_interfaces(&fce_config, modules_dir)?;
 
     let module_definitions = generate_module_definitions(module_interfaces.iter())?;
-    let fce_ctor = generate_fce_ctor(config_path);
     let module_iter = module_interfaces
         .iter()
         .map(|(module_name, _)| *module_name);
     let module_ctors = generate_module_ctors(module_iter)?;
-    let original_block = func.block;
-    let signature = func.sig;
+    let original_block = func_item.block;
+    let signature = func_item.sig;
 
     let glue_code = quote! {
         #[test]
@@ -62,23 +73,24 @@ fn generate_test_glue_code(func: syn::ItemFn, config_path: &str) -> TResult<Toke
     Ok(glue_code)
 }
 
-fn generate_fce_ctor(config_path: &str) -> TokenStream2 {
-    let config_path = quote! { #config_path };
-
-    let tmp_file_path = std::env::temp_dir();
-    let random_uuid = uuid::Uuid::new_v4().to_string();
-    let service_id = quote! { #random_uuid };
-
-    let tmp_file_path = tmp_file_path.join(random_uuid);
-    let tmp_file_path = tmp_file_path.to_string_lossy().to_string();
-    let tmp_file_path = quote! { #tmp_file_path };
+fn generate_fce_ctor(config_path: &str, modules_dir: &PathBuf) -> TokenStream2 {
+    let config_path = config_path.to_token_stream();
+    let modules_dir = modules_dir.to_string_lossy().to_string();
 
     quote! {
-        let mut __fce__generated_fce_config = fluence_test::internal::TomlAppServiceConfig::load(#config_path.to_string())
-            .unwrap_or_else(|e| panic!("app service located at `{}` config can't be loaded: {}", #config_path, e));
-        __fce__generated_fce_config.service_base_dir = Some(#tmp_file_path.to_string());
+        let tmp_dir = std::env::temp_dir();
+        let service_id = fluence_test::internal::Uuid::new_v4().to_string();
 
-        let fce = fluence_test::internal::AppService::new_with_empty_facade(__fce__generated_fce_config, #service_id, std::collections::HashMap::new())
+        let tmp_dir = tmp_dir.join(&service_id);
+        let tmp_dir = tmp_dir.to_string_lossy().to_string();
+        std::fs::create_dir(&tmp_dir).expect("can't create a directory for service in tmp");
+
+        let mut __fce_generated_fce_config = fluence_test::internal::TomlAppServiceConfig::load(#config_path.to_string())
+            .unwrap_or_else(|e| panic!("app service located at `{}` config can't be loaded: {}", #config_path, e));
+        __fce_generated_fce_config.service_base_dir = Some(tmp_dir);
+        __fce_generated_fce_config.toml_faas_config.modules_dir = Some(#modules_dir.to_string());
+
+        let fce = fluence_test::internal::AppService::new_with_empty_facade(__fce_generated_fce_config, service_id, std::collections::HashMap::new())
             .unwrap_or_else(|e| panic!("app service can't be created: {}", e));
 
         let fce = std::rc::Rc::new(std::cell::RefCell::new(fce));
@@ -94,12 +106,14 @@ fn generate_module_ctors<'n>(
         // and internally allocate memory in format
         let module_name = generate_module_name(&name)?;
         let struct_name = generate_struct_name(&name)?;
+        let name_for_user = new_ident(&name)?;
 
-        let module_ctor = quote! { #module_name::#struct_name { fce: fce.clone() }};
+        let module_ctor =
+            quote! { let mut #name_for_user = #module_name::#struct_name { fce: fce.clone() }; };
         module_ctors.push(module_ctor);
     }
 
-    let module_ctors = quote! { #(#module_ctors)*, };
+    let module_ctors = quote! { #(#module_ctors),* };
 
     Ok(module_ctors)
 }
@@ -125,7 +139,7 @@ fn generate_module_definitions<'i>(
         module_definitions.push(module_definition);
     }
 
-    let module_definitions = quote! { #(#module_definitions)*,};
+    let module_definitions = quote! { #(#module_definitions),*};
 
     Ok(module_definitions)
 }
@@ -147,7 +161,7 @@ fn generate_module_definition(
         pub mod #module_name_ident {
             #module_records
 
-            struct #struct_name_ident {
+            pub struct #struct_name_ident {
                 pub fce: std::rc::Rc<std::cell::RefCell<fluence_test::internal::AppService>>,
             }
 
@@ -225,12 +239,12 @@ fn generate_arguments_converter<'a>(
     }
 
     let arguments_serializer =
-        quote! { let arguments = fluence_test::internal::json!([#(#arguments)*,]) };
+        quote! { let arguments = fluence_test::internal::json!([#(#arguments),*]); };
     Ok(arguments_serializer)
 }
 
 fn generate_function_call(module_name: &str, method_name: &str) -> TokenStream2 {
-    quote! { self.fce.as_ref.borrow_mut().call_with_module_name(#module_name, #method_name, arguments, <_>::default()).expect("call to FCE failed"); }
+    quote! { self.fce.as_ref().borrow_mut().call_with_module_name(#module_name, #method_name, arguments, <_>::default()).expect("call to FCE failed"); }
 }
 
 fn generate_set_result(output_type: &Option<&IType>) -> TokenStream2 {
@@ -312,7 +326,7 @@ fn generate_records(records: &FCERecordTypes) -> TResult<TokenStream2> {
 
         let record = quote! {
             #[derive(Clone, fluence_test::internal::Serialize, fluence_test::internal::Deserialize)]
-            struct #record_name_ident {
+            pub struct #record_name_ident {
                 #fields
             }
         };
@@ -329,7 +343,7 @@ fn prepare_field(fields: &[IRecordFieldType], records: &FCERecordTypes) -> TResu
         let field_name = new_ident(&field.name)?;
         let field_type = itype_to_tokens(&field.ty, records)?;
 
-        let field = quote! { #field_name: #field_type };
+        let field = quote! { #field_name: #field_type, };
         result.extend(field);
     }
 
@@ -342,7 +356,7 @@ fn generate_module_name(module_name: &str) -> TResult<syn::Ident> {
 }
 
 fn generate_record_name(record_name: &str) -> TResult<syn::Ident> {
-    let extended_record_name = format!("FCEGeneratedRecord{}", record_name);
+    let extended_record_name = format!("{}", record_name);
     new_ident(&extended_record_name)
 }
 
@@ -391,8 +405,10 @@ fn itype_to_tokens(itype: &IType, records: &FCERecordTypes) -> TResult<TokenStre
 
 fn collect_module_interfaces(
     config: &TomlAppServiceConfig,
+    modules_dir: PathBuf,
 ) -> TResult<Vec<(&str, FCEModuleInterface)>> {
-    let module_paths = collect_module_paths(config);
+    let module_paths = collect_module_paths(config, modules_dir);
+    println!("module paths: {:?}", module_paths);
 
     module_paths
         .into_iter()
@@ -401,14 +417,10 @@ fn collect_module_interfaces(
         .map_err(Into::into)
 }
 
-fn collect_module_paths(config: &TomlAppServiceConfig) -> Vec<(&str, PathBuf)> {
-    let base_dir = config
-        .toml_faas_config
-        .modules_dir
-        .as_ref()
-        .map(|p| PathBuf::from(p))
-        .unwrap_or_default();
-
+fn collect_module_paths(
+    config: &TomlAppServiceConfig,
+    modules_dir: PathBuf,
+) -> Vec<(&str, PathBuf)> {
     config
         .toml_faas_config
         .module
@@ -416,9 +428,24 @@ fn collect_module_paths(config: &TomlAppServiceConfig) -> Vec<(&str, PathBuf)> {
         .map(|m| {
             let module_file_name = m.file_name.as_ref().unwrap_or_else(|| &m.name);
             let module_file_name = PathBuf::from(module_file_name);
-            let module_path = base_dir.join(module_file_name);
+            // TODO: is it right to always have .wasm extension?
+            let module_path = modules_dir.join(module_file_name).with_extension("wasm");
 
             (m.name.as_str(), module_path)
         })
         .collect::<Vec<_>>()
+}
+
+fn determine_modules_dir(
+    config: &TomlAppServiceConfig,
+    modules_dir: Option<String>,
+) -> Option<PathBuf> {
+    match modules_dir {
+        Some(modules_dir) => Some(PathBuf::from(modules_dir)),
+        None => config
+            .toml_faas_config
+            .modules_dir
+            .as_ref()
+            .map(|p| PathBuf::from(p)),
+    }
 }

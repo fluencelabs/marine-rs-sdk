@@ -2,6 +2,7 @@
 members = [
   "crates/fce-macro",
   "crates/fce-test-macro",
+  "crates/fce-test-macro-impl",
   "crates/main",
   "crates/wit",
   "fluence",
