@@ -1,4 +1,4 @@
-error: type with lifetimes or generics aren't allowed
+error: types with lifetimes or generics aren't allowed
   --> $DIR/improper_types.rs:11:21
    |
 11 |     fn test(_arg_1: Box<i32>);

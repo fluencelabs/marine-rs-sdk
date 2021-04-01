@@ -1,16 +1,16 @@
-error: type with lifetimes or generics aren't allowed
+error: types with lifetimes or generics aren't allowed
  --> $DIR/improper_types.rs:8:17
   |
 8 | fn test(_arg_1: Box<i32>) {}
   |                 ^^^^^^^^
 
-error: type with lifetimes or generics aren't allowed
+error: types with lifetimes or generics aren't allowed
   --> $DIR/improper_types.rs:11:27
    |
 11 | fn test2(_arg_1: std::rc::Rc<i32>) {}
    |                           ^^^^^^^
 
-error: type with lifetimes or generics aren't allowed
+error: types with lifetimes or generics aren't allowed
   --> $DIR/improper_types.rs:14:36
    |
 14 | fn test3(_arg_1: std::collections::HashMap<i32, String>) {}
@@ -22,7 +22,7 @@ error: Incorrect argument type - passing only by value is supported now
 17 | fn test4(_arg_1: i32) -> (i32, i32) {
    |                          ^^^^^^^^^^
 
-error: type with lifetimes or generics aren't allowed
+error: types with lifetimes or generics aren't allowed
   --> $DIR/improper_types.rs:22:26
    |
 22 | fn test5(_arg_1: i32) -> Box<i32> {
