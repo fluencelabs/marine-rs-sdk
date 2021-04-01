@@ -14,24 +14,28 @@
  * limitations under the License.
  */
 
-#![doc(html_root_url = "https://docs.rs/fluence-sdk-macro/0.5.0")]
-#![deny(
-    dead_code,
-    nonstandard_style,
-    unused_imports,
-    unused_mut,
-    unused_variables,
-    unused_unsafe,
-    unreachable_patterns
-)]
-#![warn(rust_2018_idioms)]
-#![recursion_limit = "1024"]
+use crate::attributes::FCETestAttributes;
+use crate::TResult;
+use crate::TestGeneratorError;
 
-mod attributes;
-mod errors;
-mod fce_test;
+use fluence_app_service::TomlAppServiceConfig;
+use proc_macro2::TokenStream;
+use quote::quote;
+use quote::ToTokens;
 
-pub use fce_test::fce_test_impl;
-pub use errors::TestGeneratorError;
 
-pub(crate) type TResult<T> = std::result::Result<T, TestGeneratorError>;
+
+use fce_wit_parser::module_raw_interface;
+use fce_wit_parser::interface::FCEModuleInterface;
+use fce_wit_parser::interface::FCERecordTypes;
+use fce_wit_parser::interface::FCEFunctionSignature;
+use fce_wit_parser::interface::it::IFunctionArg;
+use fce_wit_parser::interface::it::IRecordFieldType;
+use fce_wit_parser::interface::it::IType;
+
+use std::path::PathBuf;
+use syn::parse::Parser;
+
+
+
+

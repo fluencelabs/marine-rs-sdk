@@ -27,7 +27,6 @@
 #![warn(rust_2018_idioms)]
 
 pub use fluence_sdk_test_macro::fce_test;
-pub use fluence_sdk_test_macro_impl::fce_test_impl;
 
 /// These API functions are intended for internal usage in generated code.
 /// Normally, you shouldn't use them.

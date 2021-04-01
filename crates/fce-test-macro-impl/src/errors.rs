@@ -23,7 +23,7 @@ use thiserror::Error as ThisError;
 
 #[derive(Debug, ThisError)]
 pub enum TestGeneratorError {
-    #[error("{0}")]
+    #[error("Can't load Wasm modules into FCE: {0}")]
     WITParserError(#[from] WITParserError),
 
     #[error("{0}")]
@@ -32,7 +32,7 @@ pub enum TestGeneratorError {
     #[error("{0}")]
     SynError(#[from] SynError),
 
-    #[error("{0}")]
+    #[error("Can't load Wasm modules from the provided config: {0}")]
     ConfigLoadError(#[from] AppServiceError),
 
     #[error("{0}")]

@@ -19,7 +19,6 @@ path = "src/lib.rs"
 
 [dependencies]
 fluence-sdk-test-macro = { path = "../crates/fce-test-macro", version = "=0.5.0" }
-fluence-sdk-test-macro-impl = { path = "../crates/fce-test-macro-impl", version = "=0.5.0" }
 fluence-app-service = { version = "0.5.2", features = ["raw-module-api"] }
 
 serde = { version = "1.0.118", features = ["derive"] }

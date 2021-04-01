@@ -1,5 +1,5 @@
 /*
- * Copyright 2020 Fluence Labs Limited
+ * Copyright 2021 Fluence Labs Limited
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,24 +14,10 @@
  * limitations under the License.
  */
 
-#![doc(html_root_url = "https://docs.rs/fluence-sdk-macro/0.5.0")]
-#![deny(
-    dead_code,
-    nonstandard_style,
-    unused_imports,
-    unused_mut,
-    unused_variables,
-    unused_unsafe,
-    unreachable_patterns
-)]
-#![warn(rust_2018_idioms)]
-#![recursion_limit = "1024"]
+mod config_worker;
+mod fce_test_impl;
+mod glue_code_generator;
+mod module_generator;
+mod utils;
 
-mod attributes;
-mod errors;
-mod fce_test;
-
-pub use fce_test::fce_test_impl;
-pub use errors::TestGeneratorError;
-
-pub(crate) type TResult<T> = std::result::Result<T, TestGeneratorError>;
+pub use fce_test_impl::fce_test_impl;
