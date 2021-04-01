@@ -59,7 +59,7 @@ pub(super) fn generate_module_definitions<'i>(
     modules
         .into_iter()
         .map(generate_module_definition)
-        .collect::<Result<Vec<_>, _>>()
+        .collect::<TResult<Vec<_>>>()
 }
 
 fn generate_module_definition(module: &Module<'_>) -> TResult<TokenStream> {
