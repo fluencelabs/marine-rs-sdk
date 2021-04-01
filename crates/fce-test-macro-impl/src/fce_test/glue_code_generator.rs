@@ -26,6 +26,65 @@ use quote::ToTokens;
 
 use std::path::PathBuf;
 
+/// Generates glue code for tests.
+/// F.e. for the greeting service the following glue code would be generated:
+///```ignore
+/// // (0)
+///  pub mod __fce_generated_greeting {
+///     struct FCEGeneratedStructgreeting {
+///         fce: std::rc::Rc<std::cell::RefCell<fluence_test::internal::AppService>>,
+///     }
+///
+///     impl FCEGeneratedStructgreeting {
+///         pub fn new(fce: std::rc::Rc<std::cell::RefCell<fluence_test::internal::AppService>>) -> Self {
+///             Self { fce }
+///         }
+///
+///         pub fn greeting(&mut self, name: String) -> String {
+///             use std::ops::DerefMut;
+///             let arguments = fluence_test::internal::json!([name]);
+///             let result = self
+///                 .fce
+///                 .as_ref
+///                 .borrow_mut()
+///                 .call_with_module_name("greeting", "greeting", arguments, <_>::default())
+///                 .expect("call to FCE failed");
+///             let result: String = serde_json::from_value(result)
+///                 .expect("the default deserializer shouldn't fail");
+///             result
+///         }
+///     }
+///}
+/// // (1)
+/// let mut __fce__generated_fce_config = fluence_test::internal::TomlAppServiceConfig::load("/path/to/greeting/Config.toml".to_string())
+///     .unwrap_or_else(|e| {
+///         panic!(
+///              "app service located at `{}` config can't be loaded: {}",
+///            "/Users/mike/dev/work/fluence/wasm/fce/examples/greeting/Config.toml", e
+///         )
+///      });
+///
+/// __fce__generated_fce_config.service_base_dir = Some("/path/to/tmp".to_string());
+///
+/// let fce = fluence_test::internal::AppService::new_with_empty_facade(
+///         __fce__generated_fce_config,
+///         "3640e972-92e3-47cb-b95f-4e3c5bcf0f14",
+///         std::collections::HashMap::new(),
+///     ).unwrap_or_else(|e| panic!("app service can't be created: {}", e));
+///
+/// let fce = std::rc::Rc::new(std::cell::RefCell::new(fce));
+///
+/// // (2)
+///
+/// let mut greeting = __fce_generated_greeting::FCEGeneratedStructgreeting::new(fce);
+///
+/// // (3)
+///```
+///
+/// Here [(0), (1)] - module_definitions
+///      [(1), (2)] - fce ctor
+///      [(2), (3)] - ctors of all modules of the tested service
+///      [(3), (4)] - original test function
 pub(super) fn generate_test_glue_code(
     func_item: syn::ItemFn,
     attrs: FCETestAttributes,

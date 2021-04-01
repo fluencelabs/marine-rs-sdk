@@ -26,6 +26,35 @@ use fce_wit_parser::interface::FCEModuleInterface;
 use proc_macro2::TokenStream;
 use quote::quote;
 
+/// Generates definitions of modules and records of this modules.
+/// F.e. for the greeting service the following definitions would be generated:
+///```ignore
+/// pub mod __fce_generated_greeting {
+///     struct FCEGeneratedStructgreeting {
+///         fce: std::rc::Rc<std::cell::RefCell<fluence_test::internal::AppService>>,
+///     }
+///
+///     impl FCEGeneratedStructgreeting {
+///         pub fn new(fce: std::rc::Rc<std::cell::RefCell<fluence_test::internal::AppService>>) -> Self {
+///             Self { fce }
+///         }
+///
+///         pub fn greeting(&mut self, name: String) -> String {
+///             use std::ops::DerefMut;
+///             let arguments = fluence_test::internal::json!([name]);
+///             let result = self
+///                 .fce
+///                 .as_ref
+///                 .borrow_mut()
+///                 .call_with_module_name("greeting", "greeting", arguments, <_>::default())
+///                 .expect("call to FCE failed");
+///             let result: String = serde_json::from_value(result)
+///                 .expect("the default deserializer shouldn't fail");
+///             result
+///         }
+///     }
+/// }
+///```
 pub(super) fn generate_module_definitions<'i>(
     modules: impl ExactSizeIterator<Item = &'i Module<'i>>,
 ) -> TResult<TokenStream> {

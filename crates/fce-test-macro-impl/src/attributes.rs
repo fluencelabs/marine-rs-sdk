@@ -16,9 +16,13 @@
 
 use darling::FromMeta;
 
+/// Describes attributes of `fce_test` macro.
 #[derive(Debug, Default, Clone, FromMeta)]
 pub(crate) struct FCETestAttributes {
+    /// Path to a config file of a tested service.
     pub(crate) config_path: String,
+
+    /// Path to compiled modules of a service.
     #[darling(default)]
     pub(crate) modules_dir: Option<String>,
 }

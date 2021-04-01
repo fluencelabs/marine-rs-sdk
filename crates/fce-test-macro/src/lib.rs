@@ -34,20 +34,9 @@ use syn::spanned::Spanned;
 
 /// This macro allows user to write tests for services in the following form:
 ///```ignore
-/// #[fce_test(config = "/path/to/Config.toml")]
+/// #[fce_test(config = "/path/to/Config.toml", modules_dir = "path/to/service/modules")]
 /// fn test() {
-///     let service_result = fce.call("greeting", "name");
-///     assert_eq!(&service_result, "Hi, name!");
-/// }
-///```
-///
-/// This function is desugrated in the following way:
-///```ignore
-/// #[test]
-/// fn test() {
-///     let fce = fluence_faas::FluenceFaaS::with_raw_config("/path/to/Config.toml")
-///         .unwrap_or_else(|e| panic!("test instance can't be instantiated: {}", e));
-///     let service_result = fce.call("greeting", "name");
+///     let service_result = greeting.greeting("John".to_string());
 ///     assert_eq!(&service_result, "Hi, name!");
 /// }
 ///```
