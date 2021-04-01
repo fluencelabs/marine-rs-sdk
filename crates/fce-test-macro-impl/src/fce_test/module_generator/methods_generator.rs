@@ -31,7 +31,7 @@ pub(super) fn generate_module_methods<'m, 'r>(
     records: &'r FCERecordTypes,
 ) -> TResult<Vec<TokenStream>> {
     method_signatures
-        .map(|signature| -> TResult<TokenStream> {
+        .map(|signature| -> TResult<_> {
             let func_name = utils::new_ident(&signature.name)?;
             let arguments = generate_arguments(signature.arguments.iter(), records)?;
             let output_type = generate_output_type(&signature.outputs, records)?;
@@ -45,7 +45,7 @@ pub(super) fn generate_module_methods<'m, 'r>(
 
             Ok(module_method)
         })
-        .collect::<Result<Vec<_>, _>>()
+        .collect::<TResult<Vec<_>>>()
 }
 
 fn generate_fce_call(
@@ -128,16 +128,15 @@ fn generate_arguments<'a, 'r>(
     arguments: impl ExactSizeIterator<Item = &'a IFunctionArg>,
     records: &'r FCERecordTypes,
 ) -> TResult<Vec<TokenStream>> {
-    let mut result = Vec::with_capacity(arguments.len());
-    for argument in arguments {
-        let arg_name = utils::new_ident(&argument.name)?;
-        let arg_type = utils::itype_to_tokens(&argument.ty, records)?;
+    arguments
+        .map(|argument| -> TResult<_> {
+            let arg_name = utils::new_ident(&argument.name)?;
+            let arg_type = utils::itype_to_tokens(&argument.ty, records)?;
 
-        let arg = quote! { #arg_name: #arg_type };
-        result.push(arg);
-    }
-
-    Ok(result)
+            let arg = quote! { #arg_name: #arg_type };
+            Ok(arg)
+        })
+        .collect::<TResult<Vec<_>>>()
 }
 
 fn generate_output_type(output_types: &[IType], records: &FCERecordTypes) -> TResult<TokenStream> {

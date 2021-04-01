@@ -122,7 +122,7 @@ pub(super) fn generate_test_glue_code(
 
             #app_service_ctor
 
-            #module_ctors
+            #(#module_ctors)*
 
             #original_block
         }
@@ -157,22 +157,19 @@ fn generate_app_service_ctor(config_path: &str, modules_dir: &PathBuf) -> TokenS
 
 fn generate_module_ctors<'n>(
     module_names: impl ExactSizeIterator<Item = &'n str>,
-) -> TResult<TokenStream> {
-    let mut module_ctors = Vec::with_capacity(module_names.len());
-    for name in module_names {
-        // TODO: optimize these two call because they are called twice for each module name
-        // and internally allocate memory in format call.
-        let module_name = fce_test::utils::generate_module_name(&name)?;
-        let struct_name = fce_test::utils::generate_struct_name(&name)?;
-        let name_for_user = fce_test::utils::new_ident(&name)?;
+) -> TResult<Vec<TokenStream>> {
+    module_names
+        .map(|name| -> TResult<_> {
+            // TODO: optimize these two call because they are called twice for each module name
+            // and internally allocate memory in format call.
+            let module_name = fce_test::utils::generate_module_name(&name)?;
+            let struct_name = fce_test::utils::generate_struct_name(&name)?;
+            let name_for_user = fce_test::utils::new_ident(&name)?;
 
-        let module_ctor =
-            quote! { let mut #name_for_user = #module_name::#struct_name::new(fce.clone()); };
+            let module_ctor =
+                quote! { let mut #name_for_user = #module_name::#struct_name::new(fce.clone()); };
 
-        module_ctors.push(module_ctor);
-    }
-
-    let module_ctors = quote! { #(#module_ctors),* };
-
-    Ok(module_ctors)
+            Ok(module_ctor)
+        })
+        .collect::<TResult<_>>()
 }

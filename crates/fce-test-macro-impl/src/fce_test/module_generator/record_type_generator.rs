@@ -26,7 +26,7 @@ use quote::quote;
 pub(super) fn generate_records(records: &FCERecordTypes) -> TResult<Vec<TokenStream>> {
     use std::ops::Deref;
 
-    records.iter().map(|(_, record)| -> TResult<TokenStream> {
+    records.iter().map(|(_, record)| -> TResult<_> {
         let record_name_ident = utils::generate_record_name(&record.name)?;
         let fields = prepare_field(record.fields.deref().iter(), records)?;
 
@@ -39,7 +39,7 @@ pub(super) fn generate_records(records: &FCERecordTypes) -> TResult<Vec<TokenStr
 
         Ok(generated_record)
     }
-    ).collect::<Result<Vec<_>, _>>()
+    ).collect::<TResult<Vec<_>>>()
 }
 
 fn prepare_field<'f>(
@@ -47,7 +47,7 @@ fn prepare_field<'f>(
     records: &FCERecordTypes,
 ) -> TResult<Vec<TokenStream>> {
     fields
-        .map(|field| -> TResult<TokenStream> {
+        .map(|field| -> TResult<_> {
             let field_name = utils::new_ident(&field.name)?;
             let field_type = utils::itype_to_tokens(&field.ty, records)?;
 
@@ -55,5 +55,5 @@ fn prepare_field<'f>(
 
             Ok(generated_field)
         })
-        .collect::<Result<Vec<_>, _>>()
+        .collect::<TResult<Vec<_>>>()
 }
