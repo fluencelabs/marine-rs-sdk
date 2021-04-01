@@ -30,24 +30,22 @@ pub(super) fn generate_module_methods<'m, 'r>(
     method_signatures: impl ExactSizeIterator<Item = &'m FCEFunctionSignature>,
     records: &'r FCERecordTypes,
 ) -> TResult<Vec<TokenStream>> {
-    let mut result = Vec::with_capacity(method_signatures.len());
+    method_signatures
+        .map(|signature| -> TResult<TokenStream> {
+            let func_name = utils::new_ident(&signature.name)?;
+            let arguments = generate_arguments(signature.arguments.iter(), records)?;
+            let output_type = generate_output_type(&signature.outputs, records)?;
+            let fce_call = generate_fce_call(module_name, &signature, records)?;
 
-    for signature in method_signatures {
-        let func_name = utils::new_ident(&signature.name)?;
-        let arguments = generate_arguments(signature.arguments.iter(), records)?;
-        let output_type = generate_output_type(&signature.outputs, records)?;
-        let fce_call = generate_fce_call(module_name, &signature, records)?;
+            let module_method = quote! {
+                pub fn #func_name(&mut self, #(#arguments),*) #output_type {
+                    #fce_call
+                }
+            };
 
-        let module_method = quote! {
-            pub fn #func_name(&mut self, #(#arguments),*) #output_type {
-                #fce_call
-            }
-        };
-
-        result.push(module_method);
-    }
-
-    Ok(result)
+            Ok(module_method)
+        })
+        .collect::<Result<Vec<_>, _>>()
 }
 
 fn generate_fce_call(
@@ -79,20 +77,16 @@ fn generate_fce_call(
     Ok(function_call)
 }
 
+/// Generates type convertor to json because of AppService receives them in json.
 fn generate_arguments_converter<'a>(
     args: impl ExactSizeIterator<Item = &'a str>,
 ) -> TResult<TokenStream> {
-    let mut arguments = Vec::with_capacity(args.len());
+    let arg_idents: Vec<syn::Ident> = args.map(utils::new_ident).collect::<Result<_, _>>()?;
 
-    for arg in args {
-        let arg_ident = utils::new_ident(arg)?;
-        arguments.push(arg_ident);
-    }
+    let args_converter =
+        quote! { let arguments = fluence_test::internal::json!([#(#arg_idents),*]); };
 
-    let arguments_serializer =
-        quote! { let arguments = fluence_test::internal::json!([#(#arguments),*]); };
-
-    Ok(arguments_serializer)
+    Ok(args_converter)
 }
 
 fn generate_function_call(module_name: &str, method_name: &str) -> TokenStream {

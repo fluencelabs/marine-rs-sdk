@@ -22,6 +22,7 @@ use fce_wit_parser::interface::FCEModuleInterface;
 
 use std::path::PathBuf;
 
+#[derive(Debug, Clone, PartialEq, Eq)]
 pub(super) struct Module<'m> {
     pub name: &'m str,
     pub interface: FCEModuleInterface,
@@ -33,6 +34,7 @@ impl<'m> Module<'m> {
     }
 }
 
+/// Returns all modules the provided config consist of.
 pub(super) fn collect_modules(
     config: &TomlAppServiceConfig,
     modules_dir: PathBuf,
@@ -67,7 +69,11 @@ fn collect_module_paths(
         .collect::<Vec<_>>()
 }
 
-pub(super) fn determine_modules_dir(
+/// Tries to determine a dir with compiled Wasm modules according to the following
+///  - if the modules_dir attribute is specified (by user) it will be chosen,
+///  - otherwise if modules_dir is specified in AppService config it will be chosen,
+///  - otherwise None will be returned.
+pub(super) fn resolve_modules_dir(
     config: &TomlAppServiceConfig,
     modules_dir: Option<String>,
 ) -> Option<PathBuf> {

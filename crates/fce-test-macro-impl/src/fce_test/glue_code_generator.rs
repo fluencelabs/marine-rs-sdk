@@ -18,6 +18,7 @@ use crate::attributes::FCETestAttributes;
 use crate::TResult;
 use crate::TestGeneratorError;
 use crate::fce_test;
+use crate::fce_test::config_utils;
 
 use fluence_app_service::TomlAppServiceConfig;
 use proc_macro2::TokenStream;
@@ -89,7 +90,7 @@ use std::path::PathBuf;
 ///```
 ///
 /// Here [(0), (1)] - module_definitions
-///      [(1), (2)] - fce ctor
+///      [(1), (2)] - AppService ctor
 ///      [(2), (3)] - ctors of all modules of the tested service
 ///      [(3), (4)] - original test function
 pub(super) fn generate_test_glue_code(
@@ -97,28 +98,29 @@ pub(super) fn generate_test_glue_code(
     attrs: FCETestAttributes,
 ) -> TResult<TokenStream> {
     let fce_config = TomlAppServiceConfig::load(&attrs.config_path)?;
-    let modules_dir =
-        match fce_test::config_worker::determine_modules_dir(&fce_config, attrs.modules_dir) {
-            Some(modules_dir) => modules_dir,
-            None => return Err(TestGeneratorError::ModulesDirUnspecified),
-        };
+    let modules_dir = match config_utils::resolve_modules_dir(&fce_config, attrs.modules_dir) {
+        Some(modules_dir) => modules_dir,
+        None => return Err(TestGeneratorError::ModulesDirUnspecified),
+    };
 
-    let fce_ctor = generate_fce_ctor(&attrs.config_path, &modules_dir);
-    let module_interfaces = fce_test::config_worker::collect_modules(&fce_config, modules_dir)?;
+    let app_service_ctor = generate_app_service_ctor(&attrs.config_path, &modules_dir);
+    let module_interfaces = fce_test::config_utils::collect_modules(&fce_config, modules_dir)?;
 
     let module_definitions =
         fce_test::module_generator::generate_module_definitions(module_interfaces.iter())?;
+
     let module_iter = module_interfaces.iter().map(|module| module.name);
     let module_ctors = generate_module_ctors(module_iter)?;
+
     let original_block = func_item.block;
     let signature = func_item.sig;
 
     let glue_code = quote! {
         #[test]
         #signature {
-            #module_definitions
+            #(#module_definitions)*
 
-            #fce_ctor
+            #app_service_ctor
 
             #module_ctors
 
@@ -129,7 +131,7 @@ pub(super) fn generate_test_glue_code(
     Ok(glue_code)
 }
 
-fn generate_fce_ctor(config_path: &str, modules_dir: &PathBuf) -> TokenStream {
+fn generate_app_service_ctor(config_path: &str, modules_dir: &PathBuf) -> TokenStream {
     let config_path = config_path.to_token_stream();
     let modules_dir = modules_dir.to_string_lossy().to_string();
 

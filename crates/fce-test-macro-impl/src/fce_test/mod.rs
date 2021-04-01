@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-mod config_worker;
+mod config_utils;
 mod fce_test_impl;
 mod glue_code_generator;
 mod module_generator;

@@ -18,10 +18,8 @@ mod methods_generator;
 mod record_type_generator;
 
 use crate::fce_test::utils;
-use crate::fce_test::config_worker::Module;
+use crate::fce_test::config_utils::Module;
 use crate::TResult;
-
-use fce_wit_parser::interface::FCEModuleInterface;
 
 use proc_macro2::TokenStream;
 use quote::quote;
@@ -57,25 +55,19 @@ use quote::quote;
 ///```
 pub(super) fn generate_module_definitions<'i>(
     modules: impl ExactSizeIterator<Item = &'i Module<'i>>,
-) -> TResult<TokenStream> {
-    let mut module_definitions = Vec::with_capacity(modules.len());
-
-    for module in modules {
-        let module_definition = generate_module_definition(&module.name, &module.interface)?;
-        module_definitions.push(module_definition);
-    }
-
-    let module_definitions = quote! { #(#module_definitions),*};
-
-    Ok(module_definitions)
+) -> TResult<Vec<TokenStream>> {
+    modules
+        .into_iter()
+        .map(generate_module_definition)
+        .collect::<Result<Vec<_>, _>>()
 }
 
-fn generate_module_definition(
-    module_name: &str,
-    module_interface: &FCEModuleInterface,
-) -> TResult<TokenStream> {
+fn generate_module_definition(module: &Module<'_>) -> TResult<TokenStream> {
+    let module_name = module.name;
     let module_name_ident = utils::generate_module_name(module_name)?;
     let struct_name_ident = utils::generate_struct_name(module_name)?;
+
+    let module_interface = &module.interface;
     let module_records = record_type_generator::generate_records(&module_interface.record_types)?;
     let module_functions = methods_generator::generate_module_methods(
         module_name,
@@ -85,7 +77,7 @@ fn generate_module_definition(
 
     let module_definition = quote! {
         pub mod #module_name_ident {
-            #module_records
+            #(#module_records)*
 
             pub struct #struct_name_ident {
                 fce: std::rc::Rc<std::cell::RefCell<fluence_test::internal::AppService>>,
