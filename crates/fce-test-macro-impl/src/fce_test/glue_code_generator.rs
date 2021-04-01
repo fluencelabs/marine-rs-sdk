@@ -89,10 +89,11 @@ use std::path::PathBuf;
 /// // (3)
 ///```
 ///
-/// Here [(0), (1)] - module_definitions
-///      [(1), (2)] - AppService ctor
-///      [(2), (3)] - ctors of all modules of the tested service
-///      [(3), (4)] - original test function
+/// Example code above corresponds to the macro definition in the following way:
+///      [(0), (1)] - module_definitions*
+///      [(1), (2)] - app_service_ctor
+///      [(2), (3)] - module_ctors*
+///      [(3), (4)] - original_block
 pub(super) fn generate_test_glue_code(
     func_item: syn::ItemFn,
     attrs: FCETestAttributes,
