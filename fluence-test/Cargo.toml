@@ -16,6 +16,7 @@ all-features = true
 
 [lib]
 path = "src/lib.rs"
+doctest = false
 
 [dependencies]
 fluence-sdk-test-macro = { path = "../crates/fce-test-macro", version = "=0.5.0" }

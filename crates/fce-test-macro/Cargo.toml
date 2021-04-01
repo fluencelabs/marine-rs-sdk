@@ -14,6 +14,7 @@ all-features = true
 
 [lib]
 proc-macro = true
+doctest = false
 
 [dependencies]
 fluence-sdk-test-macro-impl = { path = "../fce-test-macro-impl", version = "=0.5.0" }
