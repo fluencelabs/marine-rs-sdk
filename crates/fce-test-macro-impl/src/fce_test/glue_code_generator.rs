@@ -68,7 +68,7 @@ use std::path::PathBuf;
 ///     .unwrap_or_else(|e| {
 ///         panic!(
 ///              "app service located at `{}` config can't be loaded: {}",
-///            "/Users/mike/dev/work/fluence/wasm/fce/examples/greeting/Config.toml", e
+///            "/path/to/greeting/Config.toml", e
 ///         )
 ///      });
 ///
