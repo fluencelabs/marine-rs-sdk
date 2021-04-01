@@ -39,7 +39,7 @@ pub enum TestGeneratorError {
     AttributesError(#[from] DarlingError),
 
     #[error(
-        "neither attribute specified nor service config contains modules_dir, please specify it"
+        "neither modules_dir attribute specified nor service config contains modules_dir, please specify one of them"
     )]
     ModulesDirUnspecified,
 }
@@ -48,13 +48,4 @@ pub enum TestGeneratorError {
 pub enum CorruptedITSection {
     #[error("record with {0} is absent in embedded IT section")]
     AbsentRecord(u64),
-}
-
-use proc_macro2::TokenStream;
-
-impl quote::ToTokens for TestGeneratorError {
-    fn to_tokens(&self, tokens: &mut TokenStream) {
-        let error_as_text = format!("Error was encountered inside fce_test: {}", self);
-        error_as_text.to_tokens(tokens);
-    }
 }
