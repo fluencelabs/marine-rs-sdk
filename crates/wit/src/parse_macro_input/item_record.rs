@@ -15,13 +15,14 @@
  */
 
 use super::ParseMacroInput;
-use crate::{fce_ast_types, AstRecordField};
+use crate::fce_ast_types;
+use crate::AstRecordField;
 use crate::fce_ast_types::FCEAst;
+use crate::syn_error;
+use crate::parsed_type::ParsedType;
 
-use syn::Error;
 use syn::Result;
 use syn::spanned::Spanned;
-use crate::parsed_type::ParsedType;
 
 impl ParseMacroInput for syn::ItemStruct {
     fn parse_macro_input(self) -> Result<FCEAst> {
@@ -29,29 +30,10 @@ impl ParseMacroInput for syn::ItemStruct {
 
         let fields = match &self.fields {
             syn::Fields::Named(named_fields) => &named_fields.named,
-            syn::Fields::Unnamed(unnamed_fields) => &unnamed_fields.unnamed,
-            _ => return Err(Error::new(self.span(), "only named field allowed")),
+            _ => return syn_error!(self.span(), "only named fields are allowed in structs"),
         };
 
-        let fields = fields
-            .iter()
-            .map(|field| {
-                check_field(field)?;
-                let field_name = field.ident.as_ref().map(|ident| {
-                    ident
-                        .to_string()
-                        .split(' ')
-                        .last()
-                        .unwrap_or_default()
-                        .to_string()
-                });
-                let field_type = ParsedType::from_type(&field.ty)?;
-                Ok(AstRecordField {
-                    name: field_name,
-                    ty: field_type,
-                })
-            })
-            .collect::<Result<Vec<_>>>()?;
+        let fields = fields_into_ast(fields)?;
 
         let name = self.ident.to_string();
         let ast_record_item = fce_ast_types::AstRecordItem {
@@ -69,13 +51,36 @@ fn check_record(record: &syn::ItemStruct) -> Result<()> {
         || record.generics.gt_token.is_some()
         || record.generics.where_clause.is_some()
     {
-        return Err(Error::new(
+        return syn_error!(
             record.span(),
-            "#[fce] couldn't be applied to a struct with generics or lifetimes",
-        ));
+            "#[fce] couldn't be applied to a struct with generics or lifetimes"
+        );
     }
 
     Ok(())
+}
+
+fn fields_into_ast(
+    fields: &syn::punctuated::Punctuated<syn::Field, syn::Token![,]>,
+) -> Result<Vec<AstRecordField>> {
+    fields
+        .iter()
+        .map(|field| {
+            check_field(field)?;
+            let name = field.ident.as_ref().map(|ident| {
+                ident
+                    .to_string()
+                    .split(' ')
+                    .last()
+                    .unwrap_or_default()
+                    .to_string()
+            });
+            let ty = ParsedType::from_type(&field.ty)?;
+
+            let record_field = AstRecordField { name, ty };
+            Ok(record_field)
+        })
+        .collect::<Result<Vec<_>>>()
 }
 
 /// Check that record fields satisfy the following requirements:
@@ -85,10 +90,10 @@ fn check_field(field: &syn::Field) -> Result<()> {
     match field.vis {
         syn::Visibility::Public(_) => {}
         _ => {
-            return Err(Error::new(
+            return syn_error!(
                 field.span(),
-                "#[fce] could be applied only to struct with all public fields",
-            ))
+                "#[fce] could be applied only to struct with all public fields"
+            )
         }
     };
 
@@ -104,7 +109,7 @@ fn check_field(field: &syn::Field) -> Result<()> {
     });
 
     if !is_all_attrs_public {
-        return Err(Error::new(field.span(), "field attributes isn't allowed"));
+        return syn_error!(field.span(), "field attributes isn't allowed");
     }
 
     Ok(())

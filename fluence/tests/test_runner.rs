@@ -13,4 +13,5 @@ fn test() {
     tests.pass("tests/records/empty_struct.rs");
     tests.compile_fail("tests/records/struct_with_improper_types.rs");
     tests.compile_fail("tests/records/struct_with_private_fields.rs");
+    tests.compile_fail("tests/records/unnamed_structs.rs");
 }

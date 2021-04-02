@@ -19,6 +19,7 @@ use super::FnArgGlueCodeGenerator;
 use super::passing_style_of;
 use crate::new_ident;
 use crate::wasm_type::RustType;
+use crate::fce_ast_types::AstFuncArgument;
 use crate::parsed_type::PassingStyle;
 
 use quote::quote;
@@ -47,7 +48,7 @@ pub(crate) trait FnPrologGlueCodeGenerator {
     fn generate_prolog(&self) -> FnPrologDescriptor;
 }
 
-impl FnPrologGlueCodeGenerator for Vec<(String, ParsedType)> {
+impl FnPrologGlueCodeGenerator for Vec<AstFuncArgument> {
     fn generate_prolog(&self) -> FnPrologDescriptor {
         let mut raw_arg_names = Vec::with_capacity(self.len());
         let mut raw_arg_types = Vec::with_capacity(self.len());
@@ -57,11 +58,11 @@ impl FnPrologGlueCodeGenerator for Vec<(String, ParsedType)> {
 
         let mut input_type_id = 0;
         for arg in self {
-            let passing_style = passing_style_of(&arg.1);
+            let passing_style = passing_style_of(&arg.ty);
             let TypeLifter {
                 converted_arg_ident,
                 type_lifter_glue_code,
-            } = generate_type_lifting_prolog(&arg.1, passing_style, input_type_id, input_type_id);
+            } = generate_type_lifting_prolog(&arg.ty, passing_style, input_type_id, input_type_id);
 
             let curr_raw_arg_types = arg.generate_arguments();
             let arg = quote! { #passing_style #converted_arg_ident };

@@ -18,6 +18,7 @@ use super::ParsedType;
 use super::passing_style_of;
 use super::PassingStyle;
 use crate::new_ident;
+use crate::fce_ast_types::AstFuncArgument;
 
 use quote::quote;
 
@@ -27,6 +28,13 @@ pub(crate) struct FnEpilogDescriptor {
     pub(crate) return_expression: proc_macro2::TokenStream,
     pub(crate) epilog: proc_macro2::TokenStream,
     pub(crate) mem_forget: proc_macro2::TokenStream,
+}
+
+/// Contains all ingredients needed for epilog creation.
+pub(crate) struct FnEpilogIngredients<'i> {
+    pub(crate) args: &'i [AstFuncArgument],
+    pub(crate) converted_args: &'i [syn::Ident],
+    pub(crate) return_type: &'i Option<ParsedType>,
 }
 
 /// This trait could be used to generate various parts needed to construct epilog of an export
@@ -44,24 +52,18 @@ pub(crate) trait FnEpilogGlueCodeGenerator {
     fn generate_fn_epilog(&self) -> FnEpilogDescriptor;
 }
 
-impl FnEpilogGlueCodeGenerator
-    for (
-        &Vec<(String, ParsedType)>,
-        &Vec<syn::Ident>,
-        &Option<ParsedType>,
-    )
-{
+impl FnEpilogGlueCodeGenerator for FnEpilogIngredients<'_> {
     fn generate_fn_epilog(&self) -> FnEpilogDescriptor {
         FnEpilogDescriptor {
-            fn_return_type: generate_fn_return_type(self.2),
-            return_expression: generate_return_expression(self.2),
-            epilog: generate_epilog(self.2),
-            mem_forget: generate_mem_forget(self.0, self.1, self.2),
+            fn_return_type: generate_fn_return_type(self.return_type),
+            return_expression: generate_return_expression(self.return_type),
+            epilog: generate_epilog(self.return_type),
+            mem_forget: generate_mem_forgets(self),
         }
     }
 }
 
-fn generate_fn_return_type(ty: &Option<ParsedType>) -> proc_macro2::TokenStream {
+pub(crate) fn generate_fn_return_type(ty: &Option<ParsedType>) -> proc_macro2::TokenStream {
     let ty = match ty {
         Some(ParsedType::Boolean(_)) => Some("i32"),
         Some(ParsedType::I8(_)) => Some("i8"),
@@ -90,7 +92,7 @@ fn generate_fn_return_type(ty: &Option<ParsedType>) -> proc_macro2::TokenStream 
     }
 }
 
-fn generate_return_expression(ty: &Option<ParsedType>) -> proc_macro2::TokenStream {
+pub(crate) fn generate_return_expression(ty: &Option<ParsedType>) -> proc_macro2::TokenStream {
     match ty {
         None => quote! {},
         _ => quote! {
@@ -115,10 +117,10 @@ fn generate_epilog(ty: &Option<ParsedType>) -> proc_macro2::TokenStream {
             }
         }
         Some(ParsedType::Vector(ty, _)) => {
-            let generated_serializer_name = String::from("__fce_generated_vec_serializer");
+            let generated_serializer_name = "__fce_generated_vec_serializer";
             let generated_serializer_ident = new_ident!(generated_serializer_name);
             let vector_serializer =
-                super::vector_utils::generate_vector_serializer(ty, &generated_serializer_name);
+                super::vector_utils::generate_vector_serializer(ty, generated_serializer_name);
 
             quote! {
                 #vector_serializer
@@ -136,12 +138,8 @@ fn generate_epilog(ty: &Option<ParsedType>) -> proc_macro2::TokenStream {
 /// If an export function returns a reference, this is probably a reference to one
 /// of the function arguments. If that's the case, reference must be still valid after
 /// the end of the function. Their deletion will be handled by IT with calling `release_objects`.
-fn generate_mem_forget(
-    args: &Vec<(String, ParsedType)>,
-    converted_args: &Vec<syn::Ident>,
-    ret_type: &Option<ParsedType>,
-) -> proc_macro2::TokenStream {
-    let passing_style = ret_type.as_ref().map(passing_style_of);
+fn generate_mem_forgets(ingredients: &FnEpilogIngredients<'_>) -> proc_macro2::TokenStream {
+    let passing_style = ingredients.return_type.as_ref().map(passing_style_of);
 
     match passing_style {
         // result will be deleted by IT side
@@ -149,21 +147,21 @@ fn generate_mem_forget(
             quote! { fluence::internal::add_object_to_release(Box::new(result)); }
         }
         Some(PassingStyle::ByRef) | Some(PassingStyle::ByMutRef) => {
-            mem_forget_by_args(args, converted_args)
+            mem_forget_by_args(ingredients.args, ingredients.converted_args)
         }
         None => quote! {},
     }
 }
 
 fn mem_forget_by_args(
-    args: &Vec<(String, ParsedType)>,
-    converted_args: &Vec<syn::Ident>,
+    args: &[AstFuncArgument],
+    converted_args: &[syn::Ident],
 ) -> proc_macro2::TokenStream {
     debug_assert!(args.len() == converted_args.len());
 
     let mut res = proc_macro2::TokenStream::new();
-    for ((_, arg), converted_arg) in args.iter().zip(converted_args) {
-        let arg_passing_style = passing_style_of(arg);
+    for (arg, converted_arg) in args.iter().zip(converted_args) {
+        let arg_passing_style = passing_style_of(&arg.ty);
         match arg_passing_style {
             // such values will be deleted inside an export function because they are being moved
             PassingStyle::ByValue => {}

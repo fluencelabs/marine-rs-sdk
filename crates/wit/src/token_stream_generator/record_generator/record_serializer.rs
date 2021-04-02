@@ -50,6 +50,7 @@ impl RecordSerializerGlueCodeGenerator for fce_ast_types::AstRecordItem {
                         field.name.as_ref().unwrap(),
                         id
                     );
+
                     let generated_serializer_ident = new_ident!(generated_serializer_name);
                     let vector_serializer = crate::parsed_type::generate_vector_serializer(
                         ty,

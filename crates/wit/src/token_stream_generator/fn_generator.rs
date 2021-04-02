@@ -17,8 +17,10 @@
 use crate::fce_ast_types;
 use crate::parsed_type::FnEpilogGlueCodeGenerator;
 use crate::parsed_type::FnEpilogDescriptor;
+use crate::parsed_type::FnEpilogIngredients;
 use crate::parsed_type::FnPrologGlueCodeGenerator;
 use crate::parsed_type::FnPrologDescriptor;
+
 use crate::new_ident;
 
 use proc_macro2::TokenStream;
@@ -52,17 +54,18 @@ impl quote::ToTokens for fce_ast_types::AstFunctionItem {
             args,
         } = &signature.arguments.generate_prolog();
 
+        let epilog_ingredients = FnEpilogIngredients {
+            args: &signature.arguments,
+            converted_args: converted_arg_idents,
+            return_type: &signature.output_type,
+        };
+
         let FnEpilogDescriptor {
             fn_return_type,
             return_expression,
             epilog,
             mem_forget,
-        } = (
-            &signature.arguments,
-            converted_arg_idents,
-            &signature.output_type,
-        )
-            .generate_fn_epilog();
+        } = epilog_ingredients.generate_fn_epilog();
 
         // here this Option must be Some
         let original_func = &self.original;

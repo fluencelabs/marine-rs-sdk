@@ -20,12 +20,18 @@ use serde::Serialize;
 use serde::Deserialize;
 
 #[derive(Clone, Serialize, Deserialize)]
+pub struct AstFuncArgument {
+    pub name: String,
+    pub ty: ParsedType,
+}
+
+#[derive(Clone, Serialize, Deserialize)]
 pub struct AstFunctionSignature {
     // Option is needed only for skipping serialization/deserialization of syn::ItemFn
     #[serde(skip)]
     pub visibility: Option<syn::Visibility>,
     pub name: String,
-    pub arguments: Vec<(String, ParsedType)>,
+    pub arguments: Vec<AstFuncArgument>,
     // fce supports only one return value now,
     // waiting for adding multi-value support in Wasmer.
     pub output_type: Option<ParsedType>,

@@ -44,6 +44,13 @@ macro_rules! prepare_global_data {
     };
 }
 
+#[macro_export]
+macro_rules! syn_error {
+    ($span:expr, $message:expr) => {
+        Err(syn::Error::new($span, $message))
+    };
+}
+
 /// Calculate record size in an internal serialized view.
 pub fn get_record_size<'a>(
     fields: impl Iterator<Item = &'a crate::parsed_type::ParsedType>,

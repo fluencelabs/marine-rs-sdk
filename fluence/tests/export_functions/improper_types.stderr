@@ -16,7 +16,7 @@ error: types with lifetimes or generics aren't allowed
 14 | fn test3(_arg_1: std::collections::HashMap<i32, String>) {}
    |                                    ^^^^^^^^^^^^^^^^^^^^
 
-error: Incorrect argument type - passing only by value is supported now
+error: Incorrect argument type, only path or reference are available on this position
   --> $DIR/improper_types.rs:17:26
    |
 17 | fn test4(_arg_1: i32) -> (i32, i32) {
