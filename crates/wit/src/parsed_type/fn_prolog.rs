@@ -130,7 +130,10 @@ fn generate_type_lifting_prolog(
                 },
                 ParsedType::Vector(ty, _) => {
                     let generated_deserializer_name =
-                        format!("__fce_generated_vec_deserializer_{}", supplied_arg_start_id);
+                        format!("__fce_generated_vec_deserializer_{}", supplied_arg_start_id)
+                            .replace("&", "_")
+                            .replace("<", "_")
+                            .replace(">", "_");
                     let generated_deserializer_ident = new_ident!(generated_deserializer_name);
                     let vector_deserializer = super::vector_utils::generate_vector_deserializer(
                         ty,

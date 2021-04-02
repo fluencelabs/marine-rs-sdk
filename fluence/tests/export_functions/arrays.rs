@@ -5,7 +5,7 @@ use fluence::fce;
 pub fn main() {}
 
 #[fce]
-pub fn byte_type( __arg: Vec<u8>) -> Vec<u8> {
+pub fn byte_type(_arg: Vec<u8>) -> Vec<u8> {
     unimplemented!()
 }
 

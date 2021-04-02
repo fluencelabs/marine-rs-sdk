@@ -64,10 +64,8 @@ impl ForeignModPrologGlueCodeGenerator for Vec<AstFuncArgument> {
         use crate::parsed_type::foreign_mod_arg::ForeignModArgGlueCodeGenerator;
         use quote::ToTokens;
 
-        let arg_types: Vec<proc_macro2::TokenStream> = self
-            .iter()
-            .map(|arg| arg.ty.to_token_stream())
-            .collect();
+        let arg_types: Vec<proc_macro2::TokenStream> =
+            self.iter().map(|arg| arg.ty.to_token_stream()).collect();
 
         let (arg_names, arg_transforms, arg_drops) = self
             .iter()
@@ -84,7 +82,7 @@ impl ForeignModPrologGlueCodeGenerator for Vec<AstFuncArgument> {
                         arg_drops.extend(quote::quote! { std::mem::ManuallyDrop::drop(&mut #arg_ident); });
                     },
                     ParsedType::Vector(ty, _) => {
-                        let generated_serializer_name = format!("__fce_generated_vec_serializer_{}", arg_name);
+                        let generated_serializer_name = format!("__fce_generated_vec_serializer_{}", arg_name).replace("&<>", "_");
 
                         let generated_serializer_ident = new_ident!(generated_serializer_name);
                         let vector_serializer = super::vector_utils::generate_vector_serializer(ty, &generated_serializer_name);

@@ -28,6 +28,11 @@ pub fn string_type(_arg: String) -> String {
 }
 
 #[fce]
+pub fn str_type(_arg: &str) -> &str {
+    unimplemented!()
+}
+
+#[fce]
 pub fn bytearray_type(_arg: Vec<u8>) -> Vec<u8> {
     unimplemented!()
 }

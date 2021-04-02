@@ -91,7 +91,10 @@ fn generate_vector_serializer_impl(
             }
         }
         ParsedType::Vector(ty, _) => {
-            let serializer_name = format!("{}_{}", arg_name, ty);
+            let serializer_name = format!("{}_{}", arg_name, ty)
+                .replace("<", "_")
+                .replace(">", "_")
+                .replace("&", "_");
             let inner_vector_serializer = generate_vector_serializer(&*ty, &serializer_name);
             let serializer_ident = crate::new_ident!(serializer_name);
 
@@ -182,7 +185,10 @@ pub(crate) fn generate_vector_deserializer(
             }
         }
         ParsedType::Vector(ty, _) => {
-            let deserializer_name = format!("{}_{}", arg_name, ty);
+            let deserializer_name = format!("{}_{}", arg_name, ty)
+                .replace("&", "_")
+                .replace("<", "_")
+                .replace(">", "_");
             let inner_vector_deserializer = generate_vector_deserializer(&*ty, &deserializer_name);
             let deserializer_ident = crate::new_ident!(deserializer_name);
 
