@@ -18,7 +18,7 @@ use super::ParsedType;
 use crate::wasm_type::RustType;
 use crate::new_ident;
 use crate::parsed_type::PassingStyle;
-use crate::fce_ast_types::AstFuncArgument;
+use crate::fce_ast_types::AstFnArgument;
 
 pub(crate) struct WrapperDescriptor {
     pub(crate) arg_names: Vec<syn::Ident>,
@@ -59,7 +59,7 @@ pub(crate) trait ForeignModPrologGlueCodeGenerator {
     fn generate_extern_prolog(&self) -> ExternDescriptor;
 }
 
-impl ForeignModPrologGlueCodeGenerator for Vec<AstFuncArgument> {
+impl ForeignModPrologGlueCodeGenerator for Vec<AstFnArgument> {
     fn generate_wrapper_prolog(&self) -> WrapperDescriptor {
         use crate::parsed_type::foreign_mod_arg::ForeignModArgGlueCodeGenerator;
         use quote::ToTokens;

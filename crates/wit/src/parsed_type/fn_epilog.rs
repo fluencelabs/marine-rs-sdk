@@ -18,7 +18,7 @@ use super::ParsedType;
 use super::passing_style_of;
 use super::PassingStyle;
 use crate::new_ident;
-use crate::fce_ast_types::AstFuncArgument;
+use crate::fce_ast_types::AstFnArgument;
 
 use quote::quote;
 
@@ -32,7 +32,7 @@ pub(crate) struct FnEpilogDescriptor {
 
 /// Contains all ingredients needed for epilog creation.
 pub(crate) struct FnEpilogIngredients<'i> {
-    pub(crate) args: &'i [AstFuncArgument],
+    pub(crate) args: &'i [AstFnArgument],
     pub(crate) converted_args: &'i [syn::Ident],
     pub(crate) return_type: &'i Option<ParsedType>,
 }
@@ -157,7 +157,7 @@ fn generate_mem_forgets(ingredients: &FnEpilogIngredients<'_>) -> proc_macro2::T
 }
 
 fn mem_forget_by_args(
-    args: &[AstFuncArgument],
+    args: &[AstFnArgument],
     converted_args: &[syn::Ident],
 ) -> proc_macro2::TokenStream {
     debug_assert!(args.len() == converted_args.len());

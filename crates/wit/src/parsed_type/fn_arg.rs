@@ -15,7 +15,7 @@
  */
 
 use super::ParsedType;
-use crate::fce_ast_types::AstFuncArgument;
+use crate::fce_ast_types::AstFnArgument;
 use crate::wasm_type::RustType;
 
 /// This trait could be used to generate raw args needed to construct a export function.
@@ -23,7 +23,7 @@ pub(crate) trait FnArgGlueCodeGenerator {
     fn generate_arguments(&self) -> Vec<RustType>;
 }
 
-impl FnArgGlueCodeGenerator for AstFuncArgument {
+impl FnArgGlueCodeGenerator for AstFnArgument {
     fn generate_arguments(&self) -> Vec<RustType> {
         match self.ty {
             ParsedType::Boolean(_) => vec![RustType::I32],

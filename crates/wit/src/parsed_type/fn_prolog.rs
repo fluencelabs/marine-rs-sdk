@@ -19,7 +19,7 @@ use super::FnArgGlueCodeGenerator;
 use super::passing_style_of;
 use crate::new_ident;
 use crate::wasm_type::RustType;
-use crate::fce_ast_types::AstFuncArgument;
+use crate::fce_ast_types::AstFnArgument;
 use crate::parsed_type::PassingStyle;
 
 use quote::quote;
@@ -48,7 +48,7 @@ pub(crate) trait FnPrologGlueCodeGenerator {
     fn generate_prolog(&self) -> FnPrologDescriptor;
 }
 
-impl FnPrologGlueCodeGenerator for Vec<AstFuncArgument> {
+impl FnPrologGlueCodeGenerator for Vec<AstFnArgument> {
     fn generate_prolog(&self) -> FnPrologDescriptor {
         let mut raw_arg_names = Vec::with_capacity(self.len());
         let mut raw_arg_types = Vec::with_capacity(self.len());

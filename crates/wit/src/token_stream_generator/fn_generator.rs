@@ -25,7 +25,7 @@ use crate::new_ident;
 
 use proc_macro2::TokenStream;
 
-impl quote::ToTokens for fce_ast_types::AstFunctionItem {
+impl quote::ToTokens for fce_ast_types::AstFnItem {
     fn to_tokens(&self, tokens: &mut TokenStream) {
         crate::prepare_global_data!(
             Function,

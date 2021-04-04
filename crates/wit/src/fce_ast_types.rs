@@ -20,18 +20,18 @@ use serde::Serialize;
 use serde::Deserialize;
 
 #[derive(Clone, Serialize, Deserialize)]
-pub struct AstFuncArgument {
+pub struct AstFnArgument {
     pub name: String,
     pub ty: ParsedType,
 }
 
 #[derive(Clone, Serialize, Deserialize)]
-pub struct AstFunctionSignature {
+pub struct AstFnSignature {
     // Option is needed only for skipping serialization/deserialization of syn::ItemFn
     #[serde(skip)]
     pub visibility: Option<syn::Visibility>,
     pub name: String,
-    pub arguments: Vec<AstFuncArgument>,
+    pub arguments: Vec<AstFnArgument>,
     // fce supports only one return value now,
     // waiting for adding multi-value support in Wasmer.
     pub output_type: Option<ParsedType>,
@@ -58,7 +58,7 @@ pub struct AstRecordItem {
 pub struct AstExternFnItem {
     pub link_name: Option<String>,
     // only imports are possible here
-    pub signature: AstFunctionSignature,
+    pub signature: AstFnSignature,
 }
 
 #[derive(Clone, Serialize, Deserialize)]
@@ -74,8 +74,8 @@ pub struct AstExternModItem {
 }
 
 #[derive(Clone, Serialize, Deserialize)]
-pub struct AstFunctionItem {
-    pub signature: AstFunctionSignature,
+pub struct AstFnItem {
+    pub signature: AstFnSignature,
 
     // Option is needed only for skipping serialization/deserialization of syn::ItemFn
     #[serde(skip)]
@@ -85,7 +85,7 @@ pub struct AstFunctionItem {
 #[derive(Clone, Serialize, Deserialize)]
 #[serde(tag = "ast_type")]
 pub enum FCEAst {
-    Function(AstFunctionItem),
+    Function(AstFnItem),
     ExternMod(AstExternModItem),
     Record(AstRecordItem),
 }

@@ -18,8 +18,8 @@ use super::ParseMacroInput;
 use crate::fce_ast_types;
 use crate::ParsedType;
 use crate::fce_ast_types::FCEAst;
-use crate::fce_ast_types::AstFunctionItem;
-use crate::fce_ast_types::AstFuncArgument;
+use crate::fce_ast_types::AstFnItem;
+use crate::fce_ast_types::AstFnArgument;
 use crate::syn_error;
 
 use syn::Result;
@@ -36,7 +36,7 @@ impl ParseMacroInput for syn::ItemFn {
             .zip(self.sig.inputs.iter().map(|arg| arg.span()));
         check_parsed_functions(parsed_args)?;
 
-        let ast_fn = FCEAst::Function(AstFunctionItem {
+        let ast_fn = FCEAst::Function(AstFnItem {
             signature,
             original: Some(self),
         });
@@ -47,7 +47,7 @@ impl ParseMacroInput for syn::ItemFn {
 pub(super) fn try_to_ast_signature(
     signature: syn::Signature,
     visibility: syn::Visibility,
-) -> Result<fce_ast_types::AstFunctionSignature> {
+) -> Result<fce_ast_types::AstFnSignature> {
     use quote::ToTokens;
 
     check_function(&signature)?;
@@ -76,7 +76,7 @@ pub(super) fn try_to_ast_signature(
                 .unwrap_or_default()
                 .to_string();
             let ty = ParsedType::from_type(pat.ty.as_ref())?;
-            let ast_arg = AstFuncArgument { name, ty };
+            let ast_arg = AstFnArgument { name, ty };
 
             Ok(ast_arg)
         })
@@ -84,7 +84,7 @@ pub(super) fn try_to_ast_signature(
 
     let output_type = ParsedType::from_return_type(&output)?;
 
-    let ast_function_item = fce_ast_types::AstFunctionSignature {
+    let ast_function_item = fce_ast_types::AstFnSignature {
         visibility: Some(visibility),
         name: signature.ident.to_string(),
         arguments,
@@ -127,7 +127,7 @@ fn check_function(signature: &syn::Signature) -> Result<()> {
 }
 
 fn check_parsed_functions<'a>(
-    args: impl ExactSizeIterator<Item = (&'a AstFuncArgument, proc_macro2::Span)>,
+    args: impl ExactSizeIterator<Item = (&'a AstFnArgument, proc_macro2::Span)>,
 ) -> Result<()> {
     for (arg, span) in args {
         if contains_inner_ref(&arg.ty) {
