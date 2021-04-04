@@ -24,7 +24,7 @@ jobs:
           (cd fluence; cargo clippy -v --target wasm32-wasi)
           (cd fluence-test; cargo build)
 
-          cargo test -v --all-features
+          TARGET=wasm32-wasi cargo test -v --all-features
 
       - save_cache:
           paths:

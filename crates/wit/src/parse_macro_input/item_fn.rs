@@ -134,7 +134,7 @@ fn check_parsed_functions<'a>(
         if contains_inner_ref(&arg.ty) {
             return crate::syn_error!(
                 span,
-                "vector types in export function should take arguments only by value"
+                "vector type in export functions should take arguments only by value"
             );
         }
     }
