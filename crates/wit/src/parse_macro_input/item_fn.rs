@@ -16,12 +16,14 @@
 
 use super::ParseMacroInput;
 use crate::fce_ast_types;
+use crate::ParsedType;
 use crate::fce_ast_types::FCEAst;
 use crate::fce_ast_types::AstFunctionItem;
 use crate::fce_ast_types::AstFuncArgument;
 use crate::syn_error;
 
 use syn::Result;
+use crate::parsed_type::passing_style_of;
 
 impl ParseMacroInput for syn::ItemFn {
     fn parse_macro_input(self) -> Result<FCEAst> {
@@ -38,7 +40,6 @@ pub(super) fn try_to_ast_signature(
     signature: syn::Signature,
     visibility: syn::Visibility,
 ) -> Result<fce_ast_types::AstFunctionSignature> {
-    use crate::parsed_type::ParsedType;
     use syn::spanned::Spanned;
     use quote::ToTokens;
 
@@ -73,6 +74,8 @@ pub(super) fn try_to_ast_signature(
             Ok(ast_arg)
         })
         .collect::<Result<Vec<_>>>()?;
+
+    check_parsed_functions(arguments.iter().zip(inputs.iter().map(|arg| arg.span())))?;
 
     let output_type = ParsedType::from_return_type(&output)?;
 
@@ -118,4 +121,47 @@ fn check_function(signature: &syn::Signature) -> Result<()> {
 
     // TODO: check for a lifetime
     Ok(())
+}
+
+fn check_parsed_functions<'a>(
+    args: impl ExactSizeIterator<Item = (&'a AstFuncArgument, proc_macro2::Span)>,
+) -> Result<()> {
+    for (arg, span) in args {
+        if contains_inner_ref(&arg.ty) {
+            return crate::syn_error!(
+                span,
+                "vector types in export function should take arguments only by value"
+            );
+        }
+    }
+
+    return Ok(());
+}
+
+/// Returns true if the given type is a vector contains a reference inside it's parameter type.
+/// F.e.
+/// Vec<&String> => true
+/// Vec<Vec<&Vec<String>>> => true
+/// &Vec<String> => false
+fn contains_inner_ref(ty: &ParsedType) -> bool {
+    fn contains_inner_ref_impl(ty: &ParsedType) -> bool {
+        use crate::parsed_type::PassingStyle;
+
+        match ty {
+            ParsedType::Vector(ty, passing_style) => match passing_style {
+                PassingStyle::ByValue => contains_inner_ref_impl(ty),
+                PassingStyle::ByRef | PassingStyle::ByMutRef => true,
+            },
+            _ => match passing_style_of(ty) {
+                PassingStyle::ByValue => false,
+                PassingStyle::ByRef | PassingStyle::ByMutRef => true,
+            },
+        }
+    }
+
+    match ty {
+        ParsedType::Vector(ty, _) => contains_inner_ref_impl(ty),
+        // Structs are checked while parsing
+        _ => false,
+    }
 }

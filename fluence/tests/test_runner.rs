@@ -1,6 +1,7 @@
 #[test]
 fn test() {
     let tests = trybuild::TestCases::new();
+    tests.pass("tests/export_functions/array_inner_refs.rs");
     tests.pass("tests/export_functions/arrays.rs");
     tests.pass("tests/export_functions/ref_arrays.rs");
     tests.pass("tests/export_functions/basic_types.rs");

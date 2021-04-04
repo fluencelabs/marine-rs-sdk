@@ -70,7 +70,9 @@
 mod call_parameters;
 mod mounted_binary;
 
-// extern crate self as fluence;
+#[allow(unused_extern_crates)]
+// fluence is used inside CallParameters and MountedBinaryResult glue code
+extern crate self as fluence;
 
 pub use fluence_sdk_macro::fce;
 #[cfg(feature = "fce-test")]
