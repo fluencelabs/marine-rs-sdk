@@ -20,19 +20,28 @@ use crate::ParsedType;
 use crate::fce_ast_types::FCEAst;
 use crate::fce_ast_types::AstFunctionItem;
 use crate::fce_ast_types::AstFuncArgument;
+use crate::parsed_type::passing_style_of;
 use crate::syn_error;
 
 use syn::Result;
-use crate::parsed_type::passing_style_of;
+use syn::spanned::Spanned;
 
 impl ParseMacroInput for syn::ItemFn {
     fn parse_macro_input(self) -> Result<FCEAst> {
-        try_to_ast_signature(self.sig.clone(), self.vis.clone()).map(|signature| {
-            FCEAst::Function(AstFunctionItem {
-                signature,
-                original: Some(self),
-            })
-        })
+        let signature = try_to_ast_signature(self.sig.clone(), self.vis.clone())?;
+
+        // this check specific only for export functions
+        let parsed_args = signature
+            .arguments
+            .iter()
+            .zip(self.sig.inputs.iter().map(|arg| arg.span()));
+        check_parsed_functions(parsed_args)?;
+
+        let ast_fn = FCEAst::Function(AstFunctionItem {
+            signature,
+            original: Some(self),
+        });
+        Ok(ast_fn)
     }
 }
 
@@ -40,7 +49,6 @@ pub(super) fn try_to_ast_signature(
     signature: syn::Signature,
     visibility: syn::Visibility,
 ) -> Result<fce_ast_types::AstFunctionSignature> {
-    use syn::spanned::Spanned;
     use quote::ToTokens;
 
     check_function(&signature)?;
@@ -75,8 +83,6 @@ pub(super) fn try_to_ast_signature(
         })
         .collect::<Result<Vec<_>>>()?;
 
-    check_parsed_functions(arguments.iter().zip(inputs.iter().map(|arg| arg.span())))?;
-
     let output_type = ParsedType::from_return_type(&output)?;
 
     let ast_function_item = fce_ast_types::AstFunctionSignature {
@@ -92,8 +98,6 @@ pub(super) fn try_to_ast_signature(
 /// Check whether the #[fce] macro could be applied to a function.
 #[rustfmt::skip]
 fn check_function(signature: &syn::Signature) -> Result<()> {
-    use syn::spanned::Spanned;
-
     let syn::Signature {
         constness,
         unsafety,
