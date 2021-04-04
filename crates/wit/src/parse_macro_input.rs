@@ -17,6 +17,7 @@
 mod item_fn;
 mod item_foreign_mod;
 mod item_record;
+mod utils;
 
 use crate::fce_ast_types::FCEAst;
 

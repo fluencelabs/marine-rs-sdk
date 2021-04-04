@@ -44,7 +44,7 @@ impl RecordSerializerGlueCodeGenerator for fce_ast_types::AstRecordItem {
                         std::mem::forget(#field_ident);
                     }
                 }
-                ParsedType::Vector(ty, _) => {
+                ParsedType::Vector(ty, passing_style) => {
                     let generated_serializer_name = format!(
                         "__fce_generated_vec_serializer_{}_{}",
                         field.name.as_ref().unwrap(),
@@ -54,6 +54,7 @@ impl RecordSerializerGlueCodeGenerator for fce_ast_types::AstRecordItem {
                     let generated_serializer_ident = new_ident!(generated_serializer_name);
                     let vector_serializer = crate::parsed_type::generate_vector_serializer(
                         ty,
+                        *passing_style,
                         &generated_serializer_name,
                     );
                     let serialized_field_ident = new_ident!(format!("serialized_arg_{}", id));

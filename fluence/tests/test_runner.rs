@@ -8,6 +8,7 @@ fn test() {
     tests.pass("tests/export_functions/ref_basic_types.rs");
     tests.compile_fail("tests/export_functions/improper_types.rs");
 
+    tests.compile_fail("tests/import_functions/arrays_out_inner_refs.rs");
     tests.pass("tests/import_functions/arrays.rs");
     tests.pass("tests/import_functions/ref_arrays.rs");
     tests.pass("tests/import_functions/basic_types.rs");

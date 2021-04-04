@@ -57,7 +57,7 @@ pub enum ParsedType {
     Record(String, PassingStyle), // short type name
 }
 
-#[derive(Debug, Clone, PartialEq, Serialize, Deserialize)]
+#[derive(Debug, Clone, Copy, PartialEq, Serialize, Deserialize)]
 pub enum PassingStyle {
     ByValue,
     ByRef,

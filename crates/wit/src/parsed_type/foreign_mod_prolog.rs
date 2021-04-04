@@ -81,11 +81,11 @@ impl ForeignModPrologGlueCodeGenerator for Vec<AstFuncArgument> {
                         arg_transforms.extend(quote::quote! { let mut #arg_ident = std::mem::ManuallyDrop::new(#arg_ident); });
                         arg_drops.extend(quote::quote! { std::mem::ManuallyDrop::drop(&mut #arg_ident); });
                     },
-                    ParsedType::Vector(ty, _) => {
+                    ParsedType::Vector(ty, passing_style) => {
                         let generated_serializer_name = format!("__fce_generated_vec_serializer_{}", arg_name).replace("&<>", "_");
 
                         let generated_serializer_ident = new_ident!(generated_serializer_name);
-                        let vector_serializer = super::vector_utils::generate_vector_serializer(ty, &generated_serializer_name);
+                        let vector_serializer = super::vector_utils::generate_vector_serializer(ty, *passing_style, &generated_serializer_name);
 
                         let arg_transform = quote::quote! {
                             #vector_serializer

@@ -15,21 +15,13 @@
  */
 
 use super::ParsedType;
+use super::PassingStyle;
+
 use quote::quote;
 
 pub(crate) fn generate_vector_serializer(
     value_ty: &ParsedType,
-    arg_name: &str,
-) -> proc_macro2::TokenStream {
-    let serializer_func = generate_vector_serializer_impl(value_ty, arg_name);
-
-    quote! {
-        #serializer_func
-    }
-}
-
-fn generate_vector_serializer_impl(
-    value_ty: &ParsedType,
+    vec_passing_style: PassingStyle,
     arg_name: &str,
 ) -> proc_macro2::TokenStream {
     let values_serializer = match value_ty {
@@ -90,12 +82,13 @@ fn generate_vector_serializer_impl(
                 (result.as_ptr() as _, (4 * result.len()) as _)
             }
         }
-        ParsedType::Vector(ty, _) => {
+        ParsedType::Vector(ty, passing_style) => {
             let serializer_name = format!("{}_{}", arg_name, ty)
                 .replace("<", "_")
                 .replace(">", "_")
                 .replace("&", "_");
-            let inner_vector_serializer = generate_vector_serializer(&*ty, &serializer_name);
+            let inner_vector_serializer =
+                generate_vector_serializer(&*ty, *passing_style, &serializer_name);
             let serializer_ident = crate::new_ident!(serializer_name);
 
             quote! {
@@ -128,7 +121,7 @@ fn generate_vector_serializer_impl(
     let arg = crate::new_ident!(arg_name);
 
     quote! {
-        unsafe fn #arg(arg: Vec<#value_ty>) -> (u32, u32) {
+        unsafe fn #arg(arg: #vec_passing_style Vec<#value_ty>) -> (u32, u32) {
             #values_serializer
         }
     }

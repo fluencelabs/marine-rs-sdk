@@ -20,7 +20,6 @@ use crate::ParsedType;
 use crate::fce_ast_types::FCEAst;
 use crate::fce_ast_types::AstFunctionItem;
 use crate::fce_ast_types::AstFuncArgument;
-use crate::parsed_type::passing_style_of;
 use crate::syn_error;
 
 use syn::Result;
@@ -148,23 +147,10 @@ fn check_parsed_functions<'a>(
 /// Vec<Vec<&Vec<String>>> => true
 /// &Vec<String> => false
 fn contains_inner_ref(ty: &ParsedType) -> bool {
-    fn contains_inner_ref_impl(ty: &ParsedType) -> bool {
-        use crate::parsed_type::PassingStyle;
-
-        match ty {
-            ParsedType::Vector(ty, passing_style) => match passing_style {
-                PassingStyle::ByValue => contains_inner_ref_impl(ty),
-                PassingStyle::ByRef | PassingStyle::ByMutRef => true,
-            },
-            _ => match passing_style_of(ty) {
-                PassingStyle::ByValue => false,
-                PassingStyle::ByRef | PassingStyle::ByMutRef => true,
-            },
-        }
-    }
+    use super::utils::contain_inner_ref;
 
     match ty {
-        ParsedType::Vector(ty, _) => contains_inner_ref_impl(ty),
+        ParsedType::Vector(ty, _) => contain_inner_ref(ty),
         // Structs are checked while parsing
         _ => false,
     }
