@@ -39,7 +39,6 @@ mod result;
 mod sdk_version_embedder;
 
 pub use export_allocator::allocate;
-pub use export_allocator::deallocate;
 
 #[cfg(feature = "logger")]
 pub use logger::WasmLoggerBuilder;

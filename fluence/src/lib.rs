@@ -88,8 +88,8 @@ pub use fluence_sdk_main::WasmLoggerBuilder;
 #[cfg(feature = "logger")]
 pub use fluence_sdk_main::TargetMap;
 
-pub use mounted_binary::Result as MountedBinaryResult;
-pub use mounted_binary::StringResult as MountedBinaryStringResult;
+pub use mounted_binary::MountedBinaryResult;
+pub use mounted_binary::MountedBinaryStringResult;
 pub use mounted_binary::SUCCESS_CODE as BINARY_SUCCESS_CODE;
 
 pub use fluence_sdk_main::module_manifest;
