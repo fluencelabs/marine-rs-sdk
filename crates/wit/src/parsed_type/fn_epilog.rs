@@ -127,7 +127,7 @@ fn generate_epilog(ty: &Option<ParsedType>) -> proc_macro2::TokenStream {
 
             quote! {
                 #vector_serializer
-                let result = #generated_serializer_ident(result);
+                let result = #generated_serializer_ident(&result);
                 fluence::internal::set_result_ptr(result.0 as _);
                 fluence::internal::set_result_size(result.1 as _);
             }

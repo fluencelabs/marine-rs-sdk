@@ -21,7 +21,7 @@ use quote::quote;
 
 pub(crate) fn generate_vector_serializer(
     value_ty: &ParsedType,
-    vec_passing_style: PassingStyle,
+    _vec_passing_style: PassingStyle,
     arg_name: &str,
 ) -> proc_macro2::TokenStream {
     let values_serializer = match value_ty {
@@ -96,7 +96,7 @@ pub(crate) fn generate_vector_serializer(
 
                 let mut result: Vec<u32> = Vec::with_capacity(2 * arg.len());
                 for value in arg {
-                    let (ptr, size) = #serializer_ident(value);
+                    let (ptr, size) = #serializer_ident(&value);
                     result.push(ptr as _);
                     result.push(size as _);
                 }
@@ -121,7 +121,7 @@ pub(crate) fn generate_vector_serializer(
     let arg = crate::new_ident!(arg_name);
 
     quote! {
-        unsafe fn #arg(arg: #vec_passing_style Vec<#value_ty>) -> (u32, u32) {
+        unsafe fn #arg(arg: &Vec<#value_ty>) -> (u32, u32) {
             #values_serializer
         }
     }

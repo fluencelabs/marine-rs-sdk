@@ -41,7 +41,6 @@ impl RecordSerializerGlueCodeGenerator for fce_ast_types::AstRecordItem {
                     quote! {
                         raw_record.push(#field_ident.as_ptr() as _);
                         raw_record.push(#field_ident.len() as _);
-                        std::mem::forget(#field_ident);
                     }
                 }
                 ParsedType::Vector(ty, passing_style) => {
@@ -61,7 +60,7 @@ impl RecordSerializerGlueCodeGenerator for fce_ast_types::AstRecordItem {
 
                     quote::quote! {
                         #vector_serializer
-                        let #serialized_field_ident = unsafe { #generated_serializer_ident(#field_ident) };
+                        let #serialized_field_ident = unsafe { #generated_serializer_ident(&#field_ident) };
                         raw_record.push(#serialized_field_ident.0 as _);
                         raw_record.push(#serialized_field_ident.1 as _);
                     }

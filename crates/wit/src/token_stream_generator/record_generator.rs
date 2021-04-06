@@ -75,7 +75,7 @@ fn generate_serializer_fn(record: &fce_ast_types::AstRecordItem) -> proc_macro2:
             #serializer
 
             let raw_record_ptr = raw_record.as_ptr();
-            fluence::internal::add_object_to_release(Box::new(raw_record));
+            fluence::internal::add_object_to_release(Box::new(self));
 
             raw_record_ptr as _
         }
