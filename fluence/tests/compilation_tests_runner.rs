@@ -4,6 +4,7 @@ fn fce_compilation_tests() {
     tests.compile_fail("tests/compilation_tests/export_functions/array_inner_refs.rs");
     tests.pass("tests/compilation_tests/export_functions/arrays.rs");
     tests.pass("tests/compilation_tests/export_functions/ref_arrays.rs");
+    tests.compile_fail("tests/compilation_tests/export_functions/inner_vec_refs.rs");
     tests.pass("tests/compilation_tests/export_functions/basic_types.rs");
     tests.pass("tests/compilation_tests/export_functions/ref_basic_types.rs");
     tests.compile_fail("tests/compilation_tests/export_functions/improper_types.rs");
