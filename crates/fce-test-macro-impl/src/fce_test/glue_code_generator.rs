@@ -25,7 +25,7 @@ use proc_macro2::TokenStream;
 use quote::quote;
 use quote::ToTokens;
 
-use std::path::PathBuf;
+use std::path::Path;
 
 /// Generates glue code for tests.
 /// F.e. for this test for the greeting service
@@ -153,7 +153,7 @@ pub(super) fn generate_test_glue_code(
     Ok(glue_code)
 }
 
-fn generate_app_service_ctor(config_path: &str, modules_dir: &PathBuf) -> TokenStream {
+fn generate_app_service_ctor(config_path: &str, modules_dir: &Path) -> TokenStream {
     let config_path = config_path.to_token_stream();
     let modules_dir = modules_dir.to_string_lossy().to_string();
 

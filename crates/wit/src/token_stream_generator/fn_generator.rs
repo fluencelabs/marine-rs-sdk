@@ -64,7 +64,7 @@ impl quote::ToTokens for fce_ast_types::AstFnItem {
             fn_return_type,
             return_expression,
             epilog,
-            mem_forget,
+            objs_savings,
         } = epilog_ingredients.generate_fn_epilog();
 
         // here this Option must be Some
@@ -88,8 +88,8 @@ impl quote::ToTokens for fce_ast_types::AstFnItem {
                 // return value conversation from Rust type to a Wasm type
                 #epilog
 
-                // forget result or arguments
-                #mem_forget
+                // save objects to keep them in memory that allows IT side
+                #objs_savings
             }
 
             #[cfg(target_arch = "wasm32")]

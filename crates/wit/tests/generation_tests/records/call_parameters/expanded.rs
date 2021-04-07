@@ -16,8 +16,8 @@ pub struct CallParameters {
 #[doc(hidden)]
 #[allow(clippy::all)]
 impl CallParameters {
-    pub fn __fce_generated_serialize(self) -> *const u8 {
-        let mut raw_record: Vec<u64> = Vec::new();
+    pub fn __fce_generated_serialize(&self) -> *const u8 {
+        let mut raw_record: Vec<u64> = Vec::with_capacity(2 * 6usize);
         raw_record.push(self.init_peer_id.as_ptr() as _);
         raw_record.push(self.init_peer_id.len() as _);
         raw_record.push(self.service_id.as_ptr() as _);
@@ -38,7 +38,10 @@ impl CallParameters {
                 for value in arg {
                     result.push(value.__fce_generated_serialize() as _);
                 }
-                (result.as_ptr() as _, (4 * result.len()) as _)
+                let result_ptr = result.as_ptr();
+                let result_len = 4 * result.len();
+                fluence::internal::add_object_to_release(Box::new(result));
+                (result_ptr as _, result_len as _)
             }
             let mut result: Vec<u32> = Vec::with_capacity(2 * arg.len());
             for value in arg {
@@ -47,14 +50,17 @@ impl CallParameters {
                 result.push(ptr as _);
                 result.push(size as _);
             }
-            (result.as_ptr() as _, (4 * result.len()) as _)
+            let result_ptr = result.as_ptr();
+            let result_len = 4 * result.len();
+            fluence::internal::add_object_to_release(Box::new(result));
+            (result_ptr as _, result_len as _)
         }
         let serialized_arg_5 =
             unsafe { __fce_generated_vec_serializer_tetraplets_5(&self.tetraplets) };
         raw_record.push(serialized_arg_5.0 as _);
         raw_record.push(serialized_arg_5.1 as _);
         let raw_record_ptr = raw_record.as_ptr();
-        fluence::internal::add_object_to_release(Box::new(self));
+        fluence::internal::add_object_to_release(Box::new(raw_record));
         raw_record_ptr as _
     }
     pub unsafe fn __fce_generated_deserialize(record_ptr: *const u8) -> Self {

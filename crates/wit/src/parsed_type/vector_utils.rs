@@ -57,7 +57,11 @@ pub(crate) fn generate_vector_serializer(
                     result.push(value.to_bits());
                 }
 
-                (result.as_ptr() as _, (4 * result.len()) as _)
+                let result_ptr = result.as_ptr();
+                let result_len = 4 * result.len();
+                fluence::internal::add_object_to_release(Box::new(result));
+
+                (result_ptr as _, result_len as _)
             }
         }
         ParsedType::F64(_) => {
@@ -67,7 +71,11 @@ pub(crate) fn generate_vector_serializer(
                     result.push(value.to_bits());
                 }
 
-                (result.as_ptr() as _, (8 * result.len()) as _)
+                let result_ptr = result.as_ptr();
+                let result_len = 8 * result.len();
+                fluence::internal::add_object_to_release(Box::new(result));
+
+                (result_ptr as _, result_len as _)
             }
         }
         ParsedType::Utf8Str(_) | ParsedType::Utf8String(_) => {
@@ -79,7 +87,11 @@ pub(crate) fn generate_vector_serializer(
                     result.push(value.len() as _);
                 }
 
-                (result.as_ptr() as _, (4 * result.len()) as _)
+                let result_ptr = result.as_ptr();
+                let result_len = 4 * result.len();
+                fluence::internal::add_object_to_release(Box::new(result));
+
+                (result_ptr as _, result_len as _)
             }
         }
         ParsedType::Vector(ty, passing_style) => {
@@ -101,7 +113,11 @@ pub(crate) fn generate_vector_serializer(
                     result.push(size as _);
                 }
 
-                (result.as_ptr() as _, (4 * result.len()) as _)
+                let result_ptr = result.as_ptr();
+                let result_len = 4 * result.len();
+                fluence::internal::add_object_to_release(Box::new(result));
+
+                (result_ptr as _, result_len as _)
             }
         }
 
@@ -113,7 +129,11 @@ pub(crate) fn generate_vector_serializer(
                     result.push(value.__fce_generated_serialize() as _);
                 }
 
-                (result.as_ptr() as _, (4 * result.len()) as _)
+                let result_ptr = result.as_ptr();
+                let result_len = 4 * result.len();
+                fluence::internal::add_object_to_release(Box::new(result));
+
+                (result_ptr as _, result_len as _)
             }
         }
     };

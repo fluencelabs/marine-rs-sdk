@@ -90,7 +90,7 @@ impl ForeignModPrologGlueCodeGenerator for Vec<AstFnArgument> {
                         let arg_transform = quote::quote! {
                             #vector_serializer
 
-                            let #arg_ident = #generated_serializer_ident(#arg_ident);
+                            let #arg_ident = #generated_serializer_ident(&#arg_ident);
                         };
                         arg_transforms.extend(arg_transform);
 
@@ -110,9 +110,9 @@ impl ForeignModPrologGlueCodeGenerator for Vec<AstFnArgument> {
         WrapperDescriptor {
             arg_names,
             arg_types,
+            raw_args,
             arg_transforms,
             arg_drops,
-            raw_args,
         }
     }
 

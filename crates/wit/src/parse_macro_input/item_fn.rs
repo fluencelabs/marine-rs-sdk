@@ -34,7 +34,9 @@ impl ParseMacroInput for syn::ItemFn {
             .arguments
             .iter()
             .zip(self.sig.inputs.iter().map(|arg| arg.span()));
-        check_parsed_functions(parsed_args)?;
+
+        check_args(parsed_args)?;
+        check_output_type(&signature.output_type, self.sig.output.span())?;
 
         let ast_fn = FCEAst::Function(AstFnItem {
             signature,
@@ -126,19 +128,35 @@ fn check_function(signature: &syn::Signature) -> Result<()> {
     Ok(())
 }
 
-fn check_parsed_functions<'a>(
+fn check_args<'a>(
     args: impl ExactSizeIterator<Item = (&'a AstFnArgument, proc_macro2::Span)>,
 ) -> Result<()> {
     for (arg, span) in args {
         if contains_inner_ref(&arg.ty) {
             return crate::syn_error!(
                 span,
-                "vector type in export functions should take arguments only by value"
+                "a vector type in arguments of export functions shouldn't contain references"
             );
         }
     }
 
-    return Ok(());
+    Ok(())
+}
+
+fn check_output_type(output_type: &Option<ParsedType>, span: proc_macro2::Span) -> Result<()> {
+    let ty = match output_type {
+        Some(ty) => ty,
+        None => return Ok(()),
+    };
+
+    if contains_inner_ref(ty) {
+        return crate::syn_error!(
+            span,
+            "a vector type in output types of export functions shouldn't contain references"
+        );
+    }
+
+    Ok(())
 }
 
 /// Returns true if the given type is a vector contains a reference inside it's parameter type.

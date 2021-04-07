@@ -27,7 +27,7 @@ pub(crate) struct FnEpilogDescriptor {
     pub(crate) fn_return_type: proc_macro2::TokenStream,
     pub(crate) return_expression: proc_macro2::TokenStream,
     pub(crate) epilog: proc_macro2::TokenStream,
-    pub(crate) mem_forget: proc_macro2::TokenStream,
+    pub(crate) objs_savings: proc_macro2::TokenStream,
 }
 
 /// Contains all ingredients needed for epilog creation.
@@ -58,7 +58,7 @@ impl FnEpilogGlueCodeGenerator for FnEpilogIngredients<'_> {
             fn_return_type: generate_fn_return_type(self.return_type),
             return_expression: generate_return_expression(self.return_type),
             epilog: generate_epilog(self.return_type),
-            mem_forget: generate_mem_forgets(self),
+            objs_savings: generate_objs_savings(self),
         }
     }
 }
@@ -127,9 +127,11 @@ fn generate_epilog(ty: &Option<ParsedType>) -> proc_macro2::TokenStream {
 
             quote! {
                 #vector_serializer
-                let result = #generated_serializer_ident(&result);
-                fluence::internal::set_result_ptr(result.0 as _);
-                fluence::internal::set_result_size(result.1 as _);
+                {
+                    let (serialized_vec_ptr, serialized_vec_size) = #generated_serializer_ident(&result);
+                    fluence::internal::set_result_ptr(serialized_vec_ptr as _);
+                    fluence::internal::set_result_size(serialized_vec_size as _);
+                }
             }
         }
         Some(_) => quote! {
@@ -141,7 +143,14 @@ fn generate_epilog(ty: &Option<ParsedType>) -> proc_macro2::TokenStream {
 /// If an export function returns a reference, this is probably a reference to one
 /// of the function arguments. If that's the case, reference must be still valid after
 /// the end of the function. Their deletion will be handled by IT with calling `release_objects`.
-fn generate_mem_forgets(ingredients: &FnEpilogIngredients<'_>) -> proc_macro2::TokenStream {
+fn generate_objs_savings(ingredients: &FnEpilogIngredients<'_>) -> proc_macro2::TokenStream {
+    match ingredients.return_type {
+        // if type is empty we don't need to save arguments or objects
+        Some(ty) if !ty.is_complex_type() => return proc_macro2::TokenStream::new(),
+        None => return proc_macro2::TokenStream::new(),
+        _ => {}
+    };
+
     let passing_style = ingredients.return_type.as_ref().map(passing_style_of);
 
     match passing_style {
@@ -150,13 +159,13 @@ fn generate_mem_forgets(ingredients: &FnEpilogIngredients<'_>) -> proc_macro2::T
             quote! { fluence::internal::add_object_to_release(Box::new(result)); }
         }
         Some(PassingStyle::ByRef) | Some(PassingStyle::ByMutRef) => {
-            mem_forget_by_args(ingredients.args, ingredients.converted_args)
+            generate_args_savings(ingredients.args, ingredients.converted_args)
         }
         None => quote! {},
     }
 }
 
-fn mem_forget_by_args(
+fn generate_args_savings(
     args: &[AstFnArgument],
     converted_args: &[syn::Ident],
 ) -> proc_macro2::TokenStream {

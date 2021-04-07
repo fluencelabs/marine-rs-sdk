@@ -21,7 +21,7 @@ use pretty_assertions::assert_eq;
 use std::io::Read;
 use std::path::Path;
 
-pub fn test_fce_token_streams<FP, EP>(fce_path: FP, expanded_path: EP)
+pub fn test_fce_token_streams<FP, EP>(fce_path: FP, expanded_path: EP) -> bool
 where
     FP: AsRef<Path>,
     EP: AsRef<Path>,
@@ -34,7 +34,9 @@ where
     let expanded_item = items_from_file(expanded_path);
     let fce_item = to_syn_item(fce_token_streams);
 
-    assert_eq!(fce_item, expanded_item);
+    assert_eq!(expanded_item, fce_item);
+
+    fce_item == expanded_item
 }
 
 fn stream_from_file<P>(path: P) -> proc_macro2::TokenStream

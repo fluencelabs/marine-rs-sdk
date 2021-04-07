@@ -59,7 +59,7 @@ fn collect_module_paths(
         .module
         .iter()
         .map(|m| {
-            let module_file_name = m.file_name.as_ref().unwrap_or_else(|| &m.name);
+            let module_file_name = m.file_name.as_ref().unwrap_or(&m.name);
             let module_file_name = PathBuf::from(module_file_name);
             // TODO: is it correct to always have .wasm extension?
             let module_path = modules_dir.join(module_file_name).with_extension("wasm");
@@ -83,6 +83,6 @@ pub(super) fn resolve_modules_dir(
             .toml_faas_config
             .modules_dir
             .as_ref()
-            .map(|p| PathBuf::from(p)),
+            .map(PathBuf::from),
     }
 }

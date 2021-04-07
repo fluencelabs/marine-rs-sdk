@@ -73,9 +73,11 @@ pub unsafe fn __fce_generated_wrapper_func_all_types(
     unsafe fn __fce_generated_vec_serializer(arg: &Vec<u8>) -> (u32, u32) {
         (arg.as_ptr() as _, arg.len() as _)
     }
-    let result = __fce_generated_vec_serializer(&result);
-    fluence::internal::set_result_ptr(result.0 as _);
-    fluence::internal::set_result_size(result.1 as _);
+    {
+        let (serialized_vec_ptr, serialized_vec_size) = __fce_generated_vec_serializer(&result);
+        fluence::internal::set_result_ptr(serialized_vec_ptr as _);
+        fluence::internal::set_result_size(serialized_vec_size as _);
+    }
     fluence::internal::add_object_to_release(Box::new(result));
 }
 #[cfg(target_arch = "wasm32")]

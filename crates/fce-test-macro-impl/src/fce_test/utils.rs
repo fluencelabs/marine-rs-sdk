@@ -27,7 +27,7 @@ pub(super) fn generate_module_name(module_name: &str) -> TResult<syn::Ident> {
 }
 
 pub(super) fn generate_record_name(record_name: &str) -> TResult<syn::Ident> {
-    let extended_record_name = format!("{}", record_name);
+    let extended_record_name = record_name.to_string();
     new_ident(&extended_record_name)
 }
 
