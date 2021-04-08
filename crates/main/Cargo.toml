@@ -19,7 +19,8 @@ crate-type = ["rlib"]
 doctest = false
 
 [dependencies]
-fluence-sdk-macro = { path = "../fce-macro", version = "=0.5.0" }
+fluence-sdk-macro = { path = "../fce-macro", version = "0.5.0" }
+fce-timestamp-macro = { path = "../timestamp-macro", version = "0.5.0" }
 
 log = { version = "0.4.8", features = ["std"] }
 serde = "=1.0.118"
