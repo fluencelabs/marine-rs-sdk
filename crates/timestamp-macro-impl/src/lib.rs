@@ -26,9 +26,15 @@
 #![warn(rust_2018_idioms)]
 #![recursion_limit = "1024"]
 
-use proc_macro::TokenStream;
+use proc_macro2::TokenStream;
 
-#[proc_macro]
-pub fn build_timestamp(_: TokenStream) -> TokenStream {
-    fce_timestamp_macro_impl::build_timestamp().into()
+pub const FORMAT_STRING: &str = "%H:%M:%S / %Y-%m-%d";
+
+pub fn build_timestamp() -> TokenStream {
+    let time = chrono::Utc::now();
+    let formatted_time = time.format(FORMAT_STRING);
+
+    let out_str = format!(r#"const __FCE_SDK_BUILD_TIME: &str = {}"#, formatted_time);
+
+    out_str.parse().expect("time formatting should be correct")
 }

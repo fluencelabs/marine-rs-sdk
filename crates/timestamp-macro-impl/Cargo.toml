@@ -1,17 +1,18 @@
 [package]
-name = "fce-timestamp-macro"
+name = "fce-timestamp-macro-impl"
 version = "0.5.0"  # remember to update html_root_url
 edition = "2018"
-description = "Definition of the `#[build_timestamp]` macro"
-repository = "https://github.com/fluencelabs/rust-sdk/crates/timestamp-macro"
+description = "Implementation of the `#[build_timestamp]` macro"
+repository = "https://github.com/fluencelabs/rust-sdk/crates/timestamp-macro-impl"
 authors = ["Fluence Labs"]
 keywords = ["fluence", "sdk", "webassembly", "procedural_macros"]
 categories = ["api-bindings", "wasm"]
 license = "Apache-2.0"
 
 [lib]
-proc-macro = true
 doctest = false
 
 [dependencies]
-fce-timestamp-macro-impl = { path = "../timestamp-macro-impl", version = "0.5.0" }
+proc-macro2 = "1.0.26"
+syn = { version = '1.0.64', features = ['full'] }
+chrono = "0.4.19"
