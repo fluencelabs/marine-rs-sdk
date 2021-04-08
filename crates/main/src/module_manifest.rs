@@ -20,7 +20,7 @@ pub const MANIFEST_SECTION_NAME: &str = "__fluence_wasm_module_manifest";
 #[macro_export]
 macro_rules! module_manifest {
     ($authors:expr, $version:expr, $description:expr, $repository:expr) => {
-        fce_timestamp_macro::build_timestamp!();
+        fluence::internal::build_timestamp!();
 
         const __FCE_SDK_AUTHORS_SIZE: usize = $authors.as_bytes().len();
         const __FCE_SDK_VERSION_SIZE: usize = $version.as_bytes().len();
