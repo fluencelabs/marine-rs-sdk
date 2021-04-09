@@ -19,8 +19,9 @@ path = "src/lib.rs"
 doctest = false
 
 [dependencies]
-fluence-sdk-macro = { path = "../crates/fce-macro", version = "=0.6.0" }
-fluence-sdk-main = { path = "../crates/main", version = "=0.6.0" }
+fluence-sdk-macro = { path = "../crates/fce-macro", version = "0.6.0" }
+fluence-sdk-main = { path = "../crates/main", version = "0.6.0" }
+fce-timestamp-macro = { path = "../crates/timestamp-macro", version = "0.6.0" }
 
 serde = { version = "1.0.118", features = ["derive"]}
 

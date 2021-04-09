@@ -4,6 +4,7 @@ members = [
   "crates/fce-test-macro",
   "crates/fce-test-macro-impl",
   "crates/main",
+  "crates/timestamp-macro",
   "crates/wit",
   "fluence",
   "fluence-test"
