@@ -43,25 +43,25 @@ impl ForeignModEpilogGlueCodeGenerator for Option<ParsedType> {
     fn generate_wrapper_epilog(&self) -> proc_macro2::TokenStream {
         match self {
             None => quote!(),
-            Some(ParsedType::Boolean) => quote! {
+            Some(ParsedType::Boolean(_)) => quote! {
                 return result != 0;
             },
             Some(ty) if !ty.is_complex_type() => quote! {
                 return result as _;
             },
-            Some(ParsedType::Utf8String) => quote! {
+            Some(ParsedType::Utf8String(_)) => quote! {
                 String::from_raw_parts(
                     fluence::internal::get_result_ptr() as _,
                     fluence::internal::get_result_size() as _,
                     fluence::internal::get_result_size() as _
                 )
             },
-            Some(ParsedType::Vector(ty)) => {
-                let generated_deserializer_name = String::from("__fce_generated_vec_deserializer");
+            Some(ParsedType::Vector(ty, _)) => {
+                let generated_deserializer_name = "__fce_generated_vec_deserializer";
                 let generated_deserializer_ident = new_ident!(generated_deserializer_name);
                 let vector_deserializer = super::vector_utils::generate_vector_deserializer(
                     ty,
-                    &generated_deserializer_name,
+                    generated_deserializer_name,
                 );
 
                 quote! {
@@ -72,7 +72,7 @@ impl ForeignModEpilogGlueCodeGenerator for Option<ParsedType> {
                     )
                 }
             }
-            Some(ParsedType::Record(record_name)) => {
+            Some(ParsedType::Record(record_name, _)) => {
                 let record_ident = new_ident!(record_name);
 
                 quote! {

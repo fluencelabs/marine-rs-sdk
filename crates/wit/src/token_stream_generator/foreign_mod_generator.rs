@@ -42,7 +42,7 @@ impl quote::ToTokens for fce_ast_types::AstExternModItem {
             #[link(wasm_import_module = #wasm_import_module_name)]
             #[cfg(target_arch = "wasm32")]
             extern "C" {
-                #generated_imports
+                #(#generated_imports)*
             }
 
             #[cfg(not(target_arch = "wasm32"))]
@@ -61,14 +61,14 @@ impl quote::ToTokens for fce_ast_types::AstExternModItem {
     }
 }
 
-fn generate_extern_section_items(extern_item: &fce_ast_types::AstExternModItem) -> TokenStream {
-    let mut token_stream = TokenStream::new();
+fn generate_extern_section_items(
+    extern_item: &fce_ast_types::AstExternModItem,
+) -> Vec<TokenStream> {
+    let mut section_items = Vec::with_capacity(extern_item.imports.len());
 
     for import in &extern_item.imports {
         let signature = &import.signature;
-
-        let FnEpilogDescriptor { fn_return_type, .. } = signature.output_type.generate_fn_epilog();
-
+        let fn_return_type = crate::parsed_type::generate_fn_return_type(&signature.output_type);
         let link_name = import.link_name.as_ref().unwrap_or(&signature.name);
         let import_name = generate_import_name(&signature.name);
         let ExternDescriptor {
@@ -81,10 +81,10 @@ fn generate_extern_section_items(extern_item: &fce_ast_types::AstExternModItem) 
             fn #import_name(#(#raw_arg_names: #raw_arg_types),*) #fn_return_type;
         };
 
-        token_stream.extend(func);
+        section_items.push(func);
     }
 
-    token_stream
+    section_items
 }
 
 #[rustfmt::skip]
@@ -112,10 +112,8 @@ fn generate_wrapper_functions(extern_item: &fce_ast_types::AstExternModItem) -> 
             arg_drops,
         } = signature.arguments.generate_wrapper_prolog();
 
-        let FnEpilogDescriptor {
-            return_expression, ..
-        } = signature.output_type.generate_fn_epilog();
-
+        let return_expression =
+            crate::parsed_type::generate_return_expression(&signature.output_type);
         let epilog = signature.output_type.generate_wrapper_epilog();
 
         let wrapper_func = quote! {

@@ -17,6 +17,8 @@
 use super::ParsedType;
 use crate::wasm_type::RustType;
 use crate::new_ident;
+use crate::parsed_type::PassingStyle;
+use crate::fce_ast_types::AstFnArgument;
 
 pub(crate) struct WrapperDescriptor {
     pub(crate) arg_names: Vec<syn::Ident>,
@@ -57,38 +59,39 @@ pub(crate) trait ForeignModPrologGlueCodeGenerator {
     fn generate_extern_prolog(&self) -> ExternDescriptor;
 }
 
-impl ForeignModPrologGlueCodeGenerator for Vec<(String, ParsedType)> {
+impl ForeignModPrologGlueCodeGenerator for Vec<AstFnArgument> {
     fn generate_wrapper_prolog(&self) -> WrapperDescriptor {
         use crate::parsed_type::foreign_mod_arg::ForeignModArgGlueCodeGenerator;
         use quote::ToTokens;
 
-        let arg_types: Vec<proc_macro2::TokenStream> = self
-            .iter()
-            .map(|(_, input_type)| input_type.to_token_stream())
-            .collect();
+        let arg_types: Vec<proc_macro2::TokenStream> =
+            self.iter().map(|arg| arg.ty.to_token_stream()).collect();
 
         let (arg_names, arg_transforms, arg_drops) = self
             .iter()
             .enumerate()
-            .fold((Vec::new(), proc_macro2::TokenStream::new(), proc_macro2::TokenStream::new()), |(mut arg_names, mut arg_transforms, mut arg_drops), (id, (_, ty))| {
+            .fold((Vec::new(), proc_macro2::TokenStream::new(), proc_macro2::TokenStream::new()), |(mut arg_names, mut arg_transforms, mut arg_drops), (id, arg)| {
                 let arg_name = format!("arg_{}", id);
                 let arg_ident = new_ident!(arg_name);
                 arg_names.push(arg_ident.clone());
 
-                match ty {
-                    ParsedType::Utf8String => {
+                // arguments of following two types shouldn't be deleted after transformation to raw view
+                match &arg.ty {
+                    ParsedType::Utf8String(PassingStyle::ByValue) => {
                         arg_transforms.extend(quote::quote! { let mut #arg_ident = std::mem::ManuallyDrop::new(#arg_ident); });
                         arg_drops.extend(quote::quote! { std::mem::ManuallyDrop::drop(&mut #arg_ident); });
                     },
-                    ParsedType::Vector(ty) => {
-                        let generated_serializer_name = format!("__fce_generated_vec_serializer_{}", arg_name);
-                        let generated_serializer_ident = new_ident!(generated_serializer_name);
-                        let vector_serializer = super::vector_utils::generate_vector_serializer(ty, &generated_serializer_name);
+                    ParsedType::Vector(ty, passing_style) => {
+                        let generated_ser_name = format!("__fce_generated_vec_serializer_{}", arg_name);
+                        let generated_ser_name = crate::utils::prepare_ident(generated_ser_name);
+                        let generated_ser_ident = new_ident!(generated_ser_name);
+
+                        let vector_serializer = super::vector_utils::generate_vector_serializer(ty, *passing_style, &generated_ser_name);
 
                         let arg_transform = quote::quote! {
                             #vector_serializer
 
-                            let #arg_ident = #generated_serializer_ident(#arg_ident);
+                            let #arg_ident = #generated_ser_ident(&#arg_ident);
                         };
                         arg_transforms.extend(arg_transform);
 
@@ -102,15 +105,15 @@ impl ForeignModPrologGlueCodeGenerator for Vec<(String, ParsedType)> {
         let raw_args: Vec<proc_macro2::TokenStream> = self
             .iter()
             .enumerate()
-            .map(|(id, (_, input_type))| input_type.generate_raw_args(id))
+            .map(|(id, arg)| arg.ty.generate_raw_args(id))
             .collect();
 
         WrapperDescriptor {
             arg_names,
             arg_types,
+            raw_args,
             arg_transforms,
             arg_drops,
-            raw_args,
         }
     }
 

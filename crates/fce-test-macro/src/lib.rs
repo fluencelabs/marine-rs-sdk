@@ -33,7 +33,7 @@ use proc_macro_error::proc_macro_error;
 use syn::spanned::Spanned;
 
 /// This macro allows user to write tests for services in the following form:
-///```ignore
+///```rust
 /// #[fce_test(config = "/path/to/Config.toml", modules_dir = "path/to/service/modules")]
 /// fn test() {
 ///     let service_result = greeting.greeting("John".to_string());

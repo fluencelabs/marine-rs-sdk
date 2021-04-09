@@ -44,6 +44,13 @@ macro_rules! prepare_global_data {
     };
 }
 
+#[macro_export]
+macro_rules! syn_error {
+    ($span:expr, $message:expr) => {
+        Err(syn::Error::new($span, $message))
+    };
+}
+
 /// Calculate record size in an internal serialized view.
 pub fn get_record_size<'a>(
     fields: impl Iterator<Item = &'a crate::parsed_type::ParsedType>,
@@ -54,7 +61,7 @@ pub fn get_record_size<'a>(
 
     for field in fields {
         let params_count = match field {
-            ParsedType::Vector(_) | ParsedType::Utf8String => 2,
+            ParsedType::Vector(..) | ParsedType::Utf8Str(_) | ParsedType::Utf8String(_) => 2,
             _ => 1,
         };
 
@@ -63,4 +70,15 @@ pub fn get_record_size<'a>(
     }
 
     size
+}
+
+pub(crate) fn prepare_ident(str: String) -> String {
+    str.chars()
+        .map(|c| match c {
+            '<' => '_',
+            '&' => '_',
+            '>' => '_',
+            c => c,
+        })
+        .collect()
 }

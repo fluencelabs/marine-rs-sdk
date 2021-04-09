@@ -17,7 +17,6 @@
 use super::log;
 
 use std::alloc::alloc as global_alloc;
-use std::alloc::dealloc as global_dealloc;
 use std::alloc::Layout;
 
 /// Allocates memory area of specified size and returns its address.
@@ -34,20 +33,4 @@ pub unsafe fn allocate(size: usize) -> usize {
     log(format!("sdk.allocate: {:?}\n", size));
 
     global_alloc(layout) as _
-}
-
-/// Deallocates memory area for provided memory pointer and size.
-/// Does nothing if supplied size is too long.
-#[no_mangle]
-pub unsafe fn deallocate(ptr: *mut u8, size: usize) {
-    let layout = match Layout::from_size_align(size, std::mem::align_of::<u8>()) {
-        Ok(layout) => layout,
-        // in this case a err may occur only in a case of too long allocated size,
-        // so just done nothing
-        Err(_) => return,
-    };
-
-    log(format!("sdk.deallocate: {:?} {}\n", ptr, size));
-
-    global_dealloc(ptr, layout);
 }

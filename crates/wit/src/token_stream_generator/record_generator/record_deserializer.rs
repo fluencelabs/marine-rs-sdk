@@ -39,62 +39,62 @@ impl RecordDeserializerGlueCodeGenerator for fce_ast_types::AstRecordItem {
         for (id, ast_field) in self.fields.iter().enumerate() {
             let field = new_ident!(format!("field_{}", id));
             let field_d = match &ast_field.ty {
-                ParsedType::Boolean => {
+                ParsedType::Boolean(_) => {
                     quote! {
                         let #field = raw_record[#value_id] != 0;
                     }
                 }
-                ParsedType::I8 => {
+                ParsedType::I8(_) => {
                     quote! {
                         let #field = raw_record[#value_id] as i8;
                     }
                 }
-                ParsedType::I16 => {
+                ParsedType::I16(_) => {
                     quote! {
                         let #field = raw_record[#value_id] as i16;
                     }
                 }
-                ParsedType::I32 => {
+                ParsedType::I32(_) => {
                     quote! {
                         let #field = raw_record[#value_id] as i32;
                     }
                 }
-                ParsedType::I64 => {
+                ParsedType::I64(_) => {
                     quote! {
                         let #field = raw_record[#value_id] as i64;
                     }
                 }
-                ParsedType::U8 => {
+                ParsedType::U8(_) => {
                     quote! {
                         let #field = raw_record[#value_id] as u8;
                     }
                 }
-                ParsedType::U16 => {
+                ParsedType::U16(_) => {
                     quote! {
                         let #field = raw_record[#value_id] as u16;
                     }
                 }
-                ParsedType::U32 => {
+                ParsedType::U32(_) => {
                     quote! {
                         let #field = raw_record[#value_id] as u32;
                     }
                 }
-                ParsedType::U64 => {
+                ParsedType::U64(_) => {
                     quote! {
                         let #field = raw_record[#value_id] as u64;
                     }
                 }
-                ParsedType::F32 => {
+                ParsedType::F32(_) => {
                     quote! {
                         let #field = raw_record[#value_id] as f32;
                     }
                 }
-                ParsedType::F64 => {
+                ParsedType::F64(_) => {
                     quote! {
                         let #field = f64::from_bits(raw_record[#value_id]);
                     }
                 }
-                ParsedType::Utf8String => {
+                ParsedType::Utf8Str(_) | ParsedType::Utf8String(_) => {
                     let ptr_id = value_id;
                     let size_id = value_id + 1;
                     value_id += 1;
@@ -103,10 +103,13 @@ impl RecordDeserializerGlueCodeGenerator for fce_ast_types::AstRecordItem {
                         let #field = unsafe { String::from_raw_parts(raw_record[#ptr_id] as _, raw_record[#size_id] as _, raw_record[#size_id] as _) };
                     }
                 }
-                ParsedType::Vector(ty) => {
+                ParsedType::Vector(ty, _) => {
                     let generated_deserializer_name =
                         format!("__fce_generated_vec_deserializer_{}", value_id);
+                    let generated_deserializer_name =
+                        crate::utils::prepare_ident(generated_deserializer_name);
                     let generated_deserializer_ident = new_ident!(generated_deserializer_name);
+
                     let vector_deserializer = crate::parsed_type::generate_vector_deserializer(
                         ty,
                         &generated_deserializer_name,
@@ -121,7 +124,7 @@ impl RecordDeserializerGlueCodeGenerator for fce_ast_types::AstRecordItem {
                         let #field = unsafe { #generated_deserializer_ident(raw_record[#ptr_id] as _, raw_record[#size_id] as _) };
                     }
                 }
-                ParsedType::Record(record_name) => {
+                ParsedType::Record(record_name, _) => {
                     let ptr_id = value_id;
                     let record_ident = new_ident!(record_name);
                     quote! {

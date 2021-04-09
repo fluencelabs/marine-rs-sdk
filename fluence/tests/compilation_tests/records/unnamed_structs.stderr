@@ -1,0 +1,5 @@
+error: only named fields are allowed in structs
+ --> $DIR/unnamed_structs.rs:8:1
+  |
+8 | struct A(pub i32, pub u32);
+  | ^^^^^^^^^^^^^^^^^^^^^^^^^^^

@@ -16,8 +16,11 @@
 
 use super::ParsedType;
 use super::FnArgGlueCodeGenerator;
+use super::passing_style_of;
 use crate::new_ident;
 use crate::wasm_type::RustType;
+use crate::fce_ast_types::AstFnArgument;
+use crate::parsed_type::PassingStyle;
 
 use quote::quote;
 
@@ -26,7 +29,8 @@ pub(crate) struct FnPrologDescriptor {
     pub(crate) raw_arg_names: Vec<syn::Ident>,
     pub(crate) raw_arg_types: Vec<RustType>,
     pub(crate) prolog: proc_macro2::TokenStream,
-    pub(crate) args: Vec<syn::Ident>,
+    pub(crate) converted_arg_idents: Vec<syn::Ident>,
+    pub(crate) args: Vec<proc_macro2::TokenStream>,
 }
 
 /// This trait could be used to generate various parts needed to construct prolog of an export
@@ -44,19 +48,25 @@ pub(crate) trait FnPrologGlueCodeGenerator {
     fn generate_prolog(&self) -> FnPrologDescriptor;
 }
 
-impl FnPrologGlueCodeGenerator for Vec<(String, ParsedType)> {
+impl FnPrologGlueCodeGenerator for Vec<AstFnArgument> {
     fn generate_prolog(&self) -> FnPrologDescriptor {
-        let mut prolog = proc_macro2::TokenStream::new();
-        let mut args: Vec<syn::Ident> = Vec::with_capacity(self.len());
         let mut raw_arg_names = Vec::with_capacity(self.len());
         let mut raw_arg_types = Vec::with_capacity(self.len());
+        let mut prolog = proc_macro2::TokenStream::new();
+        let mut converted_arg_idents = Vec::with_capacity(self.len());
+        let mut args: Vec<proc_macro2::TokenStream> = Vec::with_capacity(self.len());
 
         let mut input_type_id = 0;
         for arg in self {
-            let type_prolog = generate_type_prolog(&arg.1, input_type_id, input_type_id);
-            let curr_raw_arg_types = arg.generate_arguments();
+            let passing_style = passing_style_of(&arg.ty);
+            let TypeLifter {
+                converted_arg_ident,
+                type_lifter_glue_code,
+            } = generate_type_lifting_prolog(&arg.ty, passing_style, input_type_id, input_type_id);
 
-            args.push(new_ident!(format!("converted_arg_{}", input_type_id)));
+            let curr_raw_arg_types = arg.generate_arguments();
+            let arg = quote! { #passing_style #converted_arg_ident };
+            args.push(arg);
 
             raw_arg_names.extend(
                 curr_raw_arg_types
@@ -67,36 +77,47 @@ impl FnPrologGlueCodeGenerator for Vec<(String, ParsedType)> {
 
             input_type_id += curr_raw_arg_types.len();
             raw_arg_types.extend(curr_raw_arg_types);
-            prolog.extend(type_prolog);
+            prolog.extend(type_lifter_glue_code);
+            converted_arg_idents.push(converted_arg_ident);
         }
 
         FnPrologDescriptor {
             raw_arg_names,
             raw_arg_types,
             prolog,
+            converted_arg_idents,
             args,
         }
     }
 }
 
-fn generate_type_prolog(
+struct TypeLifter {
+    pub(self) converted_arg_ident: syn::Ident,
+    pub(self) type_lifter_glue_code: proc_macro2::TokenStream,
+}
+
+fn generate_type_lifting_prolog(
     ty: &ParsedType,
+    passing_style: &PassingStyle,
     generated_arg_id: usize,
     supplied_arg_start_id: usize,
-) -> proc_macro2::TokenStream {
-    let generated_arg_id = new_ident!(format!("converted_arg_{}", generated_arg_id));
+) -> TypeLifter {
+    const CONVERTED_ARG_PREFIX: &str = "converted_arg";
 
-    match ty {
-        ParsedType::Boolean => {
+    let converted_arg_ident = new_ident!(format!("{}_{}", CONVERTED_ARG_PREFIX, generated_arg_id));
+    let type_modifier = converted_arg_modifier(passing_style);
+
+    let type_lifter_glue_code = match ty {
+        ParsedType::Boolean(_) => {
             let supplied_arg_start_id = new_ident!(format!("arg_{}", supplied_arg_start_id));
             quote! {
-                let #generated_arg_id = #supplied_arg_start_id != 0;
+                let #type_modifier #converted_arg_ident = #supplied_arg_start_id != 0;
             }
         }
         ty if !ty.is_complex_type() => {
             let supplied_arg_start_id = new_ident!(format!("arg_{}", supplied_arg_start_id));
             quote! {
-                let #generated_arg_id = #supplied_arg_start_id as _;
+                let #type_modifier #converted_arg_ident = #supplied_arg_start_id as _;
             }
         }
         ty => {
@@ -104,27 +125,27 @@ fn generate_type_prolog(
             let ptr = new_ident!(format!("arg_{}", supplied_arg_start_id));
             let size = new_ident!(format!("arg_{}", supplied_arg_start_id + 1));
             match ty {
-                ParsedType::Utf8String => quote! {
-                    let #generated_arg_id = String::from_raw_parts(#ptr as _, #size as _ , #size as _);
+                ParsedType::Utf8Str(_) | ParsedType::Utf8String(_) => quote! {
+                    let #type_modifier #converted_arg_ident = String::from_raw_parts(#ptr as _, #size as _ , #size as _);
                 },
-                ParsedType::Vector(ty) => {
-                    let generated_deserializer_name =
+                ParsedType::Vector(ty, _) => {
+                    let generated_der_name =
                         format!("__fce_generated_vec_deserializer_{}", supplied_arg_start_id);
-                    let generated_deserializer_ident = new_ident!(generated_deserializer_name);
-                    let vector_deserializer = super::vector_utils::generate_vector_deserializer(
-                        ty,
-                        &generated_deserializer_name,
-                    );
+                    let generated_der_name = crate::utils::prepare_ident(generated_der_name);
+                    let generated_der_ident = new_ident!(generated_der_name);
+
+                    let vector_deserializer =
+                        super::vector_utils::generate_vector_deserializer(ty, &generated_der_name);
 
                     quote! {
                         #vector_deserializer
-                        let #generated_arg_id = #generated_deserializer_ident(#ptr as _, #size as _);
+                        let #type_modifier #converted_arg_ident = #generated_der_ident(#ptr as _, #size as _);
                     }
                 }
-                ParsedType::Record(record_name) => {
+                ParsedType::Record(record_name, _) => {
                     let record_ident = new_ident!(record_name);
                     quote! {
-                        let #generated_arg_id = #record_ident::__fce_generated_deserialize(#ptr as _);
+                        let #type_modifier #converted_arg_ident = #record_ident::__fce_generated_deserialize(#ptr as _);
                     }
                 }
                 _ => panic!(
@@ -132,5 +153,17 @@ fn generate_type_prolog(
                 ),
             }
         }
+    };
+
+    TypeLifter {
+        converted_arg_ident,
+        type_lifter_glue_code,
+    }
+}
+
+fn converted_arg_modifier(passing_style: &PassingStyle) -> proc_macro2::TokenStream {
+    match passing_style {
+        PassingStyle::ByMutRef => quote! { mut },
+        _ => quote! {},
     }
 }

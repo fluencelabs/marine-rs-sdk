@@ -17,13 +17,15 @@
 use crate::fce_ast_types;
 use crate::parsed_type::FnEpilogGlueCodeGenerator;
 use crate::parsed_type::FnEpilogDescriptor;
+use crate::parsed_type::FnEpilogIngredients;
 use crate::parsed_type::FnPrologGlueCodeGenerator;
 use crate::parsed_type::FnPrologDescriptor;
+
 use crate::new_ident;
 
 use proc_macro2::TokenStream;
 
-impl quote::ToTokens for fce_ast_types::AstFunctionItem {
+impl quote::ToTokens for fce_ast_types::AstFnItem {
     fn to_tokens(&self, tokens: &mut TokenStream) {
         crate::prepare_global_data!(
             Function,
@@ -48,14 +50,22 @@ impl quote::ToTokens for fce_ast_types::AstFunctionItem {
             raw_arg_names,
             raw_arg_types,
             prolog,
+            converted_arg_idents,
             args,
         } = &signature.arguments.generate_prolog();
+
+        let epilog_ingredients = FnEpilogIngredients {
+            args: &signature.arguments,
+            converted_args: converted_arg_idents,
+            return_type: &signature.output_type,
+        };
 
         let FnEpilogDescriptor {
             fn_return_type,
             return_expression,
             epilog,
-        } = signature.output_type.generate_fn_epilog();
+            objs_savings,
+        } = epilog_ingredients.generate_fn_epilog();
 
         // here this Option must be Some
         let original_func = &self.original;
@@ -77,6 +87,9 @@ impl quote::ToTokens for fce_ast_types::AstFunctionItem {
 
                 // return value conversation from Rust type to a Wasm type
                 #epilog
+
+                // save objects to keep them in memory that allows IT side
+                #objs_savings
             }
 
             #[cfg(target_arch = "wasm32")]

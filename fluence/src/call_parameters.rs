@@ -59,7 +59,7 @@ pub fn get_call_parameters() -> CallParameters {
     // it's safe until it is executed on standard Fluence node with appropriate import function
     unsafe {
         get_call_raw_parameters();
-        let raw_call_parameters = crate::result::get_result_ptr();
+        let raw_call_parameters = crate::internal::get_result_ptr();
         CallParameters::__fce_generated_deserialize(raw_call_parameters as _)
     }
 }

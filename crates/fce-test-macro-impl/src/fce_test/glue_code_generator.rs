@@ -25,7 +25,7 @@ use proc_macro2::TokenStream;
 use quote::quote;
 use quote::ToTokens;
 
-use std::path::PathBuf;
+use std::path::Path;
 
 /// Generates glue code for tests.
 /// F.e. for this test for the greeting service
@@ -76,7 +76,7 @@ use std::path::PathBuf;
 /// let tmp_dir = tmp_dir.to_string_lossy().to_string();
 /// std::fs::create_dir(&tmp_dir).expect("can't create a directory for service in tmp");
 ///
-/// let mut __fce__generated_fce_config = fluence_test::internal::TomlAppServiceConfig::load("/path/to/greeting/Config.toml".to_string())
+/// let mut __fce_generated_fce_config = fluence_test::internal::TomlAppServiceConfig::load("/path/to/greeting/Config.toml".to_string())
 ///     .unwrap_or_else(|e| {
 ///         panic!(
 ///              "app service located at `{}` config can't be loaded: {}",
@@ -84,10 +84,10 @@ use std::path::PathBuf;
 ///         )
 ///      });
 ///
-/// __fce__generated_fce_config.service_base_dir = Some("/path/to/tmp".to_string());
+/// __fce_generated_fce_config.service_base_dir = Some("/path/to/tmp".to_string());
 ///
 /// let fce = fluence_test::internal::AppService::new_with_empty_facade(
-///         __fce__generated_fce_config,
+///         __fce_generated_fce_config,
 ///         "3640e972-92e3-47cb-b95f-4e3c5bcf0f14",
 ///         std::collections::HashMap::new(),
 ///     ).unwrap_or_else(|e| panic!("app service can't be created: {}", e));
@@ -153,7 +153,7 @@ pub(super) fn generate_test_glue_code(
     Ok(glue_code)
 }
 
-fn generate_app_service_ctor(config_path: &str, modules_dir: &PathBuf) -> TokenStream {
+fn generate_app_service_ctor(config_path: &str, modules_dir: &Path) -> TokenStream {
     let config_path = config_path.to_token_stream();
     let modules_dir = modules_dir.to_string_lossy().to_string();
 

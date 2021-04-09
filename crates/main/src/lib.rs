@@ -31,22 +31,14 @@
 )]
 #![warn(rust_2018_idioms)]
 
-mod call_parameters;
 mod export_allocator;
 #[cfg(any(feature = "debug", feature = "logger"))]
 mod logger;
 mod module_manifest;
-pub mod mounted_binary;
 mod result;
 mod sdk_version_embedder;
 
-pub use call_parameters::CallParameters;
-pub use call_parameters::SecurityTetraplet;
-#[cfg(target_arch = "wasm32")]
-pub use call_parameters::get_call_parameters;
-
 pub use export_allocator::allocate;
-pub use export_allocator::deallocate;
 
 #[cfg(feature = "logger")]
 pub use logger::WasmLoggerBuilder;
@@ -59,6 +51,8 @@ pub use result::get_result_ptr;
 pub use result::get_result_size;
 pub use result::set_result_ptr;
 pub use result::set_result_size;
+pub use result::release_objects;
+pub use result::add_object_to_release;
 
 pub use module_manifest::MANIFEST_SECTION_NAME;
 pub use sdk_version_embedder::VERSION_SECTION_NAME;

@@ -15,99 +15,112 @@
  */
 
 use super::ParsedType;
+use super::PassingStyle;
+
 use quote::quote;
 
 pub(crate) fn generate_vector_serializer(
     value_ty: &ParsedType,
+    _vec_passing_style: PassingStyle,
     arg_name: &str,
 ) -> proc_macro2::TokenStream {
     let values_serializer = match value_ty {
-        ParsedType::Boolean => {
+        ParsedType::Boolean(_) => {
             quote! {
                 unimplemented!()
             }
         }
-        ParsedType::I8 | ParsedType::U8 => {
+        ParsedType::I8(_) | ParsedType::U8(_) => {
             quote! {
-                let arg = std::mem::ManuallyDrop::new(arg);
                 (arg.as_ptr() as _, arg.len() as _)
             }
         }
-        ParsedType::I16 | ParsedType::U16 => {
+        ParsedType::I16(_) | ParsedType::U16(_) => {
             quote! {
-                let arg = std::mem::ManuallyDrop::new(arg);
                 (arg.as_ptr() as _, (2 * arg.len()) as _)
             }
         }
-        ParsedType::I32 | ParsedType::U32 => {
+        ParsedType::I32(_) | ParsedType::U32(_) => {
             quote! {
-                let arg = std::mem::ManuallyDrop::new(arg);
                 (arg.as_ptr() as _, (4 * arg.len()) as _)
             }
         }
-        ParsedType::I64 | ParsedType::U64 => {
+        ParsedType::I64(_) | ParsedType::U64(_) => {
             quote! {
-                let arg = std::mem::ManuallyDrop::new(arg);
                 (arg.as_ptr() as _, (8 * arg.len()) as _)
             }
         }
-        ParsedType::F32 => {
+        ParsedType::F32(_) => {
             quote! {
                 let mut result: Vec<u32> = Vec::with_capacity(arg.len());
                 for value in arg {
                     result.push(value.to_bits());
                 }
 
-                let result = std::mem::ManuallyDrop::new(result);
-                (result.as_ptr() as _, (4 * result.len()) as _)
+                let result_ptr = result.as_ptr();
+                let result_len = 4 * result.len();
+                fluence::internal::add_object_to_release(Box::new(result));
+
+                (result_ptr as _, result_len as _)
             }
         }
-        ParsedType::F64 => {
+        ParsedType::F64(_) => {
             quote! {
                 let mut result: Vec<u64> = Vec::with_capacity(arg.len());
                 for value in arg {
                     result.push(value.to_bits());
                 }
 
-                let result = std::mem::ManuallyDrop::new(result);
-                (result.as_ptr() as _, (8 * result.len()) as _)
+                let result_ptr = result.as_ptr();
+                let result_len = 8 * result.len();
+                fluence::internal::add_object_to_release(Box::new(result));
+
+                (result_ptr as _, result_len as _)
             }
         }
-        ParsedType::Utf8String => {
+        ParsedType::Utf8Str(_) | ParsedType::Utf8String(_) => {
             quote! {
                 let mut result: Vec<u32> = Vec::with_capacity(arg.len());
 
                 for value in arg {
-                    let value = std::mem::ManuallyDrop::new(value);
                     result.push(value.as_ptr() as _);
                     result.push(value.len() as _);
                 }
 
-                let result = std::mem::ManuallyDrop::new(result);
-                (result.as_ptr() as _, (4 * result.len()) as _)
+                let result_ptr = result.as_ptr();
+                let result_len = 4 * result.len();
+                fluence::internal::add_object_to_release(Box::new(result));
+
+                (result_ptr as _, result_len as _)
             }
         }
-        ParsedType::Vector(ty) => {
+        ParsedType::Vector(ty, passing_style) => {
             let serializer_name = format!("{}_{}", arg_name, ty);
-            let inner_vector_serializer = generate_vector_serializer(&*ty, &serializer_name);
+            let serializer_name = crate::utils::prepare_ident(serializer_name);
             let serializer_ident = crate::new_ident!(serializer_name);
+
+            let inner_vector_serializer =
+                generate_vector_serializer(&*ty, *passing_style, &serializer_name);
 
             quote! {
                 #inner_vector_serializer
 
                 let mut result: Vec<u32> = Vec::with_capacity(2 * arg.len());
                 for value in arg {
-                    let (ptr, size) = #serializer_ident(value);
+                    let (ptr, size) = #serializer_ident(&value);
                     result.push(ptr as _);
                     result.push(size as _);
                 }
 
-                let result = std::mem::ManuallyDrop::new(result);
-                (result.as_ptr() as _, (4 * result.len()) as _)
+                let result_ptr = result.as_ptr();
+                let result_len = 4 * result.len();
+                fluence::internal::add_object_to_release(Box::new(result));
+
+                (result_ptr as _, result_len as _)
             }
         }
 
-        ParsedType::Record(_) => {
+        ParsedType::Record(..) => {
             quote! {
                 let mut result: Vec<u32> = Vec::with_capacity(arg.len());
 
@@ -115,8 +128,11 @@ pub(crate) fn generate_vector_serializer(
                     result.push(value.__fce_generated_serialize() as _);
                 }
 
-                let result = std::mem::ManuallyDrop::new(result);
-                (result.as_ptr() as _, (4 * result.len()) as _)
+                let result_ptr = result.as_ptr();
+                let result_len = 4 * result.len();
+                fluence::internal::add_object_to_release(Box::new(result));
+
+                (result_ptr as _, result_len as _)
             }
         }
     };
@@ -124,7 +140,7 @@ pub(crate) fn generate_vector_serializer(
     let arg = crate::new_ident!(arg_name);
 
     quote! {
-        unsafe fn #arg(arg: Vec<#value_ty>) -> (u32, u32) {
+        unsafe fn #arg(arg: &Vec<#value_ty>) -> (u32, u32) {
             #values_serializer
         }
     }
@@ -137,12 +153,12 @@ pub(crate) fn generate_vector_deserializer(
     let arg = crate::new_ident!(arg_name);
 
     let values_deserializer = match value_ty {
-        ParsedType::Boolean => {
+        ParsedType::Boolean(_) => {
             quote! {
-                unimplemented!()
+                unimplemented!("Vector of booleans is not supported")
             }
         }
-        ParsedType::F32 => {
+        ParsedType::F32(_) => {
             quote! {
                 let mut arg: Vec<u64> = Vec::from_raw_parts(offset as _, size as _, size as _);
                 let mut result = Vec::with_capacity(arg.len());
@@ -154,7 +170,7 @@ pub(crate) fn generate_vector_deserializer(
                 result
             }
         }
-        ParsedType::F64 => {
+        ParsedType::F64(_) => {
             quote! {
                 let mut arg: Vec<u64> = Vec::from_raw_parts(offset as _, size as _, size as _);
                 let mut result = Vec::with_capacity(arg.len());
@@ -166,7 +182,7 @@ pub(crate) fn generate_vector_deserializer(
                 result
             }
         }
-        ParsedType::Utf8String => {
+        ParsedType::Utf8Str(_) | ParsedType::Utf8String(_) => {
             quote! {
                 let mut arg: Vec<u64> = Vec::from_raw_parts(offset as _, size as _, size as _);
                 let mut arg = arg.into_iter();
@@ -180,10 +196,12 @@ pub(crate) fn generate_vector_deserializer(
                 result
             }
         }
-        ParsedType::Vector(ty) => {
+        ParsedType::Vector(ty, _) => {
             let deserializer_name = format!("{}_{}", arg_name, ty);
-            let inner_vector_deserializer = generate_vector_deserializer(&*ty, &deserializer_name);
+            let deserializer_name = crate::utils::prepare_ident(deserializer_name);
             let deserializer_ident = crate::new_ident!(deserializer_name);
+
+            let inner_vector_deserializer = generate_vector_deserializer(&*ty, &deserializer_name);
 
             quote! {
                 #inner_vector_deserializer
@@ -202,7 +220,7 @@ pub(crate) fn generate_vector_deserializer(
                 result
             }
         }
-        ParsedType::Record(record_name) => {
+        ParsedType::Record(record_name, _) => {
             let record_name_ident = crate::new_ident!(record_name);
 
             quote! {

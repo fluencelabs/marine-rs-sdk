@@ -24,7 +24,7 @@ pub const SUCCESS_CODE: i32 = 0;
 /// Describes result of calling a CLI service.
 #[fce]
 #[derive(Clone, PartialEq, Default, Eq, Debug, Serialize, Deserialize)]
-pub struct Result {
+pub struct MountedBinaryResult {
     /// Return process exit code or host execution error code, where SUCCESS_CODE means success.
     pub ret_code: i32,
 
@@ -38,10 +38,10 @@ pub struct Result {
     pub stderr: Vec<u8>,
 }
 
-/// The same as the Result, but stdout and stderr are utf8 strings.
+/// The same as the MountedBinaryResult, but stdout and stderr are utf8 strings.
 #[fce]
 #[derive(Clone, PartialEq, Default, Eq, Debug, Serialize, Deserialize)]
-pub struct StringResult {
+pub struct MountedBinaryStringResult {
     /// Return process exit code or host execution error code, where SUCCESS_CODE means success.
     pub ret_code: i32,
 
@@ -55,7 +55,7 @@ pub struct StringResult {
     pub stderr: String,
 }
 
-impl Result {
+impl MountedBinaryResult {
     /// Create a new failure MountedBinaryResult from the provided ret_code.
     pub fn from_error(ret_code: i32, error: impl Into<String>) -> Self {
         Self {
@@ -99,11 +99,11 @@ impl Result {
         }
     }
 
-    pub fn stringify(&self) -> Option<StringResult> {
+    pub fn stringify(&self) -> Option<MountedBinaryStringResult> {
         let stdout = String::from_utf8(self.stdout.clone()).ok()?;
         let stderr = String::from_utf8(self.stderr.clone()).ok()?;
 
-        let string_result = StringResult {
+        let string_result = MountedBinaryStringResult {
             ret_code: self.ret_code,
             error: self.error.clone(),
             stdout,
