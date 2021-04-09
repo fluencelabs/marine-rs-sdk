@@ -84,10 +84,10 @@ fn generate_serializer_fn(record: &fce_ast_types::AstRecordItem) -> proc_macro2:
 }
 
 fn generate_deserializer_fn(record: &fce_ast_types::AstRecordItem) -> proc_macro2::TokenStream {
-    let RecordDeserializerDescriptor {
-        deserializer,
-        type_constructor,
-    } = record.generate_deserializer();
+    let RecordDerDescriptor {
+        fields_der: deserializer,
+        record_ctor: type_constructor,
+    } = record.generate_der();
 
     let record_size =
         crate::utils::get_record_size(record.fields.iter().map(|ast_field| &ast_field.ty));
