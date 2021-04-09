@@ -18,4 +18,4 @@ proc-macro = true
 doctest = false
 
 [dependencies]
-fluence-sdk-wit = { path = "../wit", version = "=0.5.0" }
+fluence-sdk-wit = { path = "../wit", version = "0.5.0" }
