@@ -95,13 +95,12 @@ pub(crate) fn generate_vector_serializer(
             }
         }
         ParsedType::Vector(ty, passing_style) => {
-            let serializer_name = format!("{}_{}", arg_name, ty)
-                .replace("<", "_")
-                .replace(">", "_")
-                .replace("&", "_");
+            let serializer_name = format!("{}_{}", arg_name, ty);
+            let serializer_name = crate::utils::prepare_ident(serializer_name);
+            let serializer_ident = crate::new_ident!(serializer_name);
+
             let inner_vector_serializer =
                 generate_vector_serializer(&*ty, *passing_style, &serializer_name);
-            let serializer_ident = crate::new_ident!(serializer_name);
 
             quote! {
                 #inner_vector_serializer
@@ -198,12 +197,11 @@ pub(crate) fn generate_vector_deserializer(
             }
         }
         ParsedType::Vector(ty, _) => {
-            let deserializer_name = format!("{}_{}", arg_name, ty)
-                .replace("&", "_")
-                .replace("<", "_")
-                .replace(">", "_");
-            let inner_vector_deserializer = generate_vector_deserializer(&*ty, &deserializer_name);
+            let deserializer_name = format!("{}_{}", arg_name, ty);
+            let deserializer_name = crate::utils::prepare_ident(deserializer_name);
             let deserializer_ident = crate::new_ident!(deserializer_name);
+
+            let inner_vector_deserializer = generate_vector_deserializer(&*ty, &deserializer_name);
 
             quote! {
                 #inner_vector_deserializer

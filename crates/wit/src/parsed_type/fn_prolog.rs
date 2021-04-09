@@ -129,20 +129,17 @@ fn generate_type_lifting_prolog(
                     let #type_modifier #converted_arg_ident = String::from_raw_parts(#ptr as _, #size as _ , #size as _);
                 },
                 ParsedType::Vector(ty, _) => {
-                    let generated_deserializer_name =
-                        format!("__fce_generated_vec_deserializer_{}", supplied_arg_start_id)
-                            .replace("&", "_")
-                            .replace("<", "_")
-                            .replace(">", "_");
-                    let generated_deserializer_ident = new_ident!(generated_deserializer_name);
-                    let vector_deserializer = super::vector_utils::generate_vector_deserializer(
-                        ty,
-                        &generated_deserializer_name,
-                    );
+                    let generated_der_name =
+                        format!("__fce_generated_vec_deserializer_{}", supplied_arg_start_id);
+                    let generated_der_name = crate::utils::prepare_ident(generated_der_name);
+                    let generated_der_ident = new_ident!(generated_der_name);
+
+                    let vector_deserializer =
+                        super::vector_utils::generate_vector_deserializer(ty, &generated_der_name);
 
                     quote! {
                         #vector_deserializer
-                        let #type_modifier #converted_arg_ident = #generated_deserializer_ident(#ptr as _, #size as _);
+                        let #type_modifier #converted_arg_ident = #generated_der_ident(#ptr as _, #size as _);
                     }
                 }
                 ParsedType::Record(record_name, _) => {

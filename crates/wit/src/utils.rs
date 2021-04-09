@@ -71,3 +71,14 @@ pub fn get_record_size<'a>(
 
     size
 }
+
+pub(crate) fn prepare_ident(str: String) -> String {
+    str.chars()
+        .map(|c| match c {
+            '<' => '_',
+            '&' => '_',
+            '>' => '_',
+            c => c,
+        })
+        .collect()
+}
