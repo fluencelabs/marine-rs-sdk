@@ -38,7 +38,18 @@ impl ForeignModArgGlueCodeGenerator for ParsedType {
                 #arg.__fce_generated_serialize() as _
             },
             ParsedType::Boolean(_) => quote! { #arg as _ },
-            _ => quote! { #arg },
+            ty => arg_for_basic_type(ty, &arg),
         }
+    }
+}
+
+fn arg_for_basic_type(ty: &ParsedType, arg: &syn::Ident) -> proc_macro2::TokenStream {
+    use crate::parsed_type::PassingStyle;
+
+    let passing_style = crate::parsed_type::passing_style_of(ty);
+
+    match passing_style {
+        PassingStyle::ByValue => quote! { #arg },
+        _ => quote! { *#arg },
     }
 }

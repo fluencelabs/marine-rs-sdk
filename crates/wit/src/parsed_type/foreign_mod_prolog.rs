@@ -73,7 +73,6 @@ impl ForeignModPrologGlueCodeGenerator for Vec<AstFnArgument> {
             .fold((Vec::new(), proc_macro2::TokenStream::new(), proc_macro2::TokenStream::new()), |(mut arg_names, mut arg_transforms, mut arg_drops), (id, arg)| {
                 let arg_name = format!("arg_{}", id);
                 let arg_ident = new_ident!(arg_name);
-                arg_names.push(arg_ident.clone());
 
                 // arguments of following two types shouldn't be deleted after transformation to raw view
                 match &arg.ty {
@@ -82,23 +81,13 @@ impl ForeignModPrologGlueCodeGenerator for Vec<AstFnArgument> {
                         arg_drops.extend(quote::quote! { std::mem::ManuallyDrop::drop(&mut #arg_ident); });
                     },
                     ParsedType::Vector(ty, passing_style) => {
-                        let generated_ser_name = format!("__fce_generated_vec_serializer_{}", arg_name);
-                        let generated_ser_name = crate::utils::prepare_ident(generated_ser_name);
-                        let generated_ser_ident = new_ident!(generated_ser_name);
-
-                        let vector_serializer = super::vector_utils::generate_vector_serializer(ty, *passing_style, &generated_ser_name);
-
-                        let arg_transform = quote::quote! {
-                            #vector_serializer
-
-                            let #arg_ident = #generated_ser_ident(&#arg_ident);
-                        };
-                        arg_transforms.extend(arg_transform);
-
+                        let vec_arg_transforms = vector_arg_transforms(ty, *passing_style, &arg_name);
+                        arg_transforms.extend(vec_arg_transforms);
                     }
                     _ => {}
                 }
 
+                arg_names.push(arg_ident);
                 (arg_names, arg_transforms, arg_drops)
             });
 
@@ -136,4 +125,26 @@ impl ForeignModPrologGlueCodeGenerator for Vec<AstFnArgument> {
             raw_arg_types,
         }
     }
+}
+
+fn vector_arg_transforms(
+    ty: &ParsedType,
+    passing_style: PassingStyle,
+    arg_name: &str,
+) -> proc_macro2::TokenStream {
+    let generated_ser_name = format!("__fce_generated_vec_serializer_{}", arg_name);
+    let generated_ser_name = crate::utils::prepare_ident(generated_ser_name);
+    let generated_ser_ident = new_ident!(generated_ser_name);
+    let arg_ident = new_ident!(arg_name);
+
+    let vector_serializer =
+        super::vector_utils::generate_vector_serializer(ty, passing_style, &generated_ser_name);
+
+    let arg_transform = quote::quote! {
+        #vector_serializer
+
+        let #arg_ident = #generated_ser_ident(&#arg_ident);
+    };
+
+    arg_transform
 }
