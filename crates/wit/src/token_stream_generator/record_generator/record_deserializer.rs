@@ -172,25 +172,38 @@ fn build_record_ctor<'a, 'v>(
     };
 
     if is_fields_named {
-        let field_names = ast_fields
-            .map(|ast_field| {
-                new_ident!(ast_field
-                    .name
-                    .as_ref()
-                    .expect("all fields should have name"))
-            })
-            .collect::<Vec<_>>();
-
-        quote! {
-            Self {
-                #(#field_names: #field_values),*
-            }
-        }
+        build_named_fields_ctor(ast_fields, field_values)
     } else {
-        quote! {
-            Self (
-                #(#field_values),*
-            )
+        build_unnamed_fields_ctor(field_values)
+    }
+}
+
+fn build_named_fields_ctor<'a, 'v>(
+    ast_fields: impl ExactSizeIterator<Item = &'a fce_ast_types::AstRecordField>,
+    field_values: impl ExactSizeIterator<Item = &'v syn::Ident>,
+) -> proc_macro2::TokenStream {
+    let field_names = ast_fields
+        .map(|ast_field| {
+            new_ident!(ast_field
+                .name
+                .as_ref()
+                .expect("all fields should have name"))
+        })
+        .collect::<Vec<_>>();
+
+    quote! {
+        Self {
+            #(#field_names: #field_values),*
+        }
+    }
+}
+
+fn build_unnamed_fields_ctor<'v>(
+    field_values: impl ExactSizeIterator<Item = &'v syn::Ident>,
+) -> proc_macro2::TokenStream {
+    quote! {
+        Self {
+            #(#field_values),*
         }
     }
 }

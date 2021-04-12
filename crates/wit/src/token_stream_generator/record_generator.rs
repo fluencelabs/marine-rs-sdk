@@ -85,8 +85,8 @@ fn generate_serializer_fn(record: &fce_ast_types::AstRecordItem) -> proc_macro2:
 
 fn generate_deserializer_fn(record: &fce_ast_types::AstRecordItem) -> proc_macro2::TokenStream {
     let RecordDerDescriptor {
-        fields_der: deserializer,
-        record_ctor: type_constructor,
+        fields_der,
+        record_ctor,
     } = record.generate_der();
 
     let record_size =
@@ -96,9 +96,9 @@ fn generate_deserializer_fn(record: &fce_ast_types::AstRecordItem) -> proc_macro
         pub unsafe fn __fce_generated_deserialize(record_ptr: *const u8) -> Self {
             let raw_record: Vec<u64> = Vec::from_raw_parts(record_ptr as _, #record_size, #record_size);
 
-            #deserializer
+            #fields_der
 
-            #type_constructor
+            #record_ctor
         }
     }
 }
