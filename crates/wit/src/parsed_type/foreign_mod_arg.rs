@@ -42,7 +42,7 @@ impl ForeignModArgGlueCodeGenerator for ParsedType {
                 quote! { #deref_sign#arg as _ }
             }
             // this branch shouldn't be unite with booleans because otherwise
-            // conversions errors could be lost due to as _
+            // conversion errors could be lost due to using `as _`
             ty => {
                 let deref_sign = maybe_deref(ty);
                 quote! { #deref_sign#arg }
