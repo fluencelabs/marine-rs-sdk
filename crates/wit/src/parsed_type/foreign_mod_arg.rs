@@ -37,19 +37,27 @@ impl ForeignModArgGlueCodeGenerator for ParsedType {
             ParsedType::Record(..) => quote! {
                 #arg.__fce_generated_serialize() as _
             },
-            ParsedType::Boolean(_) => quote! { #arg as _ },
-            ty => arg_for_basic_type(ty, &arg),
+            ty @ ParsedType::Boolean(_) => {
+                let deref_sign = maybe_deref(ty);
+                quote! { #deref_sign#arg as _ }
+            }
+            // this branch shouldn't be unite with booleans because otherwise
+            // conversion errors could be lost due to `as _` usage
+            ty => {
+                let deref_sign = maybe_deref(ty);
+                quote! { #deref_sign#arg }
+            }
         }
     }
 }
 
-fn arg_for_basic_type(ty: &ParsedType, arg: &syn::Ident) -> proc_macro2::TokenStream {
+fn maybe_deref(ty: &ParsedType) -> proc_macro2::TokenStream {
     use crate::parsed_type::PassingStyle;
 
     let passing_style = crate::parsed_type::passing_style_of(ty);
 
     match passing_style {
-        PassingStyle::ByValue => quote! { #arg },
-        _ => quote! { *#arg },
+        PassingStyle::ByValue => proc_macro2::TokenStream::new(),
+        _ => quote! { * },
     }
 }
