@@ -121,6 +121,8 @@ fn generate_wrapper_functions(extern_item: &fce_ast_types::AstExternModItem) -> 
             #[doc(hidden)]
             #[allow(clippy::all)]
             #visibility fn #func_name(#(#arg_names: #arg_types), *) #return_type {
+                unsafe {
+
                 // make complex arguments manually droppable
                 #arg_transforms
 
@@ -132,6 +134,8 @@ fn generate_wrapper_functions(extern_item: &fce_ast_types::AstExternModItem) -> 
 
                 // return value conversation from Wasm type to a Rust type
                 #epilog
+
+                }
             }
         };
 
