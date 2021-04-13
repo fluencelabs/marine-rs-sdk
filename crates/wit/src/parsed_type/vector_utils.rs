@@ -24,30 +24,24 @@ pub(crate) fn generate_vector_serializer(
     _vec_passing_style: PassingStyle,
     arg_name: &str,
 ) -> proc_macro2::TokenStream {
+    let t = 0f32;
+    let t = t.to_be_bytes();
     let values_serializer = match value_ty {
         ParsedType::Boolean(_) => {
             quote! {
-                unimplemented!()
+                unimplemented!("Vector of booleans is unsupported")
             }
         }
-        ParsedType::I8(_) | ParsedType::U8(_) => {
+        ParsedType::I8(_)
+        | ParsedType::U8(_)
+        | ParsedType::I16(_)
+        | ParsedType::U16(_)
+        | ParsedType::I32(_)
+        | ParsedType::U32(_)
+        | ParsedType::I64(_)
+        | ParsedType::U64(_) => {
             quote! {
                 (arg.as_ptr() as _, arg.len() as _)
-            }
-        }
-        ParsedType::I16(_) | ParsedType::U16(_) => {
-            quote! {
-                (arg.as_ptr() as _, (2 * arg.len()) as _)
-            }
-        }
-        ParsedType::I32(_) | ParsedType::U32(_) => {
-            quote! {
-                (arg.as_ptr() as _, (4 * arg.len()) as _)
-            }
-        }
-        ParsedType::I64(_) | ParsedType::U64(_) => {
-            quote! {
-                (arg.as_ptr() as _, (8 * arg.len()) as _)
             }
         }
         ParsedType::F32(_) => {
@@ -155,7 +149,7 @@ pub(crate) fn generate_vector_deserializer(
     let values_deserializer = match value_ty {
         ParsedType::Boolean(_) => {
             quote! {
-                unimplemented!("Vector of booleans is not supported")
+                unimplemented!("Vector of booleans is unsupported")
             }
         }
         ParsedType::F32(_) => {
