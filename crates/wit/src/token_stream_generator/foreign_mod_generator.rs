@@ -120,7 +120,7 @@ fn generate_wrapper_functions(extern_item: &fce_ast_types::AstExternModItem) -> 
             #[cfg(target_arch = "wasm32")]
             #[doc(hidden)]
             #[allow(clippy::all)]
-            #visibility unsafe fn #func_name(#(#arg_names: #arg_types), *) #return_type {
+            #visibility fn #func_name(#(#arg_names: #arg_types), *) #return_type {
                 // make complex arguments manually droppable
                 #arg_transforms
 
