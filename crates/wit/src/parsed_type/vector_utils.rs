@@ -24,8 +24,6 @@ pub(crate) fn generate_vector_serializer(
     _vec_passing_style: PassingStyle,
     arg_name: &str,
 ) -> proc_macro2::TokenStream {
-    let t = 0f32;
-    let t = t.to_be_bytes();
     let values_serializer = match value_ty {
         ParsedType::Boolean(_) => {
             quote! {
@@ -39,37 +37,11 @@ pub(crate) fn generate_vector_serializer(
         | ParsedType::I32(_)
         | ParsedType::U32(_)
         | ParsedType::I64(_)
-        | ParsedType::U64(_) => {
+        | ParsedType::U64(_)
+        | ParsedType::F32(_)
+        | ParsedType::F64(_) => {
             quote! {
                 (arg.as_ptr() as _, arg.len() as _)
-            }
-        }
-        ParsedType::F32(_) => {
-            quote! {
-                let mut result: Vec<u32> = Vec::with_capacity(arg.len());
-                for value in arg {
-                    result.push(value.to_bits());
-                }
-
-                let result_ptr = result.as_ptr();
-                let result_len = 4 * result.len();
-                fluence::internal::add_object_to_release(Box::new(result));
-
-                (result_ptr as _, result_len as _)
-            }
-        }
-        ParsedType::F64(_) => {
-            quote! {
-                let mut result: Vec<u64> = Vec::with_capacity(arg.len());
-                for value in arg {
-                    result.push(value.to_bits());
-                }
-
-                let result_ptr = result.as_ptr();
-                let result_len = 8 * result.len();
-                fluence::internal::add_object_to_release(Box::new(result));
-
-                (result_ptr as _, result_len as _)
             }
         }
         ParsedType::Utf8Str(_) | ParsedType::Utf8String(_) => {
@@ -82,32 +54,31 @@ pub(crate) fn generate_vector_serializer(
                 }
 
                 let result_ptr = result.as_ptr();
-                let result_len = 4 * result.len();
+                let result_len = result.len();
                 fluence::internal::add_object_to_release(Box::new(result));
 
                 (result_ptr as _, result_len as _)
             }
         }
         ParsedType::Vector(ty, passing_style) => {
-            let serializer_name = format!("{}_{}", arg_name, ty);
-            let serializer_name = crate::utils::prepare_ident(serializer_name);
-            let serializer_ident = crate::new_ident!(serializer_name);
+            let ser_name = format!("{}_{}", arg_name, ty);
+            let ser_name = crate::utils::prepare_ident(ser_name);
+            let ser_ident = crate::new_ident!(ser_name);
 
-            let inner_vector_serializer =
-                generate_vector_serializer(&*ty, *passing_style, &serializer_name);
+            let inner_vector_ser = generate_vector_serializer(&*ty, *passing_style, &ser_name);
 
             quote! {
-                #inner_vector_serializer
+                #inner_vector_ser
 
                 let mut result: Vec<u32> = Vec::with_capacity(2 * arg.len());
                 for value in arg {
-                    let (ptr, size) = #serializer_ident(&value);
+                    let (ptr, size) = #ser_ident(&value);
                     result.push(ptr as _);
                     result.push(size as _);
                 }
 
                 let result_ptr = result.as_ptr();
-                let result_len = 4 * result.len();
+                let result_len = result.len();
                 fluence::internal::add_object_to_release(Box::new(result));
 
                 (result_ptr as _, result_len as _)
@@ -123,7 +94,7 @@ pub(crate) fn generate_vector_serializer(
                 }
 
                 let result_ptr = result.as_ptr();
-                let result_len = 4 * result.len();
+                let result_len = result.len();
                 fluence::internal::add_object_to_release(Box::new(result));
 
                 (result_ptr as _, result_len as _)
@@ -154,14 +125,7 @@ pub(crate) fn generate_vector_deserializer(
         }
         ParsedType::F32(_) => {
             quote! {
-                let mut arg: Vec<u64> = Vec::from_raw_parts(offset as _, size as _, size as _);
-                let mut result = Vec::with_capacity(arg.len());
-
-                for value in arg {
-                    result.push(f32::from_bits(value as _));
-                }
-
-                result
+                Vec::from_raw_parts(offset as _, size as _, size as _)
             }
         }
         ParsedType::F64(_) => {

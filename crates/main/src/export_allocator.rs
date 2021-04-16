@@ -14,6 +14,7 @@
  * limitations under the License.
  */
 
+#[cfg(feature = "debug")]
 use super::log;
 
 use std::alloc::alloc as global_alloc;
@@ -25,12 +26,32 @@ use std::alloc::Layout;
 pub unsafe fn allocate(size: usize) -> usize {
     let layout = match Layout::from_size_align(size, std::mem::align_of::<u8>()) {
         Ok(layout) => layout,
-        // in this case a err may occur only in a case of too long allocated size,
+        // in this case a err may occur only in a case of too long allocating size,
         // so just return 0
         Err(_) => return 0,
     };
 
+    #[cfg(feature = "debug")]
     log(format!("sdk.allocate: {:?}\n", size));
+
+    global_alloc(layout) as _
+}
+
+/// Allocates memory area of specified size and returns its address.
+/// Returns 0 if supplied size is too long.
+#[no_mangle]
+pub unsafe fn allocate_vec(element_count: usize, align: usize) -> usize {
+    let layout = match Layout::from_size_align(size, align) {
+        Ok(layout) => layout,
+        // in this case a err may occur only in a case of too long allocating size, or incompatible
+        // so just return 0
+        Err(_) => return 0,
+    };
+
+    let layout = layout.repeat(element_count)
+
+    #[cfg(feature = "debug")]
+        log(format!("sdk.allocate: {:?}\n", size));
 
     global_alloc(layout) as _
 }
