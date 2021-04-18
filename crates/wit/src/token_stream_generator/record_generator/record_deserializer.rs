@@ -16,10 +16,11 @@
 
 use crate::new_ident;
 use crate::parsed_type::ParsedType;
-use crate::ast_types;
+use crate::ast_types::*;
 
 use quote::quote;
 
+#[derive(Default)]
 pub(super) struct RecordDerDescriptor {
     pub(super) fields_der: proc_macro2::TokenStream,
     pub(super) record_ctor: proc_macro2::TokenStream,
@@ -30,17 +31,33 @@ pub(super) trait RecordDerGlueCodeGenerator {
     fn generate_der(&self) -> RecordDerDescriptor;
 }
 
-impl RecordDerGlueCodeGenerator for ast_types::AstRecordItem {
+impl RecordDerGlueCodeGenerator for AstRecordItem {
     fn generate_der(&self) -> RecordDerDescriptor {
-        let builder = FieldValuesBuilder::build(self.fields.iter());
-        let record_ctor = build_record_ctor(self.fields.iter(), builder.field_value_idents.iter());
+        match &self.fields {
+            AstRecordFields::Named(fields) => record_der_from_named(fields),
+            AstRecordFields::Unnamed(fields) => record_der_from_unnamed(fields),
+            AstRecordFields::Unit => RecordDerDescriptor::default(),
+        }
+    }
+}
 
-        let descriptor = RecordDerDescriptor {
-            fields_der: builder.fields_der,
-            record_ctor,
-        };
+fn record_der_from_named(fields: &[AstRecordField]) -> RecordDerDescriptor {
+    let builder = FieldValuesBuilder::build(fields.iter());
+    let record_ctor = field_ctors_from_named(fields.iter(), builder.field_value_idents.iter());
 
-        descriptor
+    RecordDerDescriptor {
+        fields_der: builder.fields_der,
+        record_ctor,
+    }
+}
+
+fn record_der_from_unnamed(fields: &[AstRecordField]) -> RecordDerDescriptor {
+    let builder = FieldValuesBuilder::build(fields.iter());
+    let record_ctor = field_ctor_from_unnamed(builder.field_value_idents.iter());
+
+    RecordDerDescriptor {
+        fields_der: builder.fields_der,
+        record_ctor,
     }
 }
 
@@ -61,7 +78,7 @@ struct FieldValuesOutcome {
 
 impl FieldValuesBuilder {
     pub(self) fn build<'a>(
-        fields: impl ExactSizeIterator<Item = &'a ast_types::AstRecordField>,
+        fields: impl ExactSizeIterator<Item = &'a AstRecordField>,
     ) -> FieldValuesOutcome {
         let values_builder = Self::new(fields.len());
         values_builder.build_impl(fields)
@@ -77,7 +94,7 @@ impl FieldValuesBuilder {
 
     fn build_impl<'r>(
         mut self,
-        fields: impl ExactSizeIterator<Item = &'r ast_types::AstRecordField>,
+        fields: impl ExactSizeIterator<Item = &'r AstRecordField>,
     ) -> FieldValuesOutcome {
         for (id, ast_field) in fields.enumerate() {
             let field_value_ident = new_ident!(format!("field_{}", id));
@@ -97,7 +114,7 @@ impl FieldValuesBuilder {
 
     fn field_der(
         &mut self,
-        ast_field: &ast_types::AstRecordField,
+        ast_field: &AstRecordField,
         field: &syn::Ident,
     ) -> proc_macro2::TokenStream {
         let value_id = self.value_id;
@@ -161,25 +178,8 @@ impl FieldValuesBuilder {
     }
 }
 
-fn build_record_ctor<'a, 'v>(
-    ast_fields: impl ExactSizeIterator<Item = &'a ast_types::AstRecordField>,
-    field_values: impl ExactSizeIterator<Item = &'v syn::Ident>,
-) -> proc_macro2::TokenStream {
-    let mut ast_fields = ast_fields.peekable();
-    let is_fields_named = match ast_fields.peek() {
-        Some(ast_field) => ast_field.name.is_some(),
-        None => return proc_macro2::TokenStream::new(),
-    };
-
-    if is_fields_named {
-        build_named_fields_ctor(ast_fields, field_values)
-    } else {
-        build_unnamed_fields_ctor(field_values)
-    }
-}
-
-fn build_named_fields_ctor<'a, 'v>(
-    ast_fields: impl ExactSizeIterator<Item = &'a ast_types::AstRecordField>,
+fn field_ctors_from_named<'a, 'v>(
+    ast_fields: impl ExactSizeIterator<Item = &'a AstRecordField>,
     field_values: impl ExactSizeIterator<Item = &'v syn::Ident>,
 ) -> proc_macro2::TokenStream {
     let field_names = ast_fields
@@ -198,7 +198,7 @@ fn build_named_fields_ctor<'a, 'v>(
     }
 }
 
-fn build_unnamed_fields_ctor<'v>(
+fn field_ctor_from_unnamed<'v>(
     field_values: impl ExactSizeIterator<Item = &'v syn::Ident>,
 ) -> proc_macro2::TokenStream {
     quote! {

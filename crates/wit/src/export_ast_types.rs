@@ -34,17 +34,26 @@ pub struct FnSignature {
     pub output_type: Option<ParsedType>,
 }
 
+#[derive(Clone, Serialize, Deserialize)]
+pub struct RecordItem {
+    pub name: String,
+    pub fields: RecordFields,
+}
+
+#[derive(Clone, Serialize, Deserialize)]
+pub enum RecordFields {
+    Named(Vec<RecordField>),
+    // named and unnamed variants have the same inner field types because of it's easy to handle it,
+    // for additional info look at https://github.com/dtolnay/syn/issues/698
+    Unnamed(Vec<RecordField>),
+    Unit,
+}
+
 #[derive(Debug, Clone, PartialEq, Serialize, Deserialize)]
 pub struct RecordField {
     // fields of tuple structs haven't got name
     pub name: Option<String>,
     pub ty: ParsedType,
-}
-
-#[derive(Clone, Serialize, Deserialize)]
-pub struct RecordItem {
-    pub name: String,
-    pub fields: Vec<RecordField>,
 }
 
 #[derive(Clone, Serialize, Deserialize)]
@@ -76,7 +85,7 @@ pub enum SDKAst {
 
 use crate::ast_types::{
     AstFnItem, AstFnSignature, AstFnArgument, AstExternModItem, AstExternFnItem, AstRecordField,
-    AstRecordItem,
+    AstRecordItem, AstRecordFields,
 };
 
 impl From<AstFnItem> for SDKAst {
@@ -121,11 +130,25 @@ impl From<AstExternModItem> for ExternModItem {
 
 impl From<AstRecordItem> for RecordItem {
     fn from(ast_record_item: AstRecordItem) -> Self {
-        let fields = ast_record_item.fields.into_iter().map(Into::into).collect();
-
         Self {
             name: ast_record_item.name,
-            fields,
+            fields: ast_record_item.fields.into(),
+        }
+    }
+}
+
+impl From<AstRecordFields> for RecordFields {
+    fn from(ast_record_item: AstRecordFields) -> Self {
+        match ast_record_item {
+            AstRecordFields::Named(fields) => {
+                let fields = fields.into_iter().map(Into::into).collect();
+                Self::Named(fields)
+            }
+            AstRecordFields::Unnamed(fields) => {
+                let fields = fields.into_iter().map(Into::into).collect();
+                Self::Unnamed(fields)
+            }
+            AstRecordFields::Unit => Self::Unit,
         }
     }
 }

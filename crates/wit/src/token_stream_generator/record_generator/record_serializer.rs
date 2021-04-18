@@ -16,19 +16,27 @@
 
 use crate::new_ident;
 use crate::parsed_type::ParsedType;
-use crate::ast_types;
+use crate::ast_types::AstRecordItem;
+use crate::ast_types::AstRecordField;
+use crate::ast_types::AstRecordFields;
 
 use quote::quote;
 
 /// This trait could be used to generate various parts of a record serializer func.
-pub(super) trait RecordSerializerGlueCodeGenerator {
+pub(super) trait RecordSerGlueCodeGenerator {
     fn generate_serializer(&self) -> proc_macro2::TokenStream;
 }
 
-impl RecordSerializerGlueCodeGenerator for ast_types::AstRecordItem {
+impl RecordSerGlueCodeGenerator for AstRecordItem {
     fn generate_serializer(&self) -> proc_macro2::TokenStream {
         let mut serializer = proc_macro2::TokenStream::new();
-        for (id, field) in self.fields.iter().enumerate() {
+        let fields = match &self.fields {
+            AstRecordFields::Named(fields) => fields,
+            AstRecordFields::Unnamed(fields) => fields,
+            AstRecordFields::Unit => return proc_macro2::TokenStream::new(),
+        };
+
+        for (id, field) in fields.iter().enumerate() {
             let field_ident = field_ident(field, id);
 
             let field_serialization = match &field.ty {
@@ -82,7 +90,7 @@ impl RecordSerializerGlueCodeGenerator for ast_types::AstRecordItem {
     }
 }
 
-fn field_ident(field: &ast_types::AstRecordField, id: usize) -> proc_macro2::TokenStream {
+fn field_ident(field: &AstRecordField, id: usize) -> proc_macro2::TokenStream {
     match &field.name {
         Some(name) => {
             let name = new_ident!(name);

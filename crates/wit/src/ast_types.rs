@@ -32,18 +32,28 @@ pub(crate) struct AstFnSignature {
     pub output_type: Option<ParsedType>,
 }
 
+#[derive(Clone)]
+pub(crate) struct AstRecordItem {
+    pub name: String,
+    pub fields: AstRecordFields,
+    pub original: syn::ItemStruct,
+}
+
+#[allow(dead_code)] // at the moment tuple and unit structs aren't supported
+#[derive(Debug, Clone, PartialEq)]
+pub(crate) enum AstRecordFields {
+    Named(Vec<AstRecordField>),
+    // named and unnamed variants have the same inner field types because of it's easy to handle it,
+    // for additional info look at https://github.com/dtolnay/syn/issues/698
+    Unnamed(Vec<AstRecordField>),
+    Unit,
+}
+
 #[derive(Debug, Clone, PartialEq)]
 pub(crate) struct AstRecordField {
     // fields of tuple structs haven't got name
     pub name: Option<String>,
     pub ty: ParsedType,
-}
-
-#[derive(Clone)]
-pub(crate) struct AstRecordItem {
-    pub name: String,
-    pub fields: Vec<AstRecordField>,
-    pub original: syn::ItemStruct,
 }
 
 #[derive(Clone)]

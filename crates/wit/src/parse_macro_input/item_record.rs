@@ -17,6 +17,7 @@
 use super::ParseMacroInput;
 use crate::ast_types;
 use crate::ast_types::AstRecordField;
+use crate::ast_types::AstRecordFields;
 use crate::ast_types::FCEAst;
 use crate::syn_error;
 use crate::parsed_type::ParsedType;
@@ -34,6 +35,7 @@ impl ParseMacroInput for syn::ItemStruct {
         };
 
         let fields = fields_into_ast(fields)?;
+        let fields = AstRecordFields::Named(fields);
 
         let name = self.ident.to_string();
         let ast_record_item = ast_types::AstRecordItem {

@@ -21,9 +21,10 @@ use record_serializer::*;
 use record_deserializer::*;
 
 use crate::new_ident;
-use crate::ast_types;
+use crate::ast_types::AstRecordItem;
+use crate::ast_types::AstRecordFields;
 
-impl quote::ToTokens for ast_types::AstRecordItem {
+impl quote::ToTokens for AstRecordItem {
     fn to_tokens(&self, tokens: &mut proc_macro2::TokenStream) {
         let original = &self.original;
         crate::prepare_global_data!(
@@ -65,9 +66,13 @@ impl quote::ToTokens for ast_types::AstRecordItem {
     }
 }
 
-fn generate_serializer_fn(record: &ast_types::AstRecordItem) -> proc_macro2::TokenStream {
+fn generate_serializer_fn(record: &AstRecordItem) -> proc_macro2::TokenStream {
     let serializer = record.generate_serializer();
-    let fields_count = record.fields.len();
+    let fields_count = match &record.fields {
+        AstRecordFields::Named(fields) => fields.len(),
+        AstRecordFields::Unnamed(fields) => fields.len(),
+        AstRecordFields::Unit => return proc_macro2::TokenStream::new(),
+    };
 
     quote::quote! {
         pub fn __fce_generated_serialize(&self) -> *const u8 {
@@ -83,14 +88,19 @@ fn generate_serializer_fn(record: &ast_types::AstRecordItem) -> proc_macro2::Tok
     }
 }
 
-fn generate_deserializer_fn(record: &ast_types::AstRecordItem) -> proc_macro2::TokenStream {
+fn generate_deserializer_fn(record: &AstRecordItem) -> proc_macro2::TokenStream {
     let RecordDerDescriptor {
         fields_der,
         record_ctor,
     } = record.generate_der();
 
-    let record_size =
-        crate::utils::get_record_size(record.fields.iter().map(|ast_field| &ast_field.ty));
+    let fields = match &record.fields {
+        AstRecordFields::Named(fields) => fields,
+        AstRecordFields::Unnamed(fields) => fields,
+        AstRecordFields::Unit => return proc_macro2::TokenStream::new(),
+    };
+
+    let record_size = crate::utils::get_record_size(fields.iter().map(|ast_field| &ast_field.ty));
 
     quote::quote! {
         pub unsafe fn __fce_generated_deserialize(record_ptr: *const u8) -> Self {
