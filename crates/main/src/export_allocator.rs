@@ -37,6 +37,7 @@ pub unsafe fn allocate(size: usize) -> usize {
     global_alloc(layout) as _
 }
 
+/*
 /// Allocates memory area of specified size and returns its address.
 /// Returns 0 if supplied size is too long.
 #[no_mangle]
@@ -55,3 +56,4 @@ pub unsafe fn allocate_vec(element_count: usize, align: usize) -> usize {
 
     global_alloc(layout) as _
 }
+*/

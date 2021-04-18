@@ -30,7 +30,8 @@
 /// This crate contains functions and types to support work with WebAssembly interface-types
 /// in Fluence.
 
-mod fce_ast_types;
+mod ast_types;
+mod export_ast_types;
 mod fce_macro_impl;
 mod parsed_type;
 mod parse_macro_input;
@@ -38,7 +39,7 @@ mod token_stream_generator;
 mod utils;
 mod wasm_type;
 
-pub use fce_ast_types::*;
+pub use export_ast_types::*;
 pub use fce_macro_impl::fce;
 pub use parsed_type::ParsedType;
 pub use token_stream_generator::GENERATED_WRAPPER_FUNC_PREFIX;

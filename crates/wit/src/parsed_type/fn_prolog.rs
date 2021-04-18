@@ -19,7 +19,7 @@ use super::FnArgGlueCodeGenerator;
 use super::passing_style_of;
 use crate::new_ident;
 use crate::wasm_type::RustType;
-use crate::fce_ast_types::AstFnArgument;
+use crate::ast_types::AstFnArgument;
 use crate::parsed_type::PassingStyle;
 
 use quote::quote;

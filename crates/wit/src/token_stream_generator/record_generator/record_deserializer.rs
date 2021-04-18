@@ -16,7 +16,7 @@
 
 use crate::new_ident;
 use crate::parsed_type::ParsedType;
-use crate::fce_ast_types;
+use crate::ast_types;
 
 use quote::quote;
 
@@ -30,7 +30,7 @@ pub(super) trait RecordDerGlueCodeGenerator {
     fn generate_der(&self) -> RecordDerDescriptor;
 }
 
-impl RecordDerGlueCodeGenerator for fce_ast_types::AstRecordItem {
+impl RecordDerGlueCodeGenerator for ast_types::AstRecordItem {
     fn generate_der(&self) -> RecordDerDescriptor {
         let builder = FieldValuesBuilder::build(self.fields.iter());
         let record_ctor = build_record_ctor(self.fields.iter(), builder.field_value_idents.iter());
@@ -61,7 +61,7 @@ struct FieldValuesOutcome {
 
 impl FieldValuesBuilder {
     pub(self) fn build<'a>(
-        fields: impl ExactSizeIterator<Item = &'a fce_ast_types::AstRecordField>,
+        fields: impl ExactSizeIterator<Item = &'a ast_types::AstRecordField>,
     ) -> FieldValuesOutcome {
         let values_builder = Self::new(fields.len());
         values_builder.build_impl(fields)
@@ -77,7 +77,7 @@ impl FieldValuesBuilder {
 
     fn build_impl<'r>(
         mut self,
-        fields: impl ExactSizeIterator<Item = &'r fce_ast_types::AstRecordField>,
+        fields: impl ExactSizeIterator<Item = &'r ast_types::AstRecordField>,
     ) -> FieldValuesOutcome {
         for (id, ast_field) in fields.enumerate() {
             let field_value_ident = new_ident!(format!("field_{}", id));
@@ -97,7 +97,7 @@ impl FieldValuesBuilder {
 
     fn field_der(
         &mut self,
-        ast_field: &fce_ast_types::AstRecordField,
+        ast_field: &ast_types::AstRecordField,
         field: &syn::Ident,
     ) -> proc_macro2::TokenStream {
         let value_id = self.value_id;
@@ -162,7 +162,7 @@ impl FieldValuesBuilder {
 }
 
 fn build_record_ctor<'a, 'v>(
-    ast_fields: impl ExactSizeIterator<Item = &'a fce_ast_types::AstRecordField>,
+    ast_fields: impl ExactSizeIterator<Item = &'a ast_types::AstRecordField>,
     field_values: impl ExactSizeIterator<Item = &'v syn::Ident>,
 ) -> proc_macro2::TokenStream {
     let mut ast_fields = ast_fields.peekable();
@@ -179,7 +179,7 @@ fn build_record_ctor<'a, 'v>(
 }
 
 fn build_named_fields_ctor<'a, 'v>(
-    ast_fields: impl ExactSizeIterator<Item = &'a fce_ast_types::AstRecordField>,
+    ast_fields: impl ExactSizeIterator<Item = &'a ast_types::AstRecordField>,
     field_values: impl ExactSizeIterator<Item = &'v syn::Ident>,
 ) -> proc_macro2::TokenStream {
     let field_names = ast_fields

@@ -14,14 +14,14 @@
  * limitations under the License.
  */
 
-use crate::fce_ast_types;
+use crate::ast_types;
 use crate::new_ident;
 use crate::parsed_type::*;
 
 use proc_macro2::TokenStream;
 use quote::quote;
 
-impl quote::ToTokens for fce_ast_types::AstExternModItem {
+impl quote::ToTokens for ast_types::AstExternModItem {
     fn to_tokens(&self, tokens: &mut TokenStream) {
         crate::prepare_global_data!(
             ExternMod,
@@ -61,9 +61,7 @@ impl quote::ToTokens for fce_ast_types::AstExternModItem {
     }
 }
 
-fn generate_extern_section_items(
-    extern_item: &fce_ast_types::AstExternModItem,
-) -> Vec<TokenStream> {
+fn generate_extern_section_items(extern_item: &ast_types::AstExternModItem) -> Vec<TokenStream> {
     let mut section_items = Vec::with_capacity(extern_item.imports.len());
 
     for import in &extern_item.imports {
@@ -92,7 +90,7 @@ fn generate_import_name(import_name: &str) -> syn::Ident {
     crate::new_ident!(format!("{}_{}", super::GENERATED_WRAPPER_FUNC_PREFIX, import_name))
 }
 
-fn generate_wrapper_functions(extern_item: &fce_ast_types::AstExternModItem) -> TokenStream {
+fn generate_wrapper_functions(extern_item: &ast_types::AstExternModItem) -> TokenStream {
     let mut token_stream = TokenStream::new();
 
     for import in &extern_item.imports {

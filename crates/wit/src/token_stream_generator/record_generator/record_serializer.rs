@@ -16,7 +16,7 @@
 
 use crate::new_ident;
 use crate::parsed_type::ParsedType;
-use crate::fce_ast_types;
+use crate::ast_types;
 
 use quote::quote;
 
@@ -25,7 +25,7 @@ pub(super) trait RecordSerializerGlueCodeGenerator {
     fn generate_serializer(&self) -> proc_macro2::TokenStream;
 }
 
-impl RecordSerializerGlueCodeGenerator for fce_ast_types::AstRecordItem {
+impl RecordSerializerGlueCodeGenerator for ast_types::AstRecordItem {
     fn generate_serializer(&self) -> proc_macro2::TokenStream {
         let mut serializer = proc_macro2::TokenStream::new();
         for (id, field) in self.fields.iter().enumerate() {
@@ -82,7 +82,7 @@ impl RecordSerializerGlueCodeGenerator for fce_ast_types::AstRecordItem {
     }
 }
 
-fn field_ident(field: &fce_ast_types::AstRecordField, id: usize) -> proc_macro2::TokenStream {
+fn field_ident(field: &ast_types::AstRecordField, id: usize) -> proc_macro2::TokenStream {
     match &field.name {
         Some(name) => {
             let name = new_ident!(name);

@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-use crate::fce_ast_types;
+use crate::ast_types;
 use crate::parsed_type::FnEpilogGlueCodeGenerator;
 use crate::parsed_type::FnEpilogDescriptor;
 use crate::parsed_type::FnEpilogIngredients;
@@ -25,7 +25,7 @@ use crate::new_ident;
 
 use proc_macro2::TokenStream;
 
-impl quote::ToTokens for fce_ast_types::AstFnItem {
+impl quote::ToTokens for ast_types::AstFnItem {
     fn to_tokens(&self, tokens: &mut TokenStream) {
         crate::prepare_global_data!(
             Function,

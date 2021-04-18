@@ -18,7 +18,7 @@ use super::ParsedType;
 use super::passing_style_of;
 use super::PassingStyle;
 use crate::new_ident;
-use crate::fce_ast_types::AstFnArgument;
+use crate::ast_types::AstFnArgument;
 
 use quote::quote;
 

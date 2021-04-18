@@ -18,7 +18,7 @@ mod fn_generator;
 mod foreign_mod_generator;
 mod record_generator;
 
-use crate::fce_ast_types::FCEAst;
+use crate::ast_types::FCEAst;
 
 pub const GENERATED_WRAPPER_FUNC_PREFIX: &str = "__fce_generated_wrapper_func_";
 pub const GENERATED_SECTION_PREFIX: &str = "__fce_generated_section__";

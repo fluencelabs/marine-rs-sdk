@@ -16,20 +16,15 @@
 
 use crate::parsed_type::ParsedType;
 
-use serde::Serialize;
-use serde::Deserialize;
-
-#[derive(Clone, Serialize, Deserialize)]
-pub struct AstFnArgument {
+#[derive(Clone)]
+pub(crate) struct AstFnArgument {
     pub name: String,
     pub ty: ParsedType,
 }
 
-#[derive(Clone, Serialize, Deserialize)]
-pub struct AstFnSignature {
-    // Option is needed only for skipping serialization/deserialization of syn::ItemFn
-    #[serde(skip)]
-    pub visibility: Option<syn::Visibility>,
+#[derive(Clone)]
+pub(crate) struct AstFnSignature {
+    pub visibility: syn::Visibility,
     pub name: String,
     pub arguments: Vec<AstFnArgument>,
     // fce supports only one return value now,
@@ -37,54 +32,43 @@ pub struct AstFnSignature {
     pub output_type: Option<ParsedType>,
 }
 
-#[derive(Debug, Clone, PartialEq, Serialize, Deserialize)]
-pub struct AstRecordField {
+#[derive(Debug, Clone, PartialEq)]
+pub(crate) struct AstRecordField {
     // fields of tuple structs haven't got name
     pub name: Option<String>,
     pub ty: ParsedType,
 }
 
-#[derive(Clone, Serialize, Deserialize)]
-pub struct AstRecordItem {
+#[derive(Clone)]
+pub(crate) struct AstRecordItem {
     pub name: String,
     pub fields: Vec<AstRecordField>,
-
-    // Option is needed only for skipping serialization/deserialization of syn::ItemFn
-    #[serde(skip)]
-    pub original: Option<syn::ItemStruct>,
+    pub original: syn::ItemStruct,
 }
 
-#[derive(Clone, Serialize, Deserialize)]
-pub struct AstExternFnItem {
+#[derive(Clone)]
+pub(crate) struct AstExternFnItem {
     pub link_name: Option<String>,
     // only imports are possible here
     pub signature: AstFnSignature,
 }
 
-#[derive(Clone, Serialize, Deserialize)]
-pub struct AstExternModItem {
+#[derive(Clone)]
+pub(crate) struct AstExternModItem {
     pub namespace: String,
-
     // only imports are possible here
     pub imports: Vec<AstExternFnItem>,
-
-    // Option is needed only for skipping serialization/deserialization of syn::ItemFn
-    #[serde(skip)]
-    pub original: Option<syn::ItemForeignMod>,
+    pub original: syn::ItemForeignMod,
 }
 
-#[derive(Clone, Serialize, Deserialize)]
-pub struct AstFnItem {
+#[derive(Clone)]
+pub(crate) struct AstFnItem {
     pub signature: AstFnSignature,
-
-    // Option is needed only for skipping serialization/deserialization of syn::ItemFn
-    #[serde(skip)]
-    pub original: Option<syn::ItemFn>,
+    pub original: syn::ItemFn,
 }
 
-#[derive(Clone, Serialize, Deserialize)]
-#[serde(tag = "ast_type")]
-pub enum FCEAst {
+#[derive(Clone)]
+pub(crate) enum FCEAst {
     Function(AstFnItem),
     ExternMod(AstExternModItem),
     Record(AstRecordItem),
