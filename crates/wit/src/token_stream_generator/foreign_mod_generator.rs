@@ -118,7 +118,9 @@ fn generate_wrapper_functions(extern_item: &ast_types::AstExternModItem) -> Toke
             #[cfg(target_arch = "wasm32")]
             #[doc(hidden)]
             #[allow(clippy::all)]
-            #visibility unsafe fn #func_name(#(#arg_names: #arg_types), *) #return_type {
+            #visibility fn #func_name(#(#arg_names: #arg_types), *) #return_type {
+                unsafe {
+
                 // make complex arguments manually droppable
                 #arg_transforms
 
@@ -130,6 +132,8 @@ fn generate_wrapper_functions(extern_item: &ast_types::AstExternModItem) -> Toke
 
                 // return value conversation from Wasm type to a Rust type
                 #epilog
+
+                }
             }
         };
 
