@@ -1,3 +1,19 @@
+/*
+ * Copyright 2021 Fluence Labs Limited
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
 use crate::new_ident;
 use crate::parsed_type::ParsedType;
 use crate::ast_types::*;
@@ -219,13 +235,31 @@ impl FieldValuesBuilder {
     }
 
     fn string_der(&mut self, field: &syn::Ident) -> TokenStream {
-        let ptr_id = self.value_id;
-        let size_id = self.value_id + 1;
-        self.value_id += 1;
+        let value_id = self.value_id;
 
-        quote! {
-            let #field = unsafe { String::from_raw_parts(raw_record[#ptr_id] as _, raw_record[#size_id] as _, raw_record[#size_id] as _) };
-        }
+        let result = quote! {
+            let #field = unsafe {
+                let offset = u32::from_le_bytes([
+                    raw_record[#value_id],
+                    raw_record[#value_id + 1],
+                    raw_record[#value_id + 2],
+                    raw_record[#value_id + 3],
+                ]);
+
+                let size = u32::from_le_bytes([
+                    raw_record[#value_id + 4],
+                    raw_record[#value_id + 5],
+                    raw_record[#value_id + 6],
+                    raw_record[#value_id + 7],
+                ]);
+
+                String::from_raw_parts(offset as _, size as _, size as _)
+            };
+        };
+
+        self.value_id += 2 * 4;
+
+        result
     }
 
     fn vector_der(&mut self, ty: &ParsedType, field: &syn::Ident) -> TokenStream {
@@ -236,22 +270,50 @@ impl FieldValuesBuilder {
         let vector_deserializer =
             crate::parsed_type::generate_vector_deserializer(ty, &generated_der_name);
 
-        let ptr_id = self.value_id;
-        let size_id = self.value_id + 1;
-        self.value_id += 1;
+        let value_id = self.value_id;
 
-        quote! {
+        let result = quote! {
             #vector_deserializer
-            let #field = unsafe { #generated_der_ident(raw_record[#ptr_id] as _, raw_record[#size_id] as _) };
-        }
+
+            let offset = u32::from_le_bytes([
+                raw_record[#value_id],
+                raw_record[#value_id + 1],
+                raw_record[#value_id + 2],
+                raw_record[#value_id + 3],
+            ]);
+
+            let size = u32::from_le_bytes([
+                raw_record[#value_id + 4],
+                raw_record[#value_id + 5],
+                raw_record[#value_id + 6],
+                raw_record[#value_id + 7],
+            ]);
+
+            let #field = unsafe { #generated_der_ident(offset as _, size as _) };
+        };
+
+        self.value_id += 2 * 4;
+
+        result
     }
 
     fn record_der(&mut self, name: &str, field: &syn::Ident) -> TokenStream {
-        let ptr_id = self.value_id;
+        let value_id = self.value_id;
         let record_ident = new_ident!(name);
 
-        quote! {
-            let #field = #record_ident::__fce_generated_deserialize(raw_record[#ptr_id] as _);
-        }
+        let result = quote! {
+            let offset = u32::from_le_bytes([
+                raw_record[#value_id],
+                raw_record[#value_id + 1],
+                raw_record[#value_id + 2],
+                raw_record[#value_id + 3],
+            ]);
+
+            let #field = #record_ident::__fce_generated_deserialize(offset as _);
+        };
+
+        self.value_id += 4;
+
+        result
     }
 }
