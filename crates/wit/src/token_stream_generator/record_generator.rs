@@ -107,7 +107,7 @@ fn generate_deserializer_fn(record: &AstRecordItem) -> proc_macro2::TokenStream 
 
     quote::quote! {
         pub unsafe fn __fce_generated_deserialize(record_ptr: *const u8) -> Self {
-            let raw_record: Vec<u64> = Vec::from_raw_parts(record_ptr as _, #record_size, #record_size);
+            let raw_record: Vec<u8> = Vec::from_raw_parts(record_ptr as _, #record_size, #record_size);
 
             #fields_der
 

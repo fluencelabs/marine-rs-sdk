@@ -25,12 +25,8 @@ pub(crate) fn generate_vector_serializer(
     arg_name: &str,
 ) -> proc_macro2::TokenStream {
     let values_serializer = match value_ty {
-        ParsedType::Boolean(_) => {
-            quote! {
-                unimplemented!("Vector of booleans is unsupported")
-            }
-        }
-        ParsedType::I8(_)
+        ParsedType::Boolean(_)
+        | ParsedType::I8(_)
         | ParsedType::U8(_)
         | ParsedType::I16(_)
         | ParsedType::U16(_)
@@ -120,31 +116,16 @@ pub(crate) fn generate_vector_deserializer(
     let values_deserializer = match value_ty {
         ParsedType::Boolean(_) => {
             quote! {
-                unimplemented!("Vector of booleans is unsupported")
-            }
-        }
-        ParsedType::F32(_) => {
-            quote! {
-                Vec::from_raw_parts(offset as _, size as _, size as _)
-            }
-        }
-        ParsedType::F64(_) => {
-            quote! {
-                let mut arg: Vec<u64> = Vec::from_raw_parts(offset as _, size as _, size as _);
-                let mut result = Vec::with_capacity(arg.len());
-
-                for value in arg {
-                    result.push(f64::from_bits(value as _));
-                }
-
-                result
+                let arg: Vec<u8> = Vec::from_raw_parts(offset as _, size as _, size as _);
+                arg.into_iter().map(|v| v == 1).collect::<Vec<bool>>()
             }
         }
         ParsedType::Utf8Str(_) | ParsedType::Utf8String(_) => {
             quote! {
-                let mut arg: Vec<u64> = Vec::from_raw_parts(offset as _, size as _, size as _);
+                let mut arg: Vec<u32> = Vec::from_raw_parts(offset as _, size as _, size as _);
                 let mut arg = arg.into_iter();
                 let mut result = Vec::with_capacity(arg.len() / 2);
+
                 while let Some(offset) = arg.next() {
                     let size = arg.next().unwrap();
                     let value = String::from_raw_parts(offset as _, size as _, size as _);
@@ -164,7 +145,7 @@ pub(crate) fn generate_vector_deserializer(
             quote! {
                 #inner_vector_deserializer
 
-                let mut arg: Vec<u64> = Vec::from_raw_parts(offset as _, size as _, size as _);
+                let mut arg: Vec<u32> = Vec::from_raw_parts(offset as _, size as _, size as _);
                 let mut result = Vec::with_capacity(arg.len());
 
                 let mut arg = arg.into_iter();
@@ -182,7 +163,7 @@ pub(crate) fn generate_vector_deserializer(
             let record_name_ident = crate::new_ident!(record_name);
 
             quote! {
-                let mut arg: Vec<u64> = Vec::from_raw_parts(offset as _, size as _, size as _);
+                let mut arg: Vec<u32> = Vec::from_raw_parts(offset as _, size as _, size as _);
                 let mut result = Vec::with_capacity(arg.len());
 
                 for offset in arg {
@@ -195,21 +176,13 @@ pub(crate) fn generate_vector_deserializer(
         }
         _ => {
             quote! {
-                let mut arg: Vec<u64> = Vec::from_raw_parts(offset as _, size as _, size as _);
-                let mut result = Vec::with_capacity(arg.len());
-
-                for value in arg {
-                    result.push(value as _);
-                }
-
-                result
+                Vec::from_raw_parts(offset as _, size as _, size as _)
             }
         }
     };
 
     quote! {
         unsafe fn #arg(offset: u32, size: u32) -> Vec<#value_ty> {
-            let size = size / 8;
             #values_deserializer
         }
     }

@@ -42,8 +42,9 @@ impl RecordSerGlueCodeGenerator for AstRecordItem {
             let field_serialization = match &field.ty {
                 ParsedType::Utf8Str(_) | ParsedType::Utf8String(_) => {
                     quote! {
-                        raw_record.push(&#field_ident.as_ptr().to_le_bytes());
-                        raw_record.push(&#field_ident.len().to_le_bytes());
+                        let field_ident_ptr = #field_ident.as_ptr() as usize;
+                        raw_record.extend(&field_ident_ptr.to_le_bytes());
+                        raw_record.extend(&#field_ident.len().to_le_bytes());
                     }
                 }
                 ParsedType::Vector(ty, passing_style) => {
@@ -65,17 +66,18 @@ impl RecordSerGlueCodeGenerator for AstRecordItem {
                         #vector_serializer
                         let #serialized_field_ident = unsafe { #generated_serializer_ident(&#field_ident) };
 
-                        raw_record.push(&#serialized_field_ident.0.to_le_bytes());
-                        raw_record.push(&#serialized_field_ident.1.to_le_bytes());
+                        raw_record.extend(&#serialized_field_ident.0.to_le_bytes());
+                        raw_record.extend(&#serialized_field_ident.1.to_le_bytes());
                     }
                 }
                 ParsedType::Record(..) => {
                     quote! {
-                        raw_record.push(&#field_ident.__fce_generated_serialize().to_le_bytes());
+                        let serialized_struct_ptr = #field_ident.__fce_generated_serialize() as usize;
+                        raw_record.extend(&serialized_struct_ptr.to_le_bytes());
                     }
                 }
                 _ => quote! {
-                    raw_record.push(&#field_ident.to_le_bytes());
+                    raw_record.extend(&#field_ident.to_le_bytes());
                 },
             };
 
