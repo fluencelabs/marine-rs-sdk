@@ -40,15 +40,10 @@ impl RecordSerGlueCodeGenerator for AstRecordItem {
             let field_ident = field_ident(field, id);
 
             let field_serialization = match &field.ty {
-                ParsedType::F64(_) => {
-                    quote! {
-                        raw_record.push(#field_ident.to_bits());
-                    }
-                }
                 ParsedType::Utf8Str(_) | ParsedType::Utf8String(_) => {
                     quote! {
-                        raw_record.push(#field_ident.as_ptr() as _);
-                        raw_record.push(#field_ident.len() as _);
+                        raw_record.push(&#field_ident.as_ptr().to_le_bytes());
+                        raw_record.push(&#field_ident.len().to_le_bytes());
                     }
                 }
                 ParsedType::Vector(ty, passing_style) => {
@@ -69,17 +64,18 @@ impl RecordSerGlueCodeGenerator for AstRecordItem {
                     quote::quote! {
                         #vector_serializer
                         let #serialized_field_ident = unsafe { #generated_serializer_ident(&#field_ident) };
-                        raw_record.push(#serialized_field_ident.0 as _);
-                        raw_record.push(#serialized_field_ident.1 as _);
+
+                        raw_record.push(&#serialized_field_ident.0.to_le_bytes());
+                        raw_record.push(&#serialized_field_ident.1.to_le_bytes());
                     }
                 }
                 ParsedType::Record(..) => {
                     quote! {
-                        raw_record.push(#field_ident.__fce_generated_serialize() as _);
+                        raw_record.push(&#field_ident.__fce_generated_serialize().to_le_bytes());
                     }
                 }
                 _ => quote! {
-                    raw_record.push(#field_ident as u64);
+                    raw_record.push(&#field_ident.to_le_bytes());
                 },
             };
 

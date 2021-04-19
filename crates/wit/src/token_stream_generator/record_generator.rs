@@ -78,7 +78,8 @@ fn generate_serializer_fn(record: &AstRecordItem) -> proc_macro2::TokenStream {
 
     quote::quote! {
         pub fn __fce_generated_serialize(&self) -> *const u8 {
-            let mut raw_record: Vec<u64> = Vec::with_capacity(2 * #fields_count);
+            // 4 is an average size of a possible record field
+            let mut raw_record: Vec<u8> = Vec::with_capacity(4 * #fields_count);
 
             #serializer
 
