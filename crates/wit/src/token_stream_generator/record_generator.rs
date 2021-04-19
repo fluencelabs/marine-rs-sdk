@@ -16,9 +16,11 @@
 
 mod record_serializer;
 mod record_deserializer;
+mod field_values_builder;
 
-use record_serializer::*;
+use field_values_builder::*;
 use record_deserializer::*;
+use record_serializer::*;
 
 use crate::new_ident;
 use crate::ast_types::AstRecordItem;
