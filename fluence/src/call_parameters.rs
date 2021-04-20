@@ -16,12 +16,12 @@
 
 use fluence_sdk_macro::fce;
 
-use serde::Serialize;
-use serde::Deserialize;
+// use serde::Serialize;
+// use serde::Deserialize;
 
 /// Describes an origin that set an argument.
 #[fce]
-#[derive(Clone, PartialEq, Default, Eq, Debug, Serialize, Deserialize)]
+// #[derive(Clone, PartialEq, Default, Eq, Debug, Serialize, Deserialize)]
 pub struct SecurityTetraplet {
     pub peer_pk: String,
     pub service_id: String,
@@ -31,7 +31,7 @@ pub struct SecurityTetraplet {
 
 /// This struct contains parameters that would be accessible by Wasm modules.
 #[fce]
-#[derive(Clone, PartialEq, Default, Eq, Debug, Serialize, Deserialize)]
+// #[derive(Clone, PartialEq, Default, Eq, Debug, Serialize, Deserialize)]
 pub struct CallParameters {
     /// Peer id of the AIR script initiator.
     pub init_peer_id: String,

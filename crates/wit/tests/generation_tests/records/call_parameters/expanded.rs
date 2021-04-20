@@ -17,17 +17,22 @@ pub struct CallParameters {
 #[allow(clippy::all)]
 impl CallParameters {
     pub fn __fce_generated_serialize(&self) -> *const u8 {
-        let mut raw_record: Vec<u64> = Vec::with_capacity(2 * 6usize);
-        raw_record.push(self.init_peer_id.as_ptr() as _);
-        raw_record.push(self.init_peer_id.len() as _);
-        raw_record.push(self.service_id.as_ptr() as _);
-        raw_record.push(self.service_id.len() as _);
-        raw_record.push(self.service_creator_peer_id.as_ptr() as _);
-        raw_record.push(self.service_creator_peer_id.len() as _);
-        raw_record.push(self.host_id.as_ptr() as _);
-        raw_record.push(self.host_id.len() as _);
-        raw_record.push(self.particle_id.as_ptr() as _);
-        raw_record.push(self.particle_id.len() as _);
+        let mut raw_record: Vec<u8> = Vec::with_capacity(4 * 6usize);
+        let field_ident_ptr = self.init_peer_id.as_ptr() as u32;
+        raw_record.extend(&field_ident_ptr.to_le_bytes());
+        raw_record.extend(&(self.init_peer_id.len() as u32).to_le_bytes());
+        let field_ident_ptr = self.service_id.as_ptr() as u32;
+        raw_record.extend(&field_ident_ptr.to_le_bytes());
+        raw_record.extend(&(self.service_id.len() as u32).to_le_bytes());
+        let field_ident_ptr = self.service_creator_peer_id.as_ptr() as u32;
+        raw_record.extend(&field_ident_ptr.to_le_bytes());
+        raw_record.extend(&(self.service_creator_peer_id.len() as u32).to_le_bytes());
+        let field_ident_ptr = self.host_id.as_ptr() as u32;
+        raw_record.extend(&field_ident_ptr.to_le_bytes());
+        raw_record.extend(&(self.host_id.len() as u32).to_le_bytes());
+        let field_ident_ptr = self.particle_id.as_ptr() as u32;
+        raw_record.extend(&field_ident_ptr.to_le_bytes());
+        raw_record.extend(&(self.particle_id.len() as u32).to_le_bytes());
         unsafe fn __fce_generated_vec_serializer_tetraplets_5(
             arg: &Vec<Vec<SecurityTetraplet>>
         ) -> (u32, u32) {
@@ -39,7 +44,7 @@ impl CallParameters {
                     result.push(value.__fce_generated_serialize() as _);
                 }
                 let result_ptr = result.as_ptr();
-                let result_len = 4 * result.len();
+                let result_len = result.len();
                 fluence::internal::add_object_to_release(Box::new(result));
                 (result_ptr as _, result_len as _)
             }
@@ -51,66 +56,104 @@ impl CallParameters {
                 result.push(size as _);
             }
             let result_ptr = result.as_ptr();
-            let result_len = 4 * result.len();
+            let result_len = result.len();
             fluence::internal::add_object_to_release(Box::new(result));
             (result_ptr as _, result_len as _)
         }
         let serialized_arg_5 =
             unsafe { __fce_generated_vec_serializer_tetraplets_5(&self.tetraplets) };
-        raw_record.push(serialized_arg_5.0 as _);
-        raw_record.push(serialized_arg_5.1 as _);
+        raw_record.extend(&serialized_arg_5.0.to_le_bytes());
+        raw_record.extend(&serialized_arg_5.1.to_le_bytes());
         let raw_record_ptr = raw_record.as_ptr();
         fluence::internal::add_object_to_release(Box::new(raw_record));
         raw_record_ptr as _
     }
     pub unsafe fn __fce_generated_deserialize(record_ptr: *const u8) -> Self {
-        let raw_record: Vec<u64> = Vec::from_raw_parts(record_ptr as _, 96usize, 96usize);
+        let raw_record: Vec<u8> = Vec::from_raw_parts(record_ptr as _, 48usize, 48usize);
         let field_0 = unsafe {
-            String::from_raw_parts(
-                raw_record[0usize] as _,
-                raw_record[1usize] as _,
-                raw_record[1usize] as _
-            )
+            let offset = u32::from_le_bytes([
+                raw_record[0usize],
+                raw_record[0usize + 1],
+                raw_record[0usize + 2],
+                raw_record[0usize + 3],
+            ]);
+            let size = u32::from_le_bytes([
+                raw_record[0usize + 4],
+                raw_record[0usize + 5],
+                raw_record[0usize + 6],
+                raw_record[0usize + 7],
+            ]);
+            String::from_raw_parts(offset as _, size as _, size as _)
         };
         let field_1 = unsafe {
-            String::from_raw_parts(
-                raw_record[2usize] as _,
-                raw_record[3usize] as _,
-                raw_record[3usize] as _
-            )
+            let offset = u32::from_le_bytes([
+                raw_record[8usize],
+                raw_record[8usize + 1],
+                raw_record[8usize + 2],
+                raw_record[8usize + 3],
+            ]);
+            let size = u32::from_le_bytes([
+                raw_record[8usize + 4],
+                raw_record[8usize + 5],
+                raw_record[8usize + 6],
+                raw_record[8usize + 7],
+            ]);
+            String::from_raw_parts(offset as _, size as _, size as _)
         };
         let field_2 = unsafe {
-            String::from_raw_parts(
-                raw_record[4usize] as _,
-                raw_record[5usize] as _,
-                raw_record[5usize] as _
-            )
+            let offset = u32::from_le_bytes([
+                raw_record[16usize],
+                raw_record[16usize + 1],
+                raw_record[16usize + 2],
+                raw_record[16usize + 3],
+            ]);
+            let size = u32::from_le_bytes([
+                raw_record[16usize + 4],
+                raw_record[16usize + 5],
+                raw_record[16usize + 6],
+                raw_record[16usize + 7],
+            ]);
+            String::from_raw_parts(offset as _, size as _, size as _)
         };
         let field_3 = unsafe {
-            String::from_raw_parts(
-                raw_record[6usize] as _,
-                raw_record[7usize] as _,
-                raw_record[7usize] as _
-            )
+            let offset = u32::from_le_bytes([
+                raw_record[24usize],
+                raw_record[24usize + 1],
+                raw_record[24usize + 2],
+                raw_record[24usize + 3],
+            ]);
+            let size = u32::from_le_bytes([
+                raw_record[24usize + 4],
+                raw_record[24usize + 5],
+                raw_record[24usize + 6],
+                raw_record[24usize + 7],
+            ]);
+            String::from_raw_parts(offset as _, size as _, size as _)
         };
         let field_4 = unsafe {
-            String::from_raw_parts(
-                raw_record[8usize] as _,
-                raw_record[9usize] as _,
-                raw_record[9usize] as _
-            )
+            let offset = u32::from_le_bytes([
+                raw_record[32usize],
+                raw_record[32usize + 1],
+                raw_record[32usize + 2],
+                raw_record[32usize + 3],
+            ]);
+            let size = u32::from_le_bytes([
+                raw_record[32usize + 4],
+                raw_record[32usize + 5],
+                raw_record[32usize + 6],
+                raw_record[32usize + 7],
+            ]);
+            String::from_raw_parts(offset as _, size as _, size as _)
         };
-        unsafe fn __fce_generated_vec_deserializer_10(
+        unsafe fn __fce_generated_vec_deserializer_40(
             offset: u32,
             size: u32
         ) -> Vec<Vec<SecurityTetraplet>> {
-            let size = size / 8;
-            unsafe fn __fce_generated_vec_deserializer_10_SecurityTetraplet(
+            unsafe fn __fce_generated_vec_deserializer_40_SecurityTetraplet(
                 offset: u32,
                 size: u32
             ) -> Vec<SecurityTetraplet> {
-                let size = size / 8;
-                let mut arg: Vec<u64> = Vec::from_raw_parts(offset as _, size as _, size as _);
+                let mut arg: Vec<u32> = Vec::from_raw_parts(offset as _, size as _, size as _);
                 let mut result = Vec::with_capacity(arg.len());
                 for offset in arg {
                     let value = SecurityTetraplet::__fce_generated_deserialize(offset as _);
@@ -118,12 +161,13 @@ impl CallParameters {
                 }
                 result
             }
-            let mut arg: Vec<u64> = Vec::from_raw_parts(offset as _, size as _, size as _);
+            let mut arg: Vec<u32> =
+                Vec::from_raw_parts(offset as _, (2 * size) as _, (2 * size) as _);
             let mut result = Vec::with_capacity(arg.len());
             let mut arg = arg.into_iter();
             while let Some(offset) = arg.next() {
                 let size = arg.next().unwrap();
-                let value = __fce_generated_vec_deserializer_10_SecurityTetraplet(
+                let value = __fce_generated_vec_deserializer_40_SecurityTetraplet(
                     offset as _,
                     size as _
                 );
@@ -131,12 +175,19 @@ impl CallParameters {
             }
             result
         }
-        let field_5 = unsafe {
-            __fce_generated_vec_deserializer_10(
-                raw_record[10usize] as _,
-                raw_record[11usize] as _
-            )
-        };
+        let offset = u32::from_le_bytes([
+            raw_record[40usize],
+            raw_record[40usize + 1],
+            raw_record[40usize + 2],
+            raw_record[40usize + 3],
+        ]);
+        let size = u32::from_le_bytes([
+            raw_record[40usize + 4],
+            raw_record[40usize + 5],
+            raw_record[40usize + 6],
+            raw_record[40usize + 7],
+        ]);
+        let field_5 = unsafe { __fce_generated_vec_deserializer_40(offset as _, size as _) };
         Self {
             init_peer_id: field_0,
             service_id: field_1,
@@ -151,6 +202,6 @@ impl CallParameters {
 #[doc(hidden)]
 #[allow(clippy::all)]
 #[link_section = "__fce_generated_section__CallParameters"]
-pub static __fce_generated_static_global_CallParameters: [u8; 445usize] = {
-    * b"{\"ast_type\":\"Record\",\"name\":\"CallParameters\",\"fields\":[{\"name\":\"init_peer_id\",\"ty\":{\"Utf8String\":\"ByValue\"}},{\"name\":\"service_id\",\"ty\":{\"Utf8String\":\"ByValue\"}},{\"name\":\"service_creator_peer_id\",\"ty\":{\"Utf8String\":\"ByValue\"}},{\"name\":\"host_id\",\"ty\":{\"Utf8String\":\"ByValue\"}},{\"name\":\"particle_id\",\"ty\":{\"Utf8String\":\"ByValue\"}},{\"name\":\"tetraplets\",\"ty\":{\"Vector\":[{\"Vector\":[{\"Record\":[\"SecurityTetraplet\",\"ByValue\"]},\"ByValue\"]},\"ByValue\"]}}]}"
+pub static __fce_generated_static_global_CallParameters: [u8; 455usize] = {
+    * b"{\"ast_type\":\"Record\",\"name\":\"CallParameters\",\"fields\":{\"Named\":[{\"name\":\"init_peer_id\",\"ty\":{\"Utf8String\":\"ByValue\"}},{\"name\":\"service_id\",\"ty\":{\"Utf8String\":\"ByValue\"}},{\"name\":\"service_creator_peer_id\",\"ty\":{\"Utf8String\":\"ByValue\"}},{\"name\":\"host_id\",\"ty\":{\"Utf8String\":\"ByValue\"}},{\"name\":\"particle_id\",\"ty\":{\"Utf8String\":\"ByValue\"}},{\"name\":\"tetraplets\",\"ty\":{\"Vector\":[{\"Vector\":[{\"Record\":[\"SecurityTetraplet\",\"ByValue\"]},\"ByValue\"]},\"ByValue\"]}}]}}"
 };

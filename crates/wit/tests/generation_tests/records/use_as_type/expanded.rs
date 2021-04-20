@@ -11,23 +11,19 @@ pub unsafe fn __fce_generated_wrapper_func_inner_arrays_2(arg_0: u32, arg_1: u32
         offset: u32,
         size: u32
     ) -> Vec<Vec<Vec<Vec<TestRecord>>>> {
-        let size = size / 8;
         unsafe fn __fce_generated_vec_deserializer_0_Vec_Vec_TestRecord__(
             offset: u32,
             size: u32
         ) -> Vec<Vec<Vec<TestRecord>>> {
-            let size = size / 8;
             unsafe fn __fce_generated_vec_deserializer_0_Vec_Vec_TestRecord___Vec_TestRecord_(
                 offset: u32,
                 size: u32
             ) -> Vec<Vec<TestRecord>> {
-                let size = size / 8;
                 unsafe fn __fce_generated_vec_deserializer_0_Vec_Vec_TestRecord___Vec_TestRecord__TestRecord(
                     offset: u32,
                     size: u32
                 ) -> Vec<TestRecord> {
-                    let size = size / 8;
-                    let mut arg: Vec<u64> = Vec::from_raw_parts(offset as _, size as _, size as _);
+                    let mut arg: Vec<u32> = Vec::from_raw_parts(offset as _, size as _, size as _);
                     let mut result = Vec::with_capacity(arg.len());
                     for offset in arg {
                         let value = TestRecord::__fce_generated_deserialize(offset as _);
@@ -35,7 +31,8 @@ pub unsafe fn __fce_generated_wrapper_func_inner_arrays_2(arg_0: u32, arg_1: u32
                     }
                     result
                 }
-                let mut arg: Vec<u64> = Vec::from_raw_parts(offset as _, size as _, size as _);
+                let mut arg: Vec<u32> =
+                    Vec::from_raw_parts(offset as _, (2 * size) as _, (2 * size) as _);
                 let mut result = Vec::with_capacity(arg.len());
                 let mut arg = arg.into_iter();
                 while let Some(offset) = arg.next() {
@@ -45,7 +42,8 @@ pub unsafe fn __fce_generated_wrapper_func_inner_arrays_2(arg_0: u32, arg_1: u32
                 }
                 result
             }
-            let mut arg: Vec<u64> = Vec::from_raw_parts(offset as _, size as _, size as _);
+            let mut arg: Vec<u32> =
+                Vec::from_raw_parts(offset as _, (2 * size) as _, (2 * size) as _);
             let mut result = Vec::with_capacity(arg.len());
             let mut arg = arg.into_iter();
             while let Some(offset) = arg.next() {
@@ -58,7 +56,7 @@ pub unsafe fn __fce_generated_wrapper_func_inner_arrays_2(arg_0: u32, arg_1: u32
             }
             result
         }
-        let mut arg: Vec<u64> = Vec::from_raw_parts(offset as _, size as _, size as _);
+        let mut arg: Vec<u32> = Vec::from_raw_parts(offset as _, (2 * size) as _, (2 * size) as _);
         let mut result = Vec::with_capacity(arg.len());
         let mut arg = arg.into_iter();
         while let Some(offset) = arg.next() {
@@ -86,7 +84,7 @@ pub unsafe fn __fce_generated_wrapper_func_inner_arrays_2(arg_0: u32, arg_1: u32
                         result.push(value.__fce_generated_serialize() as _);
                     }
                     let result_ptr = result.as_ptr();
-                    let result_len = 4 * result.len();
+                    let result_len = result.len();
                     fluence::internal::add_object_to_release(Box::new(result));
                     (result_ptr as _, result_len as _)
                 }
@@ -97,7 +95,7 @@ pub unsafe fn __fce_generated_wrapper_func_inner_arrays_2(arg_0: u32, arg_1: u32
                     result.push(size as _);
                 }
                 let result_ptr = result.as_ptr();
-                let result_len = 4 * result.len();
+                let result_len = result.len();
                 fluence::internal::add_object_to_release(Box::new(result));
                 (result_ptr as _, result_len as _)
             }
@@ -109,7 +107,7 @@ pub unsafe fn __fce_generated_wrapper_func_inner_arrays_2(arg_0: u32, arg_1: u32
                 result.push(size as _);
             }
             let result_ptr = result.as_ptr();
-            let result_len = 4 * result.len();
+            let result_len = result.len();
             fluence::internal::add_object_to_release(Box::new(result));
             (result_ptr as _, result_len as _)
         }
@@ -120,7 +118,7 @@ pub unsafe fn __fce_generated_wrapper_func_inner_arrays_2(arg_0: u32, arg_1: u32
             result.push(size as _);
         }
         let result_ptr = result.as_ptr();
-        let result_len = 4 * result.len();
+        let result_len = result.len();
         fluence::internal::add_object_to_release(Box::new(result));
         (result_ptr as _, result_len as _)
     }

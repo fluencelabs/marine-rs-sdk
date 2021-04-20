@@ -17,43 +17,36 @@
 #[cfg(feature = "debug")]
 use super::log;
 
-use std::alloc::alloc as global_alloc;
-use std::alloc::Layout;
-
-/// Allocates memory area of specified size and returns its address.
-/// Returns 0 if supplied size is too long.
+/// Allocates memory area of specified size and type and returns its address.
+/// The returned
 #[no_mangle]
-pub unsafe fn allocate(size: usize) -> usize {
-    let layout = match Layout::from_size_align(size, std::mem::align_of::<u8>()) {
-        Ok(layout) => layout,
-        // in this case a err may occur only in a case of too long allocating size,
-        // so just return 0
-        Err(_) => return 0,
-    };
+pub unsafe fn allocate(elem_count: usize, elem_ty: usize) -> usize {
+    let allocated_mem = allocate_impl(elem_count, elem_ty);
 
     #[cfg(feature = "debug")]
-    log(format!("sdk.allocate: {:?}\n", size));
+    log(format!(
+        "sdk.allocate: {} {} -> {}\n",
+        elem_count, elem_ty, allocated_mem
+    ));
 
-    global_alloc(layout) as _
+    allocated_mem
 }
 
-/*
-/// Allocates memory area of specified size and returns its address.
-/// Returns 0 if supplied size is too long.
-#[no_mangle]
-pub unsafe fn allocate_vec(element_count: usize, align: usize) -> usize {
-    let layout = match Layout::from_size_align(size, align) {
-        Ok(layout) => layout,
-        // in this case a err may occur only in a case of too long allocating size, or incompatible
-        // so just return 0
-        Err(_) => return 0,
-    };
-
-    let layout = layout.repeat(element_count)
-
-    #[cfg(feature = "debug")]
-        log(format!("sdk.allocate: {:?}\n", size));
-
-    global_alloc(layout) as _
+fn allocate_impl(elem_count: usize, elem_ty: usize) -> usize {
+    // TODO: handle OOM
+    // Such allocation scheme is needed to deal with layout
+    match elem_ty {
+        0 => Vec::<u8>::with_capacity(elem_count).as_ptr() as usize, // for booleans
+        1 => Vec::<u8>::with_capacity(elem_count).as_ptr() as usize,
+        2 => Vec::<u16>::with_capacity(elem_count).as_ptr() as usize,
+        3 => Vec::<u32>::with_capacity(elem_count).as_ptr() as usize,
+        4 => Vec::<u64>::with_capacity(elem_count).as_ptr() as usize,
+        5 => Vec::<i8>::with_capacity(elem_count).as_ptr() as usize,
+        6 => Vec::<i16>::with_capacity(elem_count).as_ptr() as usize,
+        7 => Vec::<i32>::with_capacity(elem_count).as_ptr() as usize,
+        8 => Vec::<i64>::with_capacity(elem_count).as_ptr() as usize,
+        9 => Vec::<f32>::with_capacity(elem_count).as_ptr() as usize,
+        10 => Vec::<f64>::with_capacity(elem_count).as_ptr() as usize,
+        _ => Vec::<u8>::with_capacity(0).as_ptr() as usize, // it'll allocate 0 bytes
+    }
 }
-*/

@@ -45,9 +45,9 @@ impl RecordSerGlueCodeGenerator for AstRecordItem {
                 }
                 ParsedType::Utf8Str(_) | ParsedType::Utf8String(_) => {
                     quote! {
-                        let field_ident_ptr = #field_ident.as_ptr() as usize;
+                        let field_ident_ptr = #field_ident.as_ptr() as u32;
                         raw_record.extend(&field_ident_ptr.to_le_bytes());
-                        raw_record.extend(&#field_ident.len().to_le_bytes());
+                        raw_record.extend(&(#field_ident.len() as u32).to_le_bytes());
                     }
                 }
                 ParsedType::Vector(ty, passing_style) => {

@@ -42,6 +42,8 @@ extern "C" {
 
     pub fn string_type(arg: &Vec<String>) -> Vec<String>;
 
+    pub fn bool_type(arg: &Vec<bool>) -> Vec<bool>;
+
     pub fn byte_type(arg: &Vec<u8>) -> Vec<u8>;
 
     pub fn f32_type(arg: &Vec<f32>) -> Vec<f32>;

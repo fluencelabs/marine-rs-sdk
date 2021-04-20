@@ -8,10 +8,9 @@ pub fn test_array_refs(arg: &Vec<Vec<String>>) -> &Vec<Vec<Vec<Vec<String>>>> {
 #[allow(clippy::all)]
 pub unsafe fn __fce_generated_wrapper_func_test_array_refs(arg_0: u32, arg_1: u32) {
     unsafe fn __fce_generated_vec_deserializer_0(offset: u32, size: u32) -> Vec<Vec<String>> {
-        let size = size / 8;
         unsafe fn __fce_generated_vec_deserializer_0_String(offset: u32, size: u32) -> Vec<String> {
-            let size = size / 8;
-            let mut arg: Vec<u64> = Vec::from_raw_parts(offset as _, size as _, size as _);
+            let mut arg: Vec<u32> =
+                Vec::from_raw_parts(offset as _, (2 * size) as _, (2 * size) as _);
             let mut arg = arg.into_iter();
             let mut result = Vec::with_capacity(arg.len() / 2);
             while let Some(offset) = arg.next() {
@@ -21,7 +20,7 @@ pub unsafe fn __fce_generated_wrapper_func_test_array_refs(arg_0: u32, arg_1: u3
             }
             result
         }
-        let mut arg: Vec<u64> = Vec::from_raw_parts(offset as _, size as _, size as _);
+        let mut arg: Vec<u32> = Vec::from_raw_parts(offset as _, (2 * size) as _, (2 * size) as _);
         let mut result = Vec::with_capacity(arg.len());
         let mut arg = arg.into_iter();
         while let Some(offset) = arg.next() {
@@ -49,7 +48,7 @@ pub unsafe fn __fce_generated_wrapper_func_test_array_refs(arg_0: u32, arg_1: u3
                         result.push(value.len() as _);
                     }
                     let result_ptr = result.as_ptr();
-                    let result_len = 4 * result.len();
+                    let result_len = result.len();
                     fluence::internal::add_object_to_release(Box::new(result));
                     (result_ptr as _, result_len as _)
                 }
@@ -61,7 +60,7 @@ pub unsafe fn __fce_generated_wrapper_func_test_array_refs(arg_0: u32, arg_1: u3
                     result.push(size as _);
                 }
                 let result_ptr = result.as_ptr();
-                let result_len = 4 * result.len();
+                let result_len = result.len();
                 fluence::internal::add_object_to_release(Box::new(result));
                 (result_ptr as _, result_len as _)
             }
@@ -73,7 +72,7 @@ pub unsafe fn __fce_generated_wrapper_func_test_array_refs(arg_0: u32, arg_1: u3
                 result.push(size as _);
             }
             let result_ptr = result.as_ptr();
-            let result_len = 4 * result.len();
+            let result_len = result.len();
             fluence::internal::add_object_to_release(Box::new(result));
             (result_ptr as _, result_len as _)
         }
@@ -84,7 +83,7 @@ pub unsafe fn __fce_generated_wrapper_func_test_array_refs(arg_0: u32, arg_1: u3
             result.push(size as _);
         }
         let result_ptr = result.as_ptr();
-        let result_len = 4 * result.len();
+        let result_len = result.len();
         fluence::internal::add_object_to_release(Box::new(result));
         (result_ptr as _, result_len as _)
     }
