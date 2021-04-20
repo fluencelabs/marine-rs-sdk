@@ -40,6 +40,9 @@ impl RecordSerGlueCodeGenerator for AstRecordItem {
             let field_ident = field_ident(field, id);
 
             let field_serialization = match &field.ty {
+                ParsedType::Boolean(_) => {
+                    quote! { raw_record.push(*&#field_ident as _); }
+                }
                 ParsedType::Utf8Str(_) | ParsedType::Utf8String(_) => {
                     quote! {
                         let field_ident_ptr = #field_ident.as_ptr() as usize;
