@@ -18,7 +18,7 @@
 use super::log;
 
 /// Allocates memory area of specified size and type and returns its address.
-/// The returned
+/// The allocated memory region is intended to be use as a Vec.
 #[no_mangle]
 pub unsafe fn allocate(elem_count: usize, elem_ty: usize) -> usize {
     let allocated_mem = allocate_impl(elem_count, elem_ty);
