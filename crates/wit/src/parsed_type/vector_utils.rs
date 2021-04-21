@@ -122,7 +122,8 @@ pub(crate) fn generate_vector_deserializer(
         }
         ParsedType::Utf8Str(_) | ParsedType::Utf8String(_) => {
             quote! {
-                let mut arg: Vec<u32> = Vec::from_raw_parts(offset as _, (2 * size) as _, (2 * size) as _);
+                let vec_passing_size = 2;
+                let mut arg: Vec<u32> = Vec::from_raw_parts(offset as _, (vec_passing_size * size) as _, (vec_passing_size * size) as _);
                 let mut arg = arg.into_iter();
                 let mut result = Vec::with_capacity(arg.len() / 2);
 
@@ -145,7 +146,8 @@ pub(crate) fn generate_vector_deserializer(
             quote! {
                 #inner_vector_deserializer
 
-                let mut arg: Vec<u32> = Vec::from_raw_parts(offset as _, (2 * size) as _, (2 * size) as _);
+                let vec_passing_size = 2;
+                let mut arg: Vec<u32> = Vec::from_raw_parts(offset as _, (vec_passing_size * size) as _, (vec_passing_size * size) as _);
                 let mut result = Vec::with_capacity(arg.len());
 
                 let mut arg = arg.into_iter();

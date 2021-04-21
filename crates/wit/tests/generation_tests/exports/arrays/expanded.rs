@@ -22,8 +22,9 @@ pub unsafe fn __fce_generated_wrapper_func_inner_arrays_1(arg_0: u32, arg_1: u32
                 ) -> Vec<u8> {
                     Vec::from_raw_parts(offset as _, size as _, size as _)
                 }
+                let vec_passing_size = 2;
                 let mut arg: Vec<u32> =
-                    Vec::from_raw_parts(offset as _, (2 * size) as _, (2 * size) as _);
+                    Vec::from_raw_parts(offset as _, (vec_passing_size * size) as _, (vec_passing_size * size) as _);
                 let mut result = Vec::with_capacity(arg.len());
                 let mut arg = arg.into_iter();
                 while let Some(offset) = arg.next() {
@@ -36,8 +37,9 @@ pub unsafe fn __fce_generated_wrapper_func_inner_arrays_1(arg_0: u32, arg_1: u32
                 }
                 result
             }
+            let vec_passing_size = 2;
             let mut arg: Vec<u32> =
-                Vec::from_raw_parts(offset as _, (2 * size) as _, (2 * size) as _);
+                Vec::from_raw_parts(offset as _, (vec_passing_size * size) as _, (vec_passing_size * size) as _);
             let mut result = Vec::with_capacity(arg.len());
             let mut arg = arg.into_iter();
             while let Some(offset) = arg.next() {
@@ -48,7 +50,8 @@ pub unsafe fn __fce_generated_wrapper_func_inner_arrays_1(arg_0: u32, arg_1: u32
             }
             result
         }
-        let mut arg: Vec<u32> = Vec::from_raw_parts(offset as _, (2 * size) as _, (2 * size) as _);
+        let vec_passing_size = 2;
+        let mut arg: Vec<u32> = Vec::from_raw_parts(offset as _, (vec_passing_size * size) as _, (vec_passing_size * size) as _);
         let mut result = Vec::with_capacity(arg.len());
         let mut arg = arg.into_iter();
         while let Some(offset) = arg.next() {

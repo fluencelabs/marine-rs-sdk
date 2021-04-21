@@ -32,21 +32,30 @@ pub unsafe fn allocate(elem_count: usize, elem_ty: usize) -> usize {
     allocated_mem
 }
 
+macro_rules! alloc {
+    ($ty:ty, $elem_count:ident) => {{
+        let vec = Vec::<$ty>::with_capacity($elem_count);
+        let offset = vec.as_ptr() as usize;
+        std::mem::forget(vec);
+        offset
+    }};
+}
+
 fn allocate_impl(elem_count: usize, elem_ty: usize) -> usize {
     // TODO: handle OOM
     // Such allocation scheme is needed to deal with layout
     match elem_ty {
-        0 => Vec::<u8>::with_capacity(elem_count).as_ptr() as usize, // for booleans
-        1 => Vec::<u8>::with_capacity(elem_count).as_ptr() as usize,
-        2 => Vec::<u16>::with_capacity(elem_count).as_ptr() as usize,
-        3 => Vec::<u32>::with_capacity(elem_count).as_ptr() as usize,
-        4 => Vec::<u64>::with_capacity(elem_count).as_ptr() as usize,
-        5 => Vec::<i8>::with_capacity(elem_count).as_ptr() as usize,
-        6 => Vec::<i16>::with_capacity(elem_count).as_ptr() as usize,
-        7 => Vec::<i32>::with_capacity(elem_count).as_ptr() as usize,
-        8 => Vec::<i64>::with_capacity(elem_count).as_ptr() as usize,
-        9 => Vec::<f32>::with_capacity(elem_count).as_ptr() as usize,
-        10 => Vec::<f64>::with_capacity(elem_count).as_ptr() as usize,
-        _ => Vec::<u8>::with_capacity(0).as_ptr() as usize, // it'll allocate 0 bytes
+        0 => alloc!(u8, elem_count), // for booleans
+        1 => alloc!(u8, elem_count),
+        2 => alloc!(u16, elem_count),
+        3 => alloc!(u32, elem_count),
+        4 => alloc!(u64, elem_count),
+        5 => alloc!(i8, elem_count),
+        6 => alloc!(i16, elem_count),
+        7 => alloc!(i32, elem_count),
+        8 => alloc!(i64, elem_count),
+        9 => alloc!(f32, elem_count),
+        10 => alloc!(f64, elem_count),
+        _ => alloc!(u8, 0), // it'll allocate 0 bytes
     }
 }

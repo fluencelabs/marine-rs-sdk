@@ -9,8 +9,9 @@ pub fn test_array_refs(arg: &Vec<Vec<String>>) -> &Vec<Vec<Vec<Vec<String>>>> {
 pub unsafe fn __fce_generated_wrapper_func_test_array_refs(arg_0: u32, arg_1: u32) {
     unsafe fn __fce_generated_vec_deserializer_0(offset: u32, size: u32) -> Vec<Vec<String>> {
         unsafe fn __fce_generated_vec_deserializer_0_String(offset: u32, size: u32) -> Vec<String> {
+            let vec_passing_size = 2;
             let mut arg: Vec<u32> =
-                Vec::from_raw_parts(offset as _, (2 * size) as _, (2 * size) as _);
+                Vec::from_raw_parts(offset as _, (vec_passing_size * size) as _, (vec_passing_size * size) as _);
             let mut arg = arg.into_iter();
             let mut result = Vec::with_capacity(arg.len() / 2);
             while let Some(offset) = arg.next() {
@@ -20,7 +21,8 @@ pub unsafe fn __fce_generated_wrapper_func_test_array_refs(arg_0: u32, arg_1: u3
             }
             result
         }
-        let mut arg: Vec<u32> = Vec::from_raw_parts(offset as _, (2 * size) as _, (2 * size) as _);
+        let vec_passing_size = 2;
+        let mut arg: Vec<u32> = Vec::from_raw_parts(offset as _, (vec_passing_size * size) as _, (vec_passing_size * size) as _);
         let mut result = Vec::with_capacity(arg.len());
         let mut arg = arg.into_iter();
         while let Some(offset) = arg.next() {

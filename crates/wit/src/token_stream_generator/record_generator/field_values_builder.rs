@@ -257,7 +257,7 @@ impl FieldValuesBuilder {
             };
         };
 
-        self.value_id += 2 * 4;
+        self.value_id += 2 * std::mem::size_of::<u32>();
 
         result
     }
@@ -292,7 +292,7 @@ impl FieldValuesBuilder {
             let #field = unsafe { #generated_der_ident(offset as _, size as _) };
         };
 
-        self.value_id += 2 * 4;
+        self.value_id += 2 * std::mem::size_of::<u32>();
 
         result
     }
