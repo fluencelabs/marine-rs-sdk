@@ -43,7 +43,7 @@ macro_rules! alloc {
 
 fn allocate_impl(elem_count: usize, elem_ty: usize) -> usize {
     // TODO: handle OOM
-    // Such allocation scheme is needed to deal with layout
+    // Such allocation scheme is needed to deal with Vec layout
     match elem_ty {
         0 => alloc!(u8, elem_count), // for booleans
         1 => alloc!(u8, elem_count),
