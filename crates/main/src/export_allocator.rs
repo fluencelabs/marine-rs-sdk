@@ -33,7 +33,7 @@ pub unsafe fn allocate(elem_count: usize, elem_ty: usize) -> usize {
 }
 
 macro_rules! alloc {
-    ($ty:ty, $elem_count:ident) => {{
+    ($ty:ty, $elem_count:expr) => {{
         let vec = Vec::<$ty>::with_capacity($elem_count);
         let offset = vec.as_ptr() as usize;
         std::mem::forget(vec);
