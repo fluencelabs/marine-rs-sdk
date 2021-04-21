@@ -50,24 +50,21 @@ impl RecordSerGlueCodeGenerator for AstRecordItem {
                         raw_record.extend(&(#field_ident.len() as u32).to_le_bytes());
                     }
                 }
-                ParsedType::Vector(ty, passing_style) => {
-                    let generated_serializer_name = format!(
+                ParsedType::Vector(ty, _) => {
+                    let generated_ser_name = format!(
                         "__fce_generated_vec_serializer_{}_{}",
                         field.name.as_ref().unwrap(),
                         id
                     );
 
-                    let generated_serializer_ident = new_ident!(generated_serializer_name);
-                    let vector_serializer = crate::parsed_type::generate_vector_serializer(
-                        ty,
-                        *passing_style,
-                        &generated_serializer_name,
-                    );
+                    let generated_ser_ident = new_ident!(generated_ser_name);
+                    let vector_ser =
+                        crate::parsed_type::generate_vector_ser(ty, &generated_ser_name);
                     let serialized_field_ident = new_ident!(format!("serialized_arg_{}", id));
 
                     quote::quote! {
-                        #vector_serializer
-                        let #serialized_field_ident = unsafe { #generated_serializer_ident(&#field_ident) };
+                        #vector_ser
+                        let #serialized_field_ident = unsafe { #generated_ser_ident(&#field_ident) };
 
                         raw_record.extend(&#serialized_field_ident.0.to_le_bytes());
                         raw_record.extend(&#serialized_field_ident.1.to_le_bytes());

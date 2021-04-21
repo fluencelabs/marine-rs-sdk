@@ -96,14 +96,14 @@ impl FieldValuesBuilder {
     fn bool_der(&mut self, field: &syn::Ident) -> TokenStream {
         let value_id = self.value_id;
         let result = quote! { let #field = raw_record[#value_id] != 0; };
-        self.value_id += 1;
+        self.value_id += std::mem::size_of::<u8>();
         result
     }
 
     fn i8_der(&mut self, field: &syn::Ident) -> TokenStream {
         let value_id = self.value_id;
         let result = quote! { let #field = raw_record[#value_id] as i8; };
-        self.value_id += 1;
+        self.value_id += std::mem::size_of::<i8>();
         result
     }
 
@@ -115,7 +115,7 @@ impl FieldValuesBuilder {
         ]);
         };
 
-        self.value_id += 2;
+        self.value_id += std::mem::size_of::<i16>();
         result
     }
 
@@ -129,7 +129,7 @@ impl FieldValuesBuilder {
         ]);
         };
 
-        self.value_id += 4;
+        self.value_id += std::mem::size_of::<i32>();
         result
     }
 
@@ -147,14 +147,14 @@ impl FieldValuesBuilder {
         ]);
         };
 
-        self.value_id += 8;
+        self.value_id += std::mem::size_of::<i64>();
         result
     }
 
     fn u8_der(&mut self, field: &syn::Ident) -> TokenStream {
         let value_id = self.value_id;
         let result = quote! { let #field = raw_record[#value_id] as u8; };
-        self.value_id += 1;
+        self.value_id += std::mem::size_of::<u8>();
         result
     }
 
@@ -166,7 +166,7 @@ impl FieldValuesBuilder {
         ]);
         };
 
-        self.value_id += 2;
+        self.value_id += std::mem::size_of::<u16>();
         result
     }
 
@@ -180,7 +180,7 @@ impl FieldValuesBuilder {
         ]);
         };
 
-        self.value_id += 4;
+        self.value_id += std::mem::size_of::<u32>();
         result
     }
 
@@ -198,7 +198,7 @@ impl FieldValuesBuilder {
         ]);
         };
 
-        self.value_id += 8;
+        self.value_id += std::mem::size_of::<u64>();
         result
     }
 
@@ -212,7 +212,7 @@ impl FieldValuesBuilder {
         ]);
         };
 
-        self.value_id += 4;
+        self.value_id += std::mem::size_of::<f32>();
         result
     }
 
@@ -230,7 +230,7 @@ impl FieldValuesBuilder {
         ]);
         };
 
-        self.value_id += 8;
+        self.value_id += std::mem::size_of::<f64>();
         result
     }
 
@@ -267,8 +267,7 @@ impl FieldValuesBuilder {
         let generated_der_name = crate::utils::prepare_ident(generated_der_name);
         let generated_der_ident = new_ident!(generated_der_name);
 
-        let vector_deserializer =
-            crate::parsed_type::generate_vector_deserializer(ty, &generated_der_name);
+        let vector_deserializer = crate::parsed_type::generate_vector_der(ty, &generated_der_name);
 
         let value_id = self.value_id;
 
@@ -312,7 +311,7 @@ impl FieldValuesBuilder {
             let #field = #record_ident::__fce_generated_deserialize(offset as _);
         };
 
-        self.value_id += 4;
+        self.value_id += std::mem::size_of::<u32>();
 
         result
     }

@@ -98,7 +98,7 @@ pub unsafe fn __fce_generated_wrapper_func_inner_arrays_2(arg_0: u32, arg_1: u32
                     result.push(size as _);
                 }
                 let result_ptr = result.as_ptr();
-                let result_len = result.len();
+                let result_len = result.len() / 2;
                 fluence::internal::add_object_to_release(Box::new(result));
                 (result_ptr as _, result_len as _)
             }
@@ -110,7 +110,7 @@ pub unsafe fn __fce_generated_wrapper_func_inner_arrays_2(arg_0: u32, arg_1: u32
                 result.push(size as _);
             }
             let result_ptr = result.as_ptr();
-            let result_len = result.len();
+            let result_len = result.len() / 2;
             fluence::internal::add_object_to_release(Box::new(result));
             (result_ptr as _, result_len as _)
         }
@@ -121,7 +121,7 @@ pub unsafe fn __fce_generated_wrapper_func_inner_arrays_2(arg_0: u32, arg_1: u32
             result.push(size as _);
         }
         let result_ptr = result.as_ptr();
-        let result_len = result.len();
+        let result_len = result.len() / 2;
         fluence::internal::add_object_to_release(Box::new(result));
         (result_ptr as _, result_len as _)
     }

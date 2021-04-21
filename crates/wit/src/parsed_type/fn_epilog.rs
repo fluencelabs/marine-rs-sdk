@@ -116,14 +116,11 @@ fn generate_epilog(ty: &Option<ParsedType>) -> proc_macro2::TokenStream {
                 fluence::internal::set_result_size(result.len() as _);
             }
         }
-        Some(ParsedType::Vector(ty, passing_style)) => {
+        Some(ParsedType::Vector(ty, _)) => {
             let generated_serializer_name = "__fce_generated_vec_serializer";
             let generated_serializer_ident = new_ident!(generated_serializer_name);
-            let vector_serializer = super::vector_utils::generate_vector_serializer(
-                ty,
-                *passing_style,
-                generated_serializer_name,
-            );
+            let vector_serializer =
+                super::vector_ser_der::generate_vector_ser(ty, generated_serializer_name);
 
             quote! {
                 #vector_serializer

@@ -21,8 +21,16 @@ use super::log;
 /// The allocated memory region is intended to be use as a Vec.
 #[no_mangle]
 pub unsafe fn allocate(elem_count: usize, elem_ty: usize) -> usize {
-    let allocated_mem = allocate_impl(elem_count, elem_ty);
+    if elem_count == 0 {
+        // otherwise 1 would be returned thanks to the internals of Vec in Rust
+        return 0;
+    }
 
+    let allocated_mem = allocate_impl(elem_count, elem_ty);
+    println!(
+        "sdk.allocate: {} {} -> {}\n",
+        elem_count, elem_ty, allocated_mem
+    );
     #[cfg(feature = "debug")]
     log(format!(
         "sdk.allocate: {} {} -> {}\n",

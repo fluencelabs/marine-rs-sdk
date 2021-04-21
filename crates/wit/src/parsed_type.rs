@@ -22,7 +22,7 @@ mod foreign_mod_epilog;
 mod foreign_mod_prolog;
 mod traits;
 mod utils;
-mod vector_utils;
+mod vector_ser_der;
 
 pub(crate) use fn_arg::*;
 pub(crate) use fn_epilog::*;
@@ -30,7 +30,7 @@ pub(crate) use fn_prolog::*;
 pub(crate) use foreign_mod_prolog::*;
 pub(crate) use foreign_mod_epilog::*;
 pub(crate) use utils::*;
-pub(crate) use vector_utils::*;
+pub(crate) use vector_ser_der::*;
 
 use serde::Serialize;
 use serde::Deserialize;
