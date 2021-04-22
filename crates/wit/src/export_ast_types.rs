@@ -31,7 +31,7 @@ pub struct FnSignature {
     pub arguments: Vec<FnArgument>,
     // fce supports only one return value now,
     // waiting for adding multi-value support in Wasmer.
-    pub output_type: Option<ParsedType>,
+    pub output_type: Vec<ParsedType>,
 }
 
 #[derive(Clone, Serialize, Deserialize)]
@@ -157,11 +157,15 @@ impl From<AstFnSignature> for FnSignature {
     fn from(ast_fn_sig: AstFnSignature) -> Self {
         // TODO: consider to do transmute here in case of optimization issues.
         let arguments = ast_fn_sig.arguments.into_iter().map(Into::into).collect();
+        let output_type = match ast_fn_sig.output_type {
+            Some(output_type) => vec![output_type],
+            None => Vec::new(),
+        };
 
         Self {
             name: ast_fn_sig.name,
             arguments,
-            output_type: ast_fn_sig.output_type,
+            output_type,
         }
     }
 }
