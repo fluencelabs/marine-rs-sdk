@@ -33,7 +33,7 @@ pub(crate) struct AstFnSignature {
 }
 
 #[derive(Clone)]
-pub(crate) struct AstRecordItem {
+pub(crate) struct AstRecord {
     pub name: String,
     pub fields: AstRecordFields,
     pub original: syn::ItemStruct,
@@ -60,29 +60,29 @@ pub(crate) struct AstRecordField {
 }
 
 #[derive(Clone)]
-pub(crate) struct AstExternFnItem {
+pub(crate) struct AstExternFn {
     pub link_name: Option<String>,
     // only imports are possible here
     pub signature: AstFnSignature,
 }
 
 #[derive(Clone)]
-pub(crate) struct AstExternModItem {
+pub(crate) struct AstExternMod {
     pub namespace: String,
     // only imports are possible here
-    pub imports: Vec<AstExternFnItem>,
+    pub imports: Vec<AstExternFn>,
     pub original: syn::ItemForeignMod,
 }
 
 #[derive(Clone)]
-pub(crate) struct AstFnItem {
+pub(crate) struct AstFn {
     pub signature: AstFnSignature,
     pub original: syn::ItemFn,
 }
 
 #[derive(Clone)]
 pub(crate) enum FCEAst {
-    Function(AstFnItem),
-    ExternMod(AstExternModItem),
-    Record(AstRecordItem),
+    Function(AstFn),
+    ExternMod(AstExternMod),
+    Record(AstRecord),
 }

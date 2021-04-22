@@ -32,7 +32,7 @@ pub(super) trait RecordDerGlueCodeGenerator {
     fn generate_der(&self) -> RecordDerDescriptor;
 }
 
-impl RecordDerGlueCodeGenerator for AstRecordItem {
+impl RecordDerGlueCodeGenerator for AstRecord {
     fn generate_der(&self) -> RecordDerDescriptor {
         match &self.fields {
             AstRecordFields::Named(fields) => record_der_from_named(fields),

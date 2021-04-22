@@ -16,7 +16,7 @@
 
 use crate::new_ident;
 use crate::parsed_type::ParsedType;
-use crate::ast_types::AstRecordItem;
+use crate::ast_types::AstRecord;
 use crate::ast_types::AstRecordField;
 use crate::ast_types::AstRecordFields;
 
@@ -27,7 +27,7 @@ pub(super) trait RecordSerGlueCodeGenerator {
     fn generate_serializer(&self) -> proc_macro2::TokenStream;
 }
 
-impl RecordSerGlueCodeGenerator for AstRecordItem {
+impl RecordSerGlueCodeGenerator for AstRecord {
     fn generate_serializer(&self) -> proc_macro2::TokenStream {
         let mut serializer = proc_macro2::TokenStream::new();
         let fields = match &self.fields {

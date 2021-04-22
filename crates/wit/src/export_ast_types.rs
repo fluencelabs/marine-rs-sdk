@@ -33,7 +33,7 @@ pub struct FnSignature {
 }
 
 #[derive(Clone, Serialize, Deserialize)]
-pub struct RecordItem {
+pub struct RecordType {
     pub name: String,
     pub fields: RecordFields,
 }
@@ -55,68 +55,68 @@ pub struct RecordField {
 }
 
 #[derive(Clone, Serialize, Deserialize)]
-pub struct ExternFnItem {
+pub struct ExternFnType {
     pub link_name: Option<String>,
     // only imports are possible here
     pub signature: FnSignature,
 }
 
 #[derive(Clone, Serialize, Deserialize)]
-pub struct ExternModItem {
+pub struct ExternModType {
     pub namespace: String,
     // only imports are possible here
-    pub imports: Vec<ExternFnItem>,
+    pub imports: Vec<ExternFnType>,
 }
 
 #[derive(Clone, Serialize, Deserialize)]
-pub struct FnItem {
+pub struct FnType {
     pub signature: FnSignature,
 }
 
 #[derive(Clone, Serialize, Deserialize)]
 #[serde(tag = "ast_type")]
 pub enum SDKAst {
-    Function(FnItem),
-    ExternMod(ExternModItem),
-    Record(RecordItem),
+    Function(FnType),
+    ExternMod(ExternModType),
+    Record(RecordType),
 }
 
 use crate::ast_types::{
-    AstFnItem, AstFnSignature, AstFnArgument, AstExternModItem, AstExternFnItem, AstRecordField,
-    AstRecordItem, AstRecordFields,
+    AstFn, AstFnSignature, AstFnArgument, AstExternMod, AstExternFn, AstRecordField, AstRecord,
+    AstRecordFields,
 };
 
-impl From<AstFnItem> for SDKAst {
-    fn from(ast_fn_item: AstFnItem) -> Self {
+impl From<AstFn> for SDKAst {
+    fn from(ast_fn_item: AstFn) -> Self {
         let fn_item = ast_fn_item.into();
         Self::Function(fn_item)
     }
 }
 
-impl From<AstExternModItem> for SDKAst {
-    fn from(ast_extern_mod: AstExternModItem) -> Self {
+impl From<AstExternMod> for SDKAst {
+    fn from(ast_extern_mod: AstExternMod) -> Self {
         let extern_mod = ast_extern_mod.into();
         Self::ExternMod(extern_mod)
     }
 }
 
-impl From<AstRecordItem> for SDKAst {
-    fn from(ast_record_item: AstRecordItem) -> Self {
+impl From<AstRecord> for SDKAst {
+    fn from(ast_record_item: AstRecord) -> Self {
         let record_item = ast_record_item.into();
         Self::Record(record_item)
     }
 }
 
-impl From<AstFnItem> for FnItem {
-    fn from(ast_fn_item: AstFnItem) -> Self {
+impl From<AstFn> for FnType {
+    fn from(ast_fn_item: AstFn) -> Self {
         let signature = ast_fn_item.signature.into();
 
         Self { signature }
     }
 }
 
-impl From<AstExternModItem> for ExternModItem {
-    fn from(ast_extern_mod: AstExternModItem) -> Self {
+impl From<AstExternMod> for ExternModType {
+    fn from(ast_extern_mod: AstExternMod) -> Self {
         let imports = ast_extern_mod.imports.into_iter().map(Into::into).collect();
 
         Self {
@@ -126,8 +126,8 @@ impl From<AstExternModItem> for ExternModItem {
     }
 }
 
-impl From<AstRecordItem> for RecordItem {
-    fn from(ast_record_item: AstRecordItem) -> Self {
+impl From<AstRecord> for RecordType {
+    fn from(ast_record_item: AstRecord) -> Self {
         Self {
             name: ast_record_item.name,
             fields: ast_record_item.fields.into(),
@@ -177,8 +177,8 @@ impl From<AstFnArgument> for FnArgument {
     }
 }
 
-impl From<AstExternFnItem> for ExternFnItem {
-    fn from(ast_extern_item: AstExternFnItem) -> Self {
+impl From<AstExternFn> for ExternFnType {
+    fn from(ast_extern_item: AstExternFn) -> Self {
         Self {
             link_name: ast_extern_item.link_name,
             signature: ast_extern_item.signature.into(),

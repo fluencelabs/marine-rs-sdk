@@ -23,10 +23,10 @@ use record_deserializer::*;
 use record_serializer::*;
 
 use crate::new_ident;
-use crate::ast_types::AstRecordItem;
+use crate::ast_types::AstRecord;
 use crate::ast_types::AstRecordFields;
 
-impl quote::ToTokens for AstRecordItem {
+impl quote::ToTokens for AstRecord {
     fn to_tokens(&self, tokens: &mut proc_macro2::TokenStream) {
         let original = &self.original;
         crate::prepare_global_data!(
@@ -68,7 +68,7 @@ impl quote::ToTokens for AstRecordItem {
     }
 }
 
-fn generate_serializer_fn(record: &AstRecordItem) -> proc_macro2::TokenStream {
+fn generate_serializer_fn(record: &AstRecord) -> proc_macro2::TokenStream {
     let serializer = record.generate_serializer();
     let fields_count = match &record.fields {
         AstRecordFields::Named(fields) => fields.len(),
@@ -91,7 +91,7 @@ fn generate_serializer_fn(record: &AstRecordItem) -> proc_macro2::TokenStream {
     }
 }
 
-fn generate_deserializer_fn(record: &AstRecordItem) -> proc_macro2::TokenStream {
+fn generate_deserializer_fn(record: &AstRecord) -> proc_macro2::TokenStream {
     let RecordDerDescriptor {
         fields_der,
         record_ctor,

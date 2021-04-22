@@ -18,7 +18,7 @@ use super::ParseMacroInput;
 use crate::ast_types;
 use crate::ParsedType;
 use crate::ast_types::FCEAst;
-use crate::ast_types::AstFnItem;
+use crate::ast_types::AstFn;
 use crate::ast_types::AstFnArgument;
 use crate::syn_error;
 
@@ -38,7 +38,7 @@ impl ParseMacroInput for syn::ItemFn {
         check_args(parsed_args)?;
         check_output_type(&signature.output_type, self.sig.output.span())?;
 
-        let ast_fn = FCEAst::Function(AstFnItem {
+        let ast_fn = FCEAst::Function(AstFn {
             signature,
             original: self,
         });

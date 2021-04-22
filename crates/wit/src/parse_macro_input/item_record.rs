@@ -38,7 +38,7 @@ impl ParseMacroInput for syn::ItemStruct {
         let fields = AstRecordFields::Named(fields);
 
         let name = self.ident.to_string();
-        let ast_record_item = ast_types::AstRecordItem {
+        let ast_record_item = ast_types::AstRecord {
             name,
             fields,
             original: self,
