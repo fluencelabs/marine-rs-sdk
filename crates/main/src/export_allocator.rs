@@ -22,15 +22,11 @@ use super::log;
 #[no_mangle]
 pub unsafe fn allocate(elem_count: usize, elem_ty: usize) -> usize {
     if elem_count == 0 {
-        // otherwise 1 would be returned thanks to the internals of Vec in Rust
+        // otherwise 1 would be returned due to the internals of Vec in Rust
         return 0;
     }
 
     let allocated_mem = allocate_impl(elem_count, elem_ty);
-    println!(
-        "sdk.allocate: {} {} -> {}\n",
-        elem_count, elem_ty, allocated_mem
-    );
     #[cfg(feature = "debug")]
     log(format!(
         "sdk.allocate: {} {} -> {}\n",
@@ -64,6 +60,6 @@ fn allocate_impl(elem_count: usize, elem_ty: usize) -> usize {
         8 => alloc!(i64, elem_count),
         9 => alloc!(f32, elem_count),
         10 => alloc!(f64, elem_count),
-        _ => alloc!(u8, 0), // it'll allocate 0 bytes
+        _ => 0,
     }
 }
