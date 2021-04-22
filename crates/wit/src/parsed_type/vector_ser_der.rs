@@ -34,7 +34,7 @@ pub(crate) fn generate_vector_ser(
                 fluence::internal::add_object_to_release(Box::new(converted_bool_vector));
                 (converted_bool_vector.as_ptr() as _, converted_bool_vector.len() as _)
             }
-        },
+        }
         ParsedType::I8(_)
         | ParsedType::U8(_)
         | ParsedType::I16(_)

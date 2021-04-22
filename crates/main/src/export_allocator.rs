@@ -14,9 +14,6 @@
  * limitations under the License.
  */
 
-#[cfg(feature = "debug")]
-use super::log;
-
 /// Allocates memory area of specified size and type and returns its address.
 /// The allocated memory region is intended to be use as a Vec.
 #[no_mangle]
@@ -27,8 +24,7 @@ pub unsafe fn allocate(elem_count: usize, elem_ty: usize) -> usize {
     }
 
     let allocated_mem = allocate_impl(elem_count, elem_ty);
-    #[cfg(feature = "debug")]
-    log(format!(
+    crate::debug_log!(format!(
         "sdk.allocate: {} {} -> {}\n",
         elem_count, elem_ty, allocated_mem
     ));
@@ -36,30 +32,29 @@ pub unsafe fn allocate(elem_count: usize, elem_ty: usize) -> usize {
     allocated_mem
 }
 
-macro_rules! alloc {
-    ($ty:ty, $elem_count:expr) => {{
-        let vec = Vec::<$ty>::with_capacity($elem_count);
-        let offset = vec.as_ptr() as usize;
-        std::mem::forget(vec);
-        offset
-    }};
-}
-
 fn allocate_impl(elem_count: usize, elem_ty: usize) -> usize {
-    // TODO: handle OOM
-    // Such allocation scheme is needed to deal with Vec layout
     match elem_ty {
-        0 => alloc!(u8, elem_count), // for booleans
-        1 => alloc!(u8, elem_count),
-        2 => alloc!(u16, elem_count),
-        3 => alloc!(u32, elem_count),
-        4 => alloc!(u64, elem_count),
-        5 => alloc!(i8, elem_count),
-        6 => alloc!(i16, elem_count),
-        7 => alloc!(i32, elem_count),
-        8 => alloc!(i64, elem_count),
-        9 => alloc!(f32, elem_count),
-        10 => alloc!(f64, elem_count),
+        0 => allocate_vec::<u8>(elem_count), // for booleans
+        1 => allocate_vec::<u8>(elem_count),
+        2 => allocate_vec::<u16>(elem_count),
+        3 => allocate_vec::<u32>(elem_count),
+        4 => allocate_vec::<u64>(elem_count),
+        5 => allocate_vec::<i8>(elem_count),
+        6 => allocate_vec::<i16>(elem_count),
+        7 => allocate_vec::<i32>(elem_count),
+        8 => allocate_vec::<i64>(elem_count),
+        9 => allocate_vec::<f32>(elem_count),
+        10 => allocate_vec::<f64>(elem_count),
         _ => 0,
     }
+}
+
+fn allocate_vec<T>(count: usize) -> usize {
+    // TODO: handle OOM
+    // This allocation scheme with vectors is needed to deal with internal Vec layout
+    let vec = Vec::<T>::with_capacity(count);
+    let offset = vec.as_ptr() as usize;
+    std::mem::forget(vec);
+
+    offset
 }

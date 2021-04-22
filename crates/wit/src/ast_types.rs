@@ -27,8 +27,8 @@ pub(crate) struct AstFnSignature {
     pub visibility: syn::Visibility,
     pub name: String,
     pub arguments: Vec<AstFnArgument>,
-    // fce supports only one return value now,
-    // waiting for adding multi-value support in Wasmer.
+    // only one or zero return values are supported now,
+    // waiting for adding multi-value support in Wasmer
     pub output_type: Option<ParsedType>,
 }
 
@@ -39,19 +39,22 @@ pub(crate) struct AstRecordItem {
     pub original: syn::ItemStruct,
 }
 
-#[allow(dead_code)] // at the moment tuple and unit structs aren't supported
 #[derive(Debug, Clone, PartialEq)]
 pub(crate) enum AstRecordFields {
     Named(Vec<AstRecordField>),
+
     // named and unnamed variants have the same inner field types because of it's easy to handle it,
     // for additional info look at https://github.com/dtolnay/syn/issues/698
+    #[allow(dead_code)] // at the moment tuple and unit structs aren't supported
     Unnamed(Vec<AstRecordField>),
+
+    #[allow(dead_code)] // at the moment tuple and unit structs aren't supported
     Unit,
 }
 
 #[derive(Debug, Clone, PartialEq)]
 pub(crate) struct AstRecordField {
-    // fields of tuple structs haven't got name
+    /// Name of the field. Can be `None` for tuples.
     pub name: Option<String>,
     pub ty: ParsedType,
 }
