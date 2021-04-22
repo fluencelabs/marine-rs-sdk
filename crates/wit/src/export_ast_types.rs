@@ -29,9 +29,7 @@ pub struct FnArgument {
 pub struct FnSignature {
     pub name: String,
     pub arguments: Vec<FnArgument>,
-    // fce supports only one return value now,
-    // waiting for adding multi-value support in Wasmer.
-    pub output_type: Vec<ParsedType>,
+    pub output_types: Vec<ParsedType>,
 }
 
 #[derive(Clone, Serialize, Deserialize)]
@@ -165,7 +163,7 @@ impl From<AstFnSignature> for FnSignature {
         Self {
             name: ast_fn_sig.name,
             arguments,
-            output_type,
+            output_types: output_type,
         }
     }
 }
