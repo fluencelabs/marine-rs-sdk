@@ -136,6 +136,6 @@ pub unsafe fn __fce_generated_wrapper_func_inner_arrays_2(arg_0: u32, arg_1: u32
 #[doc(hidden)]
 #[allow(clippy::all)]
 #[link_section = "__fce_generated_section__inner_arrays_2"]
-pub static __fce_generated_static_global_inner_arrays_2: [u8; 365usize] = {
-    * b"{\"ast_type\":\"Function\",\"signature\":{\"name\":\"inner_arrays_2\",\"arguments\":[{\"name\":\"arg\",\"ty\":{\"Vector\":[{\"Vector\":[{\"Vector\":[{\"Vector\":[{\"Record\":[\"TestRecord\",\"ByValue\"]},\"ByValue\"]},\"ByValue\"]},\"ByValue\"]},\"ByValue\"]}}],\"output_type\":{\"Vector\":[{\"Vector\":[{\"Vector\":[{\"Vector\":[{\"Record\":[\"TestRecord\",\"ByValue\"]},\"ByValue\"]},\"ByValue\"]},\"ByValue\"]},\"ByValue\"]}}}"
+pub static __fce_generated_static_global_inner_arrays_2: [u8; 368usize] = {
+    * b"{\"ast_type\":\"Function\",\"signature\":{\"name\":\"inner_arrays_2\",\"arguments\":[{\"name\":\"arg\",\"ty\":{\"Vector\":[{\"Vector\":[{\"Vector\":[{\"Vector\":[{\"Record\":[\"TestRecord\",\"ByValue\"]},\"ByValue\"]},\"ByValue\"]},\"ByValue\"]},\"ByValue\"]}}],\"output_types\":[{\"Vector\":[{\"Vector\":[{\"Vector\":[{\"Vector\":[{\"Record\":[\"TestRecord\",\"ByValue\"]},\"ByValue\"]},\"ByValue\"]},\"ByValue\"]},\"ByValue\"]}]}}"
 };

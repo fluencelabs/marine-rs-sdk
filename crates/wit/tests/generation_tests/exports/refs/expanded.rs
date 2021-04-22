@@ -100,6 +100,6 @@ pub unsafe fn __fce_generated_wrapper_func_test_array_refs(arg_0: u32, arg_1: u3
 #[doc(hidden)]
 #[allow(clippy::all)]
 #[link_section = "__fce_generated_section__test_array_refs"]
-pub static __fce_generated_static_global_test_array_refs: [u8; 294usize] = {
-    * b"{\"ast_type\":\"Function\",\"signature\":{\"name\":\"test_array_refs\",\"arguments\":[{\"name\":\"arg\",\"ty\":{\"Vector\":[{\"Vector\":[{\"Utf8String\":\"ByValue\"},\"ByValue\"]},\"ByRef\"]}}],\"output_type\":{\"Vector\":[{\"Vector\":[{\"Vector\":[{\"Vector\":[{\"Utf8String\":\"ByValue\"},\"ByValue\"]},\"ByValue\"]},\"ByValue\"]},\"ByRef\"]}}}"
+pub static __fce_generated_static_global_test_array_refs: [u8; 297usize] = {
+    * b"{\"ast_type\":\"Function\",\"signature\":{\"name\":\"test_array_refs\",\"arguments\":[{\"name\":\"arg\",\"ty\":{\"Vector\":[{\"Vector\":[{\"Utf8String\":\"ByValue\"},\"ByValue\"]},\"ByRef\"]}}],\"output_types\":[{\"Vector\":[{\"Vector\":[{\"Vector\":[{\"Vector\":[{\"Utf8String\":\"ByValue\"},\"ByValue\"]},\"ByValue\"]},\"ByValue\"]},\"ByRef\"]}]}}"
 };

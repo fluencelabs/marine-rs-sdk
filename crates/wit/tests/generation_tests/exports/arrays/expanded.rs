@@ -120,6 +120,6 @@ pub unsafe fn __fce_generated_wrapper_func_inner_arrays_1(arg_0: u32, arg_1: u32
 #[doc(hidden)]
 #[allow(clippy::all)]
 #[link_section = "__fce_generated_section__inner_arrays_1"]
-pub static __fce_generated_static_global_inner_arrays_1: [u8; 327usize] = {
-    * b"{\"ast_type\":\"Function\",\"signature\":{\"name\":\"inner_arrays_1\",\"arguments\":[{\"name\":\"arg\",\"ty\":{\"Vector\":[{\"Vector\":[{\"Vector\":[{\"Vector\":[{\"U8\":\"ByValue\"},\"ByValue\"]},\"ByValue\"]},\"ByValue\"]},\"ByValue\"]}}],\"output_type\":{\"Vector\":[{\"Vector\":[{\"Vector\":[{\"Vector\":[{\"U8\":\"ByValue\"},\"ByValue\"]},\"ByValue\"]},\"ByValue\"]},\"ByValue\"]}}}"
+pub static __fce_generated_static_global_inner_arrays_1: [u8; 330usize] = {
+    * b"{\"ast_type\":\"Function\",\"signature\":{\"name\":\"inner_arrays_1\",\"arguments\":[{\"name\":\"arg\",\"ty\":{\"Vector\":[{\"Vector\":[{\"Vector\":[{\"Vector\":[{\"U8\":\"ByValue\"},\"ByValue\"]},\"ByValue\"]},\"ByValue\"]},\"ByValue\"]}}],\"output_types\":[{\"Vector\":[{\"Vector\":[{\"Vector\":[{\"Vector\":[{\"U8\":\"ByValue\"},\"ByValue\"]},\"ByValue\"]},\"ByValue\"]},\"ByValue\"]}]}}"
 };
