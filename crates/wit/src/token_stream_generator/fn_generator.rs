@@ -25,25 +25,6 @@ use crate::new_ident;
 
 use proc_macro2::TokenStream;
 
-// vectors:
-// before:
-// Vec<u8>
-// Vec<f32>
-// Vec<u64>
-// => Vec<u64> => (ptr, size) => IT
-// Vec<Vec<u8>> => Vec<Vec<u64>> => Vec<(u32, u32)> => Vec<u64>
-
-// after:
-// Vec<bool> => Vec<u8>
-// Vec<u8> => (ptr, size) => IT
-
-// records
-// before:
-// Record A => Vec<u64> => IT
-
-// after:
-// Record A => Vec<u8> => IT
-
 impl quote::ToTokens for ast_types::AstFnItem {
     fn to_tokens(&self, tokens: &mut TokenStream) {
         crate::prepare_global_data!(
