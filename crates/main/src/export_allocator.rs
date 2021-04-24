@@ -24,11 +24,6 @@ pub unsafe fn allocate(elem_count: usize, elem_ty: usize) -> usize {
     }
 
     let allocated_mem = allocate_impl(elem_count, elem_ty);
-    println!(
-        "sdk.allocate: {} {} -> {}\n",
-        elem_count, elem_ty, allocated_mem
-    );
-
     crate::debug_log!(format!(
         "sdk.allocate: {} {} -> {}\n",
         elem_count, elem_ty, allocated_mem
