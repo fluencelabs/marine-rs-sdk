@@ -31,8 +31,12 @@ pub(crate) fn generate_vector_ser(
         ParsedType::Boolean(_) => {
             quote! {
                 let converted_bool_vector: Vec<u8> = arg.into_iter().map(|v| *v as u8).collect::<_>();
+                let ptr = converted_bool_vector.as_ptr();
+                let len = converted_bool_vector.len();
+
                 fluence::internal::add_object_to_release(Box::new(converted_bool_vector));
-                (converted_bool_vector.as_ptr() as _, converted_bool_vector.len() as _)
+
+                (ptr as _, len as _)
             }
         }
         ParsedType::I8(_)
