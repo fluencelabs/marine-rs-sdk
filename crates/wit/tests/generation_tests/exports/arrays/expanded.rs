@@ -8,30 +8,23 @@ pub fn inner_arrays_1(arg: Vec<Vec<Vec<Vec<u8>>>>) -> Vec<Vec<Vec<Vec<u8>>>> {
 #[allow(clippy::all)]
 pub unsafe fn __fce_generated_wrapper_func_inner_arrays_1(arg_0: u32, arg_1: u32) {
     unsafe fn __fce_generated_vec_deserializer_0(offset: u32, size: u32) -> Vec<Vec<Vec<Vec<u8>>>> {
-        let size = size / 8;
         unsafe fn __fce_generated_vec_deserializer_0_Vec_Vec_u8__(
             offset: u32,
             size: u32
         ) -> Vec<Vec<Vec<u8>>> {
-            let size = size / 8;
             unsafe fn __fce_generated_vec_deserializer_0_Vec_Vec_u8___Vec_u8_(
                 offset: u32,
                 size: u32
             ) -> Vec<Vec<u8>> {
-                let size = size / 8;
                 unsafe fn __fce_generated_vec_deserializer_0_Vec_Vec_u8___Vec_u8__u8(
                     offset: u32,
                     size: u32
                 ) -> Vec<u8> {
-                    let size = size / 8;
-                    let mut arg: Vec<u64> = Vec::from_raw_parts(offset as _, size as _, size as _);
-                    let mut result = Vec::with_capacity(arg.len());
-                    for value in arg {
-                        result.push(value as _);
-                    }
-                    result
+                    Vec::from_raw_parts(offset as _, size as _, size as _)
                 }
-                let mut arg: Vec<u64> = Vec::from_raw_parts(offset as _, size as _, size as _);
+                let vec_passing_size = 2;
+                let mut arg: Vec<u32> =
+                    Vec::from_raw_parts(offset as _, (vec_passing_size * size) as _, (vec_passing_size * size) as _);
                 let mut result = Vec::with_capacity(arg.len());
                 let mut arg = arg.into_iter();
                 while let Some(offset) = arg.next() {
@@ -44,7 +37,9 @@ pub unsafe fn __fce_generated_wrapper_func_inner_arrays_1(arg_0: u32, arg_1: u32
                 }
                 result
             }
-            let mut arg: Vec<u64> = Vec::from_raw_parts(offset as _, size as _, size as _);
+            let vec_passing_size = 2;
+            let mut arg: Vec<u32> =
+                Vec::from_raw_parts(offset as _, (vec_passing_size * size) as _, (vec_passing_size * size) as _);
             let mut result = Vec::with_capacity(arg.len());
             let mut arg = arg.into_iter();
             while let Some(offset) = arg.next() {
@@ -55,7 +50,8 @@ pub unsafe fn __fce_generated_wrapper_func_inner_arrays_1(arg_0: u32, arg_1: u32
             }
             result
         }
-        let mut arg: Vec<u64> = Vec::from_raw_parts(offset as _, size as _, size as _);
+        let vec_passing_size = 2;
+        let mut arg: Vec<u32> = Vec::from_raw_parts(offset as _, (vec_passing_size * size) as _, (vec_passing_size * size) as _);
         let mut result = Vec::with_capacity(arg.len());
         let mut arg = arg.into_iter();
         while let Some(offset) = arg.next() {
@@ -87,7 +83,7 @@ pub unsafe fn __fce_generated_wrapper_func_inner_arrays_1(arg_0: u32, arg_1: u32
                     result.push(size as _);
                 }
                 let result_ptr = result.as_ptr();
-                let result_len = 4 * result.len();
+                let result_len = result.len() / 2;
                 fluence::internal::add_object_to_release(Box::new(result));
                 (result_ptr as _, result_len as _)
             }
@@ -98,7 +94,7 @@ pub unsafe fn __fce_generated_wrapper_func_inner_arrays_1(arg_0: u32, arg_1: u32
                 result.push(size as _);
             }
             let result_ptr = result.as_ptr();
-            let result_len = 4 * result.len();
+            let result_len = result.len() / 2;
             fluence::internal::add_object_to_release(Box::new(result));
             (result_ptr as _, result_len as _)
         }
@@ -109,7 +105,7 @@ pub unsafe fn __fce_generated_wrapper_func_inner_arrays_1(arg_0: u32, arg_1: u32
             result.push(size as _);
         }
         let result_ptr = result.as_ptr();
-        let result_len = 4 * result.len();
+        let result_len = result.len() / 2;
         fluence::internal::add_object_to_release(Box::new(result));
         (result_ptr as _, result_len as _)
     }
@@ -124,6 +120,6 @@ pub unsafe fn __fce_generated_wrapper_func_inner_arrays_1(arg_0: u32, arg_1: u32
 #[doc(hidden)]
 #[allow(clippy::all)]
 #[link_section = "__fce_generated_section__inner_arrays_1"]
-pub static __fce_generated_static_global_inner_arrays_1: [u8; 327usize] = {
-    * b"{\"ast_type\":\"Function\",\"signature\":{\"name\":\"inner_arrays_1\",\"arguments\":[{\"name\":\"arg\",\"ty\":{\"Vector\":[{\"Vector\":[{\"Vector\":[{\"Vector\":[{\"U8\":\"ByValue\"},\"ByValue\"]},\"ByValue\"]},\"ByValue\"]},\"ByValue\"]}}],\"output_type\":{\"Vector\":[{\"Vector\":[{\"Vector\":[{\"Vector\":[{\"U8\":\"ByValue\"},\"ByValue\"]},\"ByValue\"]},\"ByValue\"]},\"ByValue\"]}}}"
+pub static __fce_generated_static_global_inner_arrays_1: [u8; 330usize] = {
+    * b"{\"ast_type\":\"Function\",\"signature\":{\"name\":\"inner_arrays_1\",\"arguments\":[{\"name\":\"arg\",\"ty\":{\"Vector\":[{\"Vector\":[{\"Vector\":[{\"Vector\":[{\"U8\":\"ByValue\"},\"ByValue\"]},\"ByValue\"]},\"ByValue\"]},\"ByValue\"]}}],\"output_types\":[{\"Vector\":[{\"Vector\":[{\"Vector\":[{\"Vector\":[{\"U8\":\"ByValue\"},\"ByValue\"]},\"ByValue\"]},\"ByValue\"]},\"ByValue\"]}]}}"
 };

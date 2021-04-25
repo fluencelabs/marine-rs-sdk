@@ -16,14 +16,17 @@
 
 mod record_serializer;
 mod record_deserializer;
+mod field_values_builder;
 
-use record_serializer::*;
+use field_values_builder::*;
 use record_deserializer::*;
+use record_serializer::*;
 
 use crate::new_ident;
-use crate::fce_ast_types;
+use crate::ast_types::AstRecord;
+use crate::ast_types::AstRecordFields;
 
-impl quote::ToTokens for fce_ast_types::AstRecordItem {
+impl quote::ToTokens for AstRecord {
     fn to_tokens(&self, tokens: &mut proc_macro2::TokenStream) {
         let original = &self.original;
         crate::prepare_global_data!(
@@ -65,13 +68,18 @@ impl quote::ToTokens for fce_ast_types::AstRecordItem {
     }
 }
 
-fn generate_serializer_fn(record: &fce_ast_types::AstRecordItem) -> proc_macro2::TokenStream {
+fn generate_serializer_fn(record: &AstRecord) -> proc_macro2::TokenStream {
     let serializer = record.generate_serializer();
-    let fields_count = record.fields.len();
+    let fields_count = match &record.fields {
+        AstRecordFields::Named(fields) => fields.len(),
+        AstRecordFields::Unnamed(fields) => fields.len(),
+        AstRecordFields::Unit => return proc_macro2::TokenStream::new(),
+    };
 
     quote::quote! {
         pub fn __fce_generated_serialize(&self) -> *const u8 {
-            let mut raw_record: Vec<u64> = Vec::with_capacity(2 * #fields_count);
+            // 4 is an average size of a possible record field
+            let mut raw_record: Vec<u8> = Vec::with_capacity(4 * #fields_count);
 
             #serializer
 
@@ -83,22 +91,27 @@ fn generate_serializer_fn(record: &fce_ast_types::AstRecordItem) -> proc_macro2:
     }
 }
 
-fn generate_deserializer_fn(record: &fce_ast_types::AstRecordItem) -> proc_macro2::TokenStream {
-    let RecordDeserializerDescriptor {
-        deserializer,
-        type_constructor,
-    } = record.generate_deserializer();
+fn generate_deserializer_fn(record: &AstRecord) -> proc_macro2::TokenStream {
+    let RecordDerDescriptor {
+        fields_der,
+        record_ctor,
+    } = record.generate_der();
 
-    let record_size =
-        crate::utils::get_record_size(record.fields.iter().map(|ast_field| &ast_field.ty));
+    let fields = match &record.fields {
+        AstRecordFields::Named(fields) => fields,
+        AstRecordFields::Unnamed(fields) => fields,
+        AstRecordFields::Unit => return proc_macro2::TokenStream::new(),
+    };
+
+    let record_size = crate::utils::get_record_size(fields.iter().map(|ast_field| &ast_field.ty));
 
     quote::quote! {
         pub unsafe fn __fce_generated_deserialize(record_ptr: *const u8) -> Self {
-            let raw_record: Vec<u64> = Vec::from_raw_parts(record_ptr as _, #record_size, #record_size);
+            let raw_record: Vec<u8> = Vec::from_raw_parts(record_ptr as _, #record_size, #record_size);
 
-            #deserializer
+            #fields_der
 
-            #type_constructor
+            #record_ctor
         }
     }
 }

@@ -18,8 +18,6 @@
 //! by two global variables that contain pointer and size. Will be refactored after multi-value
 //! support in Wasmer.
 
-use super::log;
-
 use std::sync::atomic::AtomicUsize;
 use std::cell::RefCell;
 use std::any::Any;
@@ -31,7 +29,7 @@ thread_local!(static OBJECTS_TO_RELEASE: RefCell<Vec<Box<dyn Any>>> = RefCell::n
 
 #[no_mangle]
 pub unsafe fn get_result_ptr() -> usize {
-    log(format!(
+    crate::debug_log!(format!(
         "sdk.get_result_ptr, returns {}\n",
         *RESULT_PTR.get_mut()
     ));
@@ -41,7 +39,7 @@ pub unsafe fn get_result_ptr() -> usize {
 
 #[no_mangle]
 pub unsafe fn get_result_size() -> usize {
-    log(format!(
+    crate::debug_log!(format!(
         "sdk.get_result_size, returns {}\n",
         *RESULT_SIZE.get_mut()
     ));
@@ -51,14 +49,14 @@ pub unsafe fn get_result_size() -> usize {
 
 #[no_mangle]
 pub unsafe fn set_result_ptr(ptr: usize) {
-    log(format!("sdk.set_result_ptr: {}\n", ptr));
+    crate::debug_log!(format!("sdk.set_result_ptr: {}\n", ptr));
 
     *RESULT_PTR.get_mut() = ptr;
 }
 
 #[no_mangle]
 pub unsafe fn set_result_size(size: usize) {
-    log(format!("sdk.set_result_size: {}\n", size));
+    crate::debug_log!(format!("sdk.set_result_size: {}\n", size));
 
     *RESULT_SIZE.get_mut() = size;
 }

@@ -57,16 +57,14 @@ impl ForeignModEpilogGlueCodeGenerator for Option<ParsedType> {
                 )
             },
             Some(ParsedType::Vector(ty, _)) => {
-                let generated_deserializer_name = "__fce_generated_vec_deserializer";
-                let generated_deserializer_ident = new_ident!(generated_deserializer_name);
-                let vector_deserializer = super::vector_utils::generate_vector_deserializer(
-                    ty,
-                    generated_deserializer_name,
-                );
+                let generated_der_name = "__fce_generated_vec_deserializer";
+                let generated_der_ident = new_ident!(generated_der_name);
+                let vector_deserializer =
+                    super::vector_ser_der::generate_vector_der(ty, generated_der_name);
 
                 quote! {
                     #vector_deserializer
-                    #generated_deserializer_ident(
+                    #generated_der_ident(
                         fluence::internal::get_result_ptr() as _,
                         fluence::internal::get_result_size() as _,
                     )

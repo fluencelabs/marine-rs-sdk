@@ -57,14 +57,16 @@ pub use result::add_object_to_release;
 pub use module_manifest::MANIFEST_SECTION_NAME;
 pub use sdk_version_embedder::VERSION_SECTION_NAME;
 
-#[allow(unused_variables)]
-pub(crate) fn log<S: AsRef<str>>(msg: S) {
-    // logs will be printed only if debug feature is enabled
-    #[cfg(feature = "debug")]
-    {
-        let level = log::Level::Info as i32;
-        let target = 0i32;
-        let msg = msg.as_ref();
-        logger::log_utf8_string(level, target, msg.as_ptr() as i32, msg.len() as i32);
-    }
+// these logs will be printed only if debug feature is enabled
+#[macro_export]
+macro_rules! debug_log {
+    ($msg_generator:expr) => {
+        #[cfg(feature = "debug")]
+        {
+            let level = log::Level::Info as i32;
+            let target = 0i32;
+            let msg = $msg_generator;
+            crate::logger::log_utf8_string(level, target, msg.as_ptr() as i32, msg.len() as i32);
+        }
+    };
 }

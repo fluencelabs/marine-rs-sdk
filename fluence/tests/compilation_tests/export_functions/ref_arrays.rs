@@ -32,6 +32,11 @@ pub fn string_type(_arg: &Vec<String>) -> &Vec<String> {
 }
 
 #[fce]
+pub fn bool_type(_arg: &Vec<bool>) -> &Vec<bool> {
+    unimplemented!()
+}
+
+#[fce]
 pub fn f32_type(_arg: &Vec<f32>) -> &Vec<f32> {
     unimplemented!()
 }

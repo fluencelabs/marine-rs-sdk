@@ -15,8 +15,8 @@
  */
 
 use super::ParseMacroInput;
-use crate::fce_ast_types;
-use crate::fce_ast_types::FCEAst;
+use crate::ast_types;
+use crate::ast_types::FCEAst;
 use crate::syn_error;
 
 use syn::Result;
@@ -36,10 +36,10 @@ impl ParseMacroInput for syn::ItemForeignMod {
         let imports = extract_import_functions(&self)?;
         check_imports(imports.iter().zip(self.items.iter().map(|i| i.span())))?;
 
-        let extern_mod_item = fce_ast_types::AstExternModItem {
+        let extern_mod_item = ast_types::AstExternMod {
             namespace,
             imports,
-            original: Some(self),
+            original: self,
         };
         Ok(FCEAst::ExternMod(extern_mod_item))
     }
@@ -99,7 +99,7 @@ fn try_extract_namespace(
 
 fn extract_import_functions(
     foreign_mod: &syn::ItemForeignMod,
-) -> Result<Vec<fce_ast_types::AstExternFnItem>> {
+) -> Result<Vec<ast_types::AstExternFn>> {
     foreign_mod
         .items
         .iter()
@@ -111,7 +111,7 @@ fn extract_import_functions(
 /// This function checks whether these imports contains inner references. In this case glue
 /// code couldn't be generated.
 fn check_imports<'i>(
-    extern_fns: impl ExactSizeIterator<Item = (&'i fce_ast_types::AstExternFnItem, proc_macro2::Span)>,
+    extern_fns: impl ExactSizeIterator<Item = (&'i ast_types::AstExternFn, proc_macro2::Span)>,
 ) -> Result<()> {
     use super::utils::contain_inner_ref;
 
@@ -129,7 +129,7 @@ fn check_imports<'i>(
     Ok(())
 }
 
-fn parse_raw_foreign_item(raw_item: syn::ForeignItem) -> Result<fce_ast_types::AstExternFnItem> {
+fn parse_raw_foreign_item(raw_item: syn::ForeignItem) -> Result<ast_types::AstExternFn> {
     let function_item = match raw_item {
         syn::ForeignItem::Fn(function_item) => function_item,
         _ => {
@@ -158,7 +158,7 @@ fn parse_raw_foreign_item(raw_item: syn::ForeignItem) -> Result<fce_ast_types::A
     };
 
     let signature = super::item_fn::try_to_ast_signature(function_item.sig, function_item.vis)?;
-    let ast_extern_fn_item = fce_ast_types::AstExternFnItem {
+    let ast_extern_fn_item = ast_types::AstExternFn {
         link_name,
         signature,
     };

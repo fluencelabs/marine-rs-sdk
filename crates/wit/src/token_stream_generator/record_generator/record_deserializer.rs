@@ -15,158 +15,79 @@
  */
 
 use crate::new_ident;
-use crate::parsed_type::ParsedType;
-use crate::fce_ast_types;
+use crate::ast_types::*;
+use super::FieldValuesBuilder;
 
+use proc_macro2::TokenStream;
 use quote::quote;
 
-pub(super) struct RecordDeserializerDescriptor {
-    pub(super) deserializer: proc_macro2::TokenStream,
-    pub(super) type_constructor: proc_macro2::TokenStream,
+#[derive(Default)]
+pub(super) struct RecordDerDescriptor {
+    pub(super) fields_der: TokenStream,
+    pub(super) record_ctor: TokenStream,
 }
 
 /// This trait could be used to generate various parts of a record serializer func.
-pub(super) trait RecordDeserializerGlueCodeGenerator {
-    fn generate_deserializer(&self) -> RecordDeserializerDescriptor;
+pub(super) trait RecordDerGlueCodeGenerator {
+    fn generate_der(&self) -> RecordDerDescriptor;
 }
 
-impl RecordDeserializerGlueCodeGenerator for fce_ast_types::AstRecordItem {
-    fn generate_deserializer(&self) -> RecordDeserializerDescriptor {
-        let mut field_values = Vec::with_capacity(self.fields.len());
-        let mut deserializer = proc_macro2::TokenStream::new();
-        let mut value_id: usize = 0;
-
-        for (id, ast_field) in self.fields.iter().enumerate() {
-            let field = new_ident!(format!("field_{}", id));
-            let field_d = match &ast_field.ty {
-                ParsedType::Boolean(_) => {
-                    quote! {
-                        let #field = raw_record[#value_id] != 0;
-                    }
-                }
-                ParsedType::I8(_) => {
-                    quote! {
-                        let #field = raw_record[#value_id] as i8;
-                    }
-                }
-                ParsedType::I16(_) => {
-                    quote! {
-                        let #field = raw_record[#value_id] as i16;
-                    }
-                }
-                ParsedType::I32(_) => {
-                    quote! {
-                        let #field = raw_record[#value_id] as i32;
-                    }
-                }
-                ParsedType::I64(_) => {
-                    quote! {
-                        let #field = raw_record[#value_id] as i64;
-                    }
-                }
-                ParsedType::U8(_) => {
-                    quote! {
-                        let #field = raw_record[#value_id] as u8;
-                    }
-                }
-                ParsedType::U16(_) => {
-                    quote! {
-                        let #field = raw_record[#value_id] as u16;
-                    }
-                }
-                ParsedType::U32(_) => {
-                    quote! {
-                        let #field = raw_record[#value_id] as u32;
-                    }
-                }
-                ParsedType::U64(_) => {
-                    quote! {
-                        let #field = raw_record[#value_id] as u64;
-                    }
-                }
-                ParsedType::F32(_) => {
-                    quote! {
-                        let #field = raw_record[#value_id] as f32;
-                    }
-                }
-                ParsedType::F64(_) => {
-                    quote! {
-                        let #field = f64::from_bits(raw_record[#value_id]);
-                    }
-                }
-                ParsedType::Utf8Str(_) | ParsedType::Utf8String(_) => {
-                    let ptr_id = value_id;
-                    let size_id = value_id + 1;
-                    value_id += 1;
-
-                    quote! {
-                        let #field = unsafe { String::from_raw_parts(raw_record[#ptr_id] as _, raw_record[#size_id] as _, raw_record[#size_id] as _) };
-                    }
-                }
-                ParsedType::Vector(ty, _) => {
-                    let generated_deserializer_name =
-                        format!("__fce_generated_vec_deserializer_{}", value_id);
-                    let generated_deserializer_name =
-                        crate::utils::prepare_ident(generated_deserializer_name);
-                    let generated_deserializer_ident = new_ident!(generated_deserializer_name);
-
-                    let vector_deserializer = crate::parsed_type::generate_vector_deserializer(
-                        ty,
-                        &generated_deserializer_name,
-                    );
-
-                    let ptr_id = value_id;
-                    let size_id = value_id + 1;
-                    value_id += 1;
-
-                    quote! {
-                        #vector_deserializer
-                        let #field = unsafe { #generated_deserializer_ident(raw_record[#ptr_id] as _, raw_record[#size_id] as _) };
-                    }
-                }
-                ParsedType::Record(record_name, _) => {
-                    let ptr_id = value_id;
-                    let record_ident = new_ident!(record_name);
-                    quote! {
-                        let #field = #record_ident::__fce_generated_deserialize(raw_record[#ptr_id] as _);
-                    }
-                }
-            };
-
-            field_values.push(field);
-            deserializer.extend(field_d);
-            value_id += 1;
+impl RecordDerGlueCodeGenerator for AstRecord {
+    fn generate_der(&self) -> RecordDerDescriptor {
+        match &self.fields {
+            AstRecordFields::Named(fields) => record_der_from_named(fields),
+            AstRecordFields::Unnamed(fields) => record_der_from_unnamed(fields),
+            AstRecordFields::Unit => RecordDerDescriptor::default(),
         }
+    }
+}
 
-        let type_constructor = match self.fields.first() {
-            Some(ast_field) if ast_field.name.is_some() => {
-                let field_names = self
-                    .fields
-                    .iter()
-                    .map(|field| {
-                        new_ident!(field.name.clone().expect("all fields should have name"))
-                    })
-                    .collect::<Vec<_>>();
+fn record_der_from_named(fields: &[AstRecordField]) -> RecordDerDescriptor {
+    let builder = FieldValuesBuilder::build(fields.iter());
+    let record_ctor = field_ctors_from_named(fields.iter(), builder.field_value_idents.iter());
 
-                quote! {
-                    Self {
-                        #(#field_names: #field_values),*
-                    }
-                }
-            }
-            Some(_) => {
-                quote! {
-                    Self (
-                        #(#field_values),*
-                    )
-                }
-            }
-            _ => quote! {},
-        };
+    RecordDerDescriptor {
+        fields_der: builder.fields_der,
+        record_ctor,
+    }
+}
 
-        RecordDeserializerDescriptor {
-            deserializer,
-            type_constructor,
+fn record_der_from_unnamed(fields: &[AstRecordField]) -> RecordDerDescriptor {
+    let builder = FieldValuesBuilder::build(fields.iter());
+    let record_ctor = field_ctor_from_unnamed(builder.field_value_idents.iter());
+
+    RecordDerDescriptor {
+        fields_der: builder.fields_der,
+        record_ctor,
+    }
+}
+
+fn field_ctors_from_named<'a, 'v>(
+    ast_fields: impl ExactSizeIterator<Item = &'a AstRecordField>,
+    field_values: impl ExactSizeIterator<Item = &'v syn::Ident>,
+) -> TokenStream {
+    let field_names = ast_fields
+        .map(|ast_field| {
+            new_ident!(ast_field
+                .name
+                .as_ref()
+                .expect("all fields should have name"))
+        })
+        .collect::<Vec<_>>();
+
+    quote! {
+        Self {
+            #(#field_names: #field_values),*
+        }
+    }
+}
+
+fn field_ctor_from_unnamed<'v>(
+    field_values: impl ExactSizeIterator<Item = &'v syn::Ident>,
+) -> TokenStream {
+    quote! {
+        Self {
+            #(#field_values),*
         }
     }
 }

@@ -15,11 +15,11 @@
  */
 
 use super::ParseMacroInput;
-use crate::fce_ast_types;
+use crate::ast_types;
 use crate::ParsedType;
-use crate::fce_ast_types::FCEAst;
-use crate::fce_ast_types::AstFnItem;
-use crate::fce_ast_types::AstFnArgument;
+use crate::ast_types::FCEAst;
+use crate::ast_types::AstFn;
+use crate::ast_types::AstFnArgument;
 use crate::syn_error;
 
 use syn::Result;
@@ -38,9 +38,9 @@ impl ParseMacroInput for syn::ItemFn {
         check_args(parsed_args)?;
         check_output_type(&signature.output_type, self.sig.output.span())?;
 
-        let ast_fn = FCEAst::Function(AstFnItem {
+        let ast_fn = FCEAst::Function(AstFn {
             signature,
-            original: Some(self),
+            original: self,
         });
         Ok(ast_fn)
     }
@@ -49,7 +49,7 @@ impl ParseMacroInput for syn::ItemFn {
 pub(super) fn try_to_ast_signature(
     signature: syn::Signature,
     visibility: syn::Visibility,
-) -> Result<fce_ast_types::AstFnSignature> {
+) -> Result<ast_types::AstFnSignature> {
     use quote::ToTokens;
 
     check_function(&signature)?;
@@ -86,8 +86,8 @@ pub(super) fn try_to_ast_signature(
 
     let output_type = ParsedType::from_return_type(&output)?;
 
-    let ast_function_item = fce_ast_types::AstFnSignature {
-        visibility: Some(visibility),
+    let ast_function_item = ast_types::AstFnSignature {
+        visibility,
         name: signature.ident.to_string(),
         arguments,
         output_type,

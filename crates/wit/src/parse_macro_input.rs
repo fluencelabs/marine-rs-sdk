@@ -19,7 +19,7 @@ mod item_foreign_mod;
 mod item_record;
 mod utils;
 
-use crate::fce_ast_types::FCEAst;
+use crate::ast_types::FCEAst;
 
 pub(crate) trait ParseMacroInput {
     fn parse_macro_input(self) -> syn::Result<FCEAst>;

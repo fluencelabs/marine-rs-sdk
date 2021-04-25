@@ -16,62 +16,68 @@
 
 use crate::new_ident;
 use crate::parsed_type::ParsedType;
-use crate::fce_ast_types;
+use crate::ast_types::AstRecord;
+use crate::ast_types::AstRecordField;
+use crate::ast_types::AstRecordFields;
 
 use quote::quote;
 
 /// This trait could be used to generate various parts of a record serializer func.
-pub(super) trait RecordSerializerGlueCodeGenerator {
+pub(super) trait RecordSerGlueCodeGenerator {
     fn generate_serializer(&self) -> proc_macro2::TokenStream;
 }
 
-impl RecordSerializerGlueCodeGenerator for fce_ast_types::AstRecordItem {
+impl RecordSerGlueCodeGenerator for AstRecord {
     fn generate_serializer(&self) -> proc_macro2::TokenStream {
         let mut serializer = proc_macro2::TokenStream::new();
-        for (id, field) in self.fields.iter().enumerate() {
+        let fields = match &self.fields {
+            AstRecordFields::Named(fields) => fields,
+            AstRecordFields::Unnamed(fields) => fields,
+            AstRecordFields::Unit => return proc_macro2::TokenStream::new(),
+        };
+
+        for (id, field) in fields.iter().enumerate() {
             let field_ident = field_ident(field, id);
 
             let field_serialization = match &field.ty {
-                ParsedType::F64(_) => {
-                    quote! {
-                        raw_record.push(#field_ident.to_bits());
-                    }
+                ParsedType::Boolean(_) => {
+                    quote! { raw_record.push(*&#field_ident as _); }
                 }
                 ParsedType::Utf8Str(_) | ParsedType::Utf8String(_) => {
                     quote! {
-                        raw_record.push(#field_ident.as_ptr() as _);
-                        raw_record.push(#field_ident.len() as _);
+                        let field_ident_ptr = #field_ident.as_ptr() as u32;
+                        raw_record.extend(&field_ident_ptr.to_le_bytes());
+                        raw_record.extend(&(#field_ident.len() as u32).to_le_bytes());
                     }
                 }
-                ParsedType::Vector(ty, passing_style) => {
-                    let generated_serializer_name = format!(
+                ParsedType::Vector(ty, _) => {
+                    let generated_ser_name = format!(
                         "__fce_generated_vec_serializer_{}_{}",
                         field.name.as_ref().unwrap(),
                         id
                     );
 
-                    let generated_serializer_ident = new_ident!(generated_serializer_name);
-                    let vector_serializer = crate::parsed_type::generate_vector_serializer(
-                        ty,
-                        *passing_style,
-                        &generated_serializer_name,
-                    );
+                    let generated_ser_ident = new_ident!(generated_ser_name);
+                    let vector_ser =
+                        crate::parsed_type::generate_vector_ser(ty, &generated_ser_name);
                     let serialized_field_ident = new_ident!(format!("serialized_arg_{}", id));
 
                     quote::quote! {
-                        #vector_serializer
-                        let #serialized_field_ident = unsafe { #generated_serializer_ident(&#field_ident) };
-                        raw_record.push(#serialized_field_ident.0 as _);
-                        raw_record.push(#serialized_field_ident.1 as _);
+                        #vector_ser
+                        let #serialized_field_ident = unsafe { #generated_ser_ident(&#field_ident) };
+
+                        raw_record.extend(&#serialized_field_ident.0.to_le_bytes());
+                        raw_record.extend(&#serialized_field_ident.1.to_le_bytes());
                     }
                 }
                 ParsedType::Record(..) => {
                     quote! {
-                        raw_record.push(#field_ident.__fce_generated_serialize() as _);
+                        let serialized_struct_ptr = #field_ident.__fce_generated_serialize() as usize;
+                        raw_record.extend(&serialized_struct_ptr.to_le_bytes());
                     }
                 }
                 _ => quote! {
-                    raw_record.push(#field_ident as u64);
+                    raw_record.extend(&#field_ident.to_le_bytes());
                 },
             };
 
@@ -82,7 +88,7 @@ impl RecordSerializerGlueCodeGenerator for fce_ast_types::AstRecordItem {
     }
 }
 
-fn field_ident(field: &fce_ast_types::AstRecordField, id: usize) -> proc_macro2::TokenStream {
+fn field_ident(field: &AstRecordField, id: usize) -> proc_macro2::TokenStream {
     match &field.name {
         Some(name) => {
             let name = new_ident!(name);

@@ -18,7 +18,7 @@ use super::ParsedType;
 use crate::wasm_type::RustType;
 use crate::new_ident;
 use crate::parsed_type::PassingStyle;
-use crate::fce_ast_types::AstFnArgument;
+use crate::ast_types::AstFnArgument;
 
 pub(crate) struct WrapperDescriptor {
     pub(crate) arg_names: Vec<syn::Ident>,
@@ -80,8 +80,8 @@ impl ForeignModPrologGlueCodeGenerator for Vec<AstFnArgument> {
                         arg_transforms.extend(quote::quote! { let mut #arg_ident = std::mem::ManuallyDrop::new(#arg_ident); });
                         arg_drops.extend(quote::quote! { std::mem::ManuallyDrop::drop(&mut #arg_ident); });
                     },
-                    ParsedType::Vector(ty, passing_style) => {
-                        let vec_arg_transforms = vector_arg_transforms(ty, *passing_style, &arg_name);
+                    ParsedType::Vector(ty, _) => {
+                        let vec_arg_transforms = vector_arg_transforms(ty, &arg_name);
                         arg_transforms.extend(vec_arg_transforms);
                     }
                     _ => {}
@@ -127,18 +127,13 @@ impl ForeignModPrologGlueCodeGenerator for Vec<AstFnArgument> {
     }
 }
 
-fn vector_arg_transforms(
-    ty: &ParsedType,
-    passing_style: PassingStyle,
-    arg_name: &str,
-) -> proc_macro2::TokenStream {
+fn vector_arg_transforms(ty: &ParsedType, arg_name: &str) -> proc_macro2::TokenStream {
     let generated_ser_name = format!("__fce_generated_vec_serializer_{}", arg_name);
     let generated_ser_name = crate::utils::prepare_ident(generated_ser_name);
     let generated_ser_ident = new_ident!(generated_ser_name);
     let arg_ident = new_ident!(arg_name);
 
-    let vector_serializer =
-        super::vector_utils::generate_vector_serializer(ty, passing_style, &generated_ser_name);
+    let vector_serializer = super::vector_ser_der::generate_vector_ser(ty, &generated_ser_name);
 
     let arg_transform = quote::quote! {
         #vector_serializer

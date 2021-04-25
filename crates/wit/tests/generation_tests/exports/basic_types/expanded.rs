@@ -47,13 +47,7 @@ pub unsafe fn __fce_generated_wrapper_func_all_types(
     let converted_arg_9 = arg_9 as _;
     let converted_arg_10 = String::from_raw_parts(arg_10 as _, arg_11 as _, arg_11 as _);
     unsafe fn __fce_generated_vec_deserializer_12(offset: u32, size: u32) -> Vec<u8> {
-        let size = size / 8;
-        let mut arg: Vec<u64> = Vec::from_raw_parts(offset as _, size as _, size as _);
-        let mut result = Vec::with_capacity(arg.len());
-        for value in arg {
-            result.push(value as _);
-        }
-        result
+        Vec::from_raw_parts(offset as _, size as _, size as _)
     }
     let converted_arg_12 = __fce_generated_vec_deserializer_12(arg_12 as _, arg_13 as _);
     let result = all_types(
@@ -84,6 +78,6 @@ pub unsafe fn __fce_generated_wrapper_func_all_types(
 #[doc(hidden)]
 #[allow(clippy::all)]
 #[link_section = "__fce_generated_section__all_types"]
-pub static __fce_generated_static_global_all_types: [u8; 633usize] = {
-    * b"{\"ast_type\":\"Function\",\"signature\":{\"name\":\"all_types\",\"arguments\":[{\"name\":\"arg_0\",\"ty\":{\"I8\":\"ByValue\"}},{\"name\":\"arg_1\",\"ty\":{\"I16\":\"ByValue\"}},{\"name\":\"arg_2\",\"ty\":{\"I32\":\"ByValue\"}},{\"name\":\"arg_3\",\"ty\":{\"I64\":\"ByValue\"}},{\"name\":\"arg_4\",\"ty\":{\"U8\":\"ByValue\"}},{\"name\":\"arg_5\",\"ty\":{\"U16\":\"ByValue\"}},{\"name\":\"arg_6\",\"ty\":{\"U32\":\"ByValue\"}},{\"name\":\"arg_7\",\"ty\":{\"U64\":\"ByValue\"}},{\"name\":\"arg_8\",\"ty\":{\"F32\":\"ByValue\"}},{\"name\":\"arg_9\",\"ty\":{\"F64\":\"ByValue\"}},{\"name\":\"arg_10\",\"ty\":{\"Utf8String\":\"ByValue\"}},{\"name\":\"arg_11\",\"ty\":{\"Vector\":[{\"U8\":\"ByValue\"},\"ByValue\"]}}],\"output_type\":{\"Vector\":[{\"U8\":\"ByValue\"},\"ByValue\"]}}}"
+pub static __fce_generated_static_global_all_types: [u8; 636usize] = {
+    * b"{\"ast_type\":\"Function\",\"signature\":{\"name\":\"all_types\",\"arguments\":[{\"name\":\"arg_0\",\"ty\":{\"I8\":\"ByValue\"}},{\"name\":\"arg_1\",\"ty\":{\"I16\":\"ByValue\"}},{\"name\":\"arg_2\",\"ty\":{\"I32\":\"ByValue\"}},{\"name\":\"arg_3\",\"ty\":{\"I64\":\"ByValue\"}},{\"name\":\"arg_4\",\"ty\":{\"U8\":\"ByValue\"}},{\"name\":\"arg_5\",\"ty\":{\"U16\":\"ByValue\"}},{\"name\":\"arg_6\",\"ty\":{\"U32\":\"ByValue\"}},{\"name\":\"arg_7\",\"ty\":{\"U64\":\"ByValue\"}},{\"name\":\"arg_8\",\"ty\":{\"F32\":\"ByValue\"}},{\"name\":\"arg_9\",\"ty\":{\"F64\":\"ByValue\"}},{\"name\":\"arg_10\",\"ty\":{\"Utf8String\":\"ByValue\"}},{\"name\":\"arg_11\",\"ty\":{\"Vector\":[{\"U8\":\"ByValue\"},\"ByValue\"]}}],\"output_types\":[{\"Vector\":[{\"U8\":\"ByValue\"},\"ByValue\"]}]}}"
 };

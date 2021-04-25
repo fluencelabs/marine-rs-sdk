@@ -15,7 +15,7 @@
  */
 
 use super::ParsedType;
-use crate::fce_ast_types::AstFnArgument;
+use crate::ast_types::AstFnArgument;
 use crate::wasm_type::RustType;
 
 /// This trait could be used to generate raw args needed to construct a export function.

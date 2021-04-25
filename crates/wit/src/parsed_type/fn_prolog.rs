@@ -19,7 +19,7 @@ use super::FnArgGlueCodeGenerator;
 use super::passing_style_of;
 use crate::new_ident;
 use crate::wasm_type::RustType;
-use crate::fce_ast_types::AstFnArgument;
+use crate::ast_types::AstFnArgument;
 use crate::parsed_type::PassingStyle;
 
 use quote::quote;
@@ -135,7 +135,7 @@ fn generate_type_lifting_prolog(
                     let generated_der_ident = new_ident!(generated_der_name);
 
                     let vector_deserializer =
-                        super::vector_utils::generate_vector_deserializer(ty, &generated_der_name);
+                        super::vector_ser_der::generate_vector_der(ty, &generated_der_name);
 
                     quote! {
                         #vector_deserializer

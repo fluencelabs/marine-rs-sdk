@@ -26,7 +26,7 @@ macro_rules! new_ident {
 macro_rules! prepare_global_data {
     ($fce_type: ident, $self: ident, $name: expr, $data: ident, $data_size: ident, $global_static_name: ident, $section_name: ident) => {
         // TODO: change serialization protocol
-        let fce_type = fce_ast_types::FCEAst::$fce_type($self.clone());
+        let fce_type = crate::export_ast_types::SDKAst::$fce_type($self.clone().into());
         let $data = serde_json::to_vec(&fce_type).unwrap();
         let $data_size = $data.len();
         let $data = syn::LitByteStr::new(&$data, proc_macro2::Span::call_site());
@@ -60,13 +60,14 @@ pub fn get_record_size<'a>(
     let mut size = 0;
 
     for field in fields {
-        let params_count = match field {
-            ParsedType::Vector(..) | ParsedType::Utf8Str(_) | ParsedType::Utf8String(_) => 2,
-            _ => 1,
+        size += match field {
+            ParsedType::U8(_) | ParsedType::I8(_) | ParsedType::Boolean(_) => 1,
+            ParsedType::U16(_) | ParsedType::I16(_) => 2,
+            ParsedType::U32(_) | ParsedType::I32(_) | ParsedType::F32(_) => 4,
+            ParsedType::U64(_) | ParsedType::I64(_) | ParsedType::F64(_) => 8,
+            ParsedType::Record(..) => 4,
+            ParsedType::Vector(..) | ParsedType::Utf8Str(_) | ParsedType::Utf8String(_) => 2 * 4,
         };
-
-        // internally record is being serialized to a vector of u64.
-        size += std::mem::size_of::<u64>() * params_count;
     }
 
     size
