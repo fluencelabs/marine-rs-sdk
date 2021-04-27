@@ -85,13 +85,13 @@ fn generate_arguments_converter<'a>(
     let arg_idents: Vec<syn::Ident> = args.map(utils::new_ident).collect::<Result<_, _>>()?;
 
     let args_converter =
-        quote! { let arguments = fluence_test::internal::json!([#(#arg_idents),*]); };
+        quote! { let arguments = fluence_test::internal::serde_json::json!([#(#arg_idents),*]); };
 
     Ok(args_converter)
 }
 
 fn generate_function_call(module_name: &str, method_name: &str) -> TokenStream {
-    quote! { self.fce.as_ref().borrow_mut().call_with_module_name(#module_name, #method_name, arguments, <_>::default()).expect("call to FCE failed"); }
+    quote! { self.fce.as_ref().borrow_mut().call_module(#module_name, #method_name, arguments, <_>::default()).expect("call to FCE failed"); }
 }
 
 fn generate_set_result(output_type: &Option<&IType>) -> TokenStream {
@@ -109,7 +109,7 @@ fn generate_convert_to_output(
         Some(ty) => {
             let ty = utils::itype_to_tokens(ty, records)?;
             quote! {
-                let result: #ty = serde_json::from_value(result).expect("the default deserializer shouldn't fail");
+                let result: #ty = fluence_test::internal::serde_json::from_value(result).expect("the default deserializer shouldn't fail");
             }
         }
         None => TokenStream::new(),

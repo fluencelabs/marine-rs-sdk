@@ -31,7 +31,8 @@ pub(super) fn generate_records(records: &FCERecordTypes) -> TResult<Vec<TokenStr
         let fields = prepare_field(record.fields.deref().iter(), records)?;
 
         let generated_record = quote! {
-            #[derive(Clone, fluence_test::internal::Serialize, fluence_test::internal::Deserialize)]
+            #[derive(Clone, fluence_test::internal::serde::Serialize, fluence_test::internal::serde::Deserialize)]
+            #[serde(crate = "fluence_test::internal::serde")]
             pub struct #record_name_ident {
                 #(#fields),*
             }

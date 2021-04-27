@@ -39,14 +39,14 @@ use quote::quote;
 ///
 ///         pub fn greeting(&mut self, name: String) -> String {
 ///             use std::ops::DerefMut;
-///             let arguments = fluence_test::internal::json!([name]);
+///             let arguments = fluence_test::internal::serde_json::json!([name]);
 ///             let result = self
 ///                 .fce
 ///                 .as_ref
 ///                 .borrow_mut()
 ///                 .call_with_module_name("greeting", "greeting", arguments, <_>::default())
 ///                 .expect("call to FCE failed");
-///             let result: String = serde_json::from_value(result)
+///             let result: String = fluence_test::internal::serde_json::from_value(result)
 ///                 .expect("the default deserializer shouldn't fail");
 ///             result
 ///         }

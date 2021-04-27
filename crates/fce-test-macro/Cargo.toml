@@ -1,6 +1,6 @@
 [package]
 name = "fluence-sdk-test-macro"
-version = "0.1.0"  # remember to update html_root_url
+version = "0.1.2"  # remember to update html_root_url
 edition = "2018"
 description = "Definition of the `#[fce_test]` macro"
 repository = "https://github.com/fluencelabs/rust-sdk/crates/macro-test"
@@ -17,7 +17,7 @@ proc-macro = true
 doctest = false
 
 [dependencies]
-fluence-sdk-test-macro-impl = { path = "../fce-test-macro-impl", version = "0.1.0" }
+fluence-sdk-test-macro-impl = { path = "../fce-test-macro-impl", version = "0.1.2" }
 
 quote = "1.0.9"
 proc-macro2 = "1.0.24"

@@ -34,9 +34,8 @@ pub mod internal {
     pub use fluence_app_service::AppService;
     pub use fluence_app_service::TomlAppServiceConfig;
 
-    pub use serde::Serialize;
-    pub use serde::Deserialize;
-    pub use serde_json::json;
+    pub use serde;
+    pub use serde_json;
 
     pub use uuid::Uuid;
 }
