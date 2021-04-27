@@ -56,6 +56,8 @@ pub(super) fn itype_to_tokens(itype: &IType, records: &FCERecordTypes) -> TResul
             token_stream
         }
         IType::String => quote! { String },
+        IType::ByteArray => quote! { Vec<u8> },
+        IType::Boolean => quote! { bool },
         IType::S8 => quote! { i8 },
         IType::S16 => quote! { i16 },
         IType::S32 => quote! { i32 },
@@ -68,9 +70,6 @@ pub(super) fn itype_to_tokens(itype: &IType, records: &FCERecordTypes) -> TResul
         IType::I64 => quote! { i64 },
         IType::F32 => quote! { f32 },
         IType::F64 => quote! { f64 },
-        IType::Anyref => {
-            unimplemented!("anyrefs aren't supported and will be deleted from IType soon")
-        }
     };
 
     Ok(token_stream)

@@ -67,7 +67,6 @@ impl quote::ToTokens for ast_types::AstFn {
             objs_savings,
         } = epilog_ingredients.generate_fn_epilog();
 
-        // here this Option must be Some
         let original_func = &self.original;
 
         let glue_code = quote::quote! {
@@ -88,7 +87,7 @@ impl quote::ToTokens for ast_types::AstFn {
                 // return value conversation from Rust type to a Wasm type
                 #epilog
 
-                // save objects to keep them in memory that allows IT side
+                // save objects to keep them in memory for lifting
                 #objs_savings
             }
 
