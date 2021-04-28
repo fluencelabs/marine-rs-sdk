@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-#![doc(html_root_url = "https://docs.rs/fluence-sdk-macro/0.5.0")]
+#![doc(html_root_url = "https://docs.rs/fluence-test-macro/0.1.4")]
 #![deny(
     dead_code,
     nonstandard_style,
@@ -24,13 +24,18 @@
     unused_unsafe,
     unreachable_patterns
 )]
+#![feature(proc_macro_span)]
 #![warn(rust_2018_idioms)]
 #![recursion_limit = "1024"]
 
 use fluence_sdk_test_macro_impl::fce_test_impl;
 use proc_macro::TokenStream;
 use proc_macro_error::proc_macro_error;
+use caller_modpath::expose_caller_modpath;
+use caller_modpath::CallerModpath;
 use syn::spanned::Spanned;
+
+use std::path::PathBuf;
 
 /// This macro allows user to write tests for services in the following form:
 ///```rust
@@ -40,13 +45,16 @@ use syn::spanned::Spanned;
 ///     assert_eq!(&service_result, "Hi, name!");
 /// }
 ///```
+#[expose_caller_modpath]
 #[proc_macro_error]
 #[proc_macro_attribute]
 pub fn fce_test(attrs: TokenStream, input: TokenStream) -> TokenStream {
     let attrs: proc_macro2::TokenStream = attrs.into();
     let attrs_span = attrs.span();
+    let full_path = proc_macro::Span::caller_modpath();
+    let full_path = PathBuf::from(full_path);
 
-    match fce_test_impl(attrs, input.into()) {
+    match fce_test_impl(attrs, input.into(), full_path) {
         Ok(stream) => stream.into(),
         Err(e) => proc_macro_error::abort!(attrs_span, format!("{}", e)),
     }

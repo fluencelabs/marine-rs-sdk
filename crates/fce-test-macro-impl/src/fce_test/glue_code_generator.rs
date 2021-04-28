@@ -23,9 +23,10 @@ use crate::fce_test::config_utils;
 use fluence_app_service::TomlAppServiceConfig;
 use proc_macro2::TokenStream;
 use quote::quote;
-use quote::ToTokens;
+//use quote::ToTokens;
 
 use std::path::Path;
+use std::path::PathBuf;
 
 /// Generates glue code for tests.
 /// F.e. for this test for the greeting service
@@ -114,6 +115,7 @@ use std::path::Path;
 pub(super) fn generate_test_glue_code(
     func_item: syn::ItemFn,
     attrs: FCETestAttributes,
+    full_path: PathBuf,
 ) -> TResult<TokenStream> {
     let fce_config = TomlAppServiceConfig::load(&attrs.config_path)?;
     let modules_dir = match config_utils::resolve_modules_dir(&fce_config, attrs.modules_dir) {
@@ -121,7 +123,7 @@ pub(super) fn generate_test_glue_code(
         None => return Err(TestGeneratorError::ModulesDirUnspecified),
     };
 
-    let app_service_ctor = generate_app_service_ctor(&attrs.config_path, &modules_dir);
+    let app_service_ctor = generate_app_service_ctor(&attrs.config_path, &modules_dir, full_path);
     let module_interfaces = fce_test::config_utils::collect_modules(&fce_config, modules_dir)?;
 
     let module_definitions =
@@ -153,9 +155,13 @@ pub(super) fn generate_test_glue_code(
     Ok(glue_code)
 }
 
-fn generate_app_service_ctor(config_path: &str, modules_dir: &Path) -> TokenStream {
-    let config_path = config_path.to_token_stream();
+fn generate_app_service_ctor(config_path: &str, modules_dir: &Path, full_path: PathBuf) -> TokenStream {
     let modules_dir = modules_dir.to_string_lossy().to_string();
+
+    let config_path = full_path.join(config_path);
+    let config_path = config_path.to_str().unwrap();
+    let modules_dir = full_path.join(modules_dir);
+    let modules_dir = modules_dir.to_str().unwrap();
 
     quote! {
         let tmp_dir = std::env::temp_dir();
