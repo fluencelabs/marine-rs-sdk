@@ -34,7 +34,7 @@ pub(super) fn generate_records(records: &FCERecordTypes) -> TResult<Vec<TokenStr
             #[derive(Clone, fluence_test::internal::serde::Serialize, fluence_test::internal::serde::Deserialize)]
             #[serde(crate = "fluence_test::internal::serde")]
             pub struct #record_name_ident {
-                #(#fields),*
+                #(pub #fields),*
             }
         };
 

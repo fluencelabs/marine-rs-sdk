@@ -37,7 +37,8 @@ pub(super) fn generate_struct_name(struct_name: &str) -> TResult<syn::Ident> {
 }
 
 pub(super) fn new_ident(ident_str: &str) -> TResult<syn::Ident> {
-    syn::parse_str::<syn::Ident>(ident_str).map_err(Into::into)
+    let ident_str = ident_str.replace('-', "_");
+    syn::parse_str::<syn::Ident>(&ident_str).map_err(Into::into)
 }
 
 pub(super) fn itype_to_tokens(itype: &IType, records: &FCERecordTypes) -> TResult<TokenStream> {
