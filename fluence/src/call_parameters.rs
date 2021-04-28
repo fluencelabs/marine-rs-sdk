@@ -64,6 +64,11 @@ pub fn get_call_parameters() -> CallParameters {
     }
 }
 
+#[cfg(not(target_arch = "wasm32"))]
+pub fn get_call_parameters() -> CallParameters {
+    unimplemented!()
+}
+
 #[cfg(target_arch = "wasm32")]
 #[link(wasm_import_module = "host")]
 #[allow(improper_ctypes)]

@@ -75,12 +75,9 @@ mod mounted_binary;
 extern crate self as fluence;
 
 pub use fluence_sdk_macro::fce;
-#[cfg(feature = "fce-test")]
-pub use fluence_sdk_test_macro::fce_test;
 
 pub use call_parameters::CallParameters;
 pub use call_parameters::SecurityTetraplet;
-#[cfg(target_arch = "wasm32")]
 pub use call_parameters::get_call_parameters;
 
 #[cfg(feature = "logger")]
