@@ -64,6 +64,13 @@ pub fn get_call_parameters() -> CallParameters {
     }
 }
 
+#[cfg(not(target_arch = "wasm32"))]
+pub fn get_call_parameters() -> CallParameters {
+    // return the default call parameters to allow compilation to native
+    // that needed for cargo test
+    <_>::default()
+}
+
 #[cfg(target_arch = "wasm32")]
 #[link(wasm_import_module = "host")]
 #[allow(improper_ctypes)]
