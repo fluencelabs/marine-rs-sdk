@@ -31,11 +31,7 @@
 use fluence_sdk_test_macro_impl::fce_test_impl;
 use proc_macro::TokenStream;
 use proc_macro_error::proc_macro_error;
-use caller_modpath::expose_caller_modpath;
-use caller_modpath::CallerModpath;
 use syn::spanned::Spanned;
-
-use std::path::PathBuf;
 
 /// This macro allows user to write tests for services in the following form:
 ///```rust
@@ -45,14 +41,13 @@ use std::path::PathBuf;
 ///     assert_eq!(&service_result, "Hi, name!");
 /// }
 ///```
-#[expose_caller_modpath]
 #[proc_macro_error]
 #[proc_macro_attribute]
 pub fn fce_test(attrs: TokenStream, input: TokenStream) -> TokenStream {
     let attrs: proc_macro2::TokenStream = attrs.into();
     let attrs_span = attrs.span();
-    let full_path = proc_macro::Span::caller_modpath();
-    let full_path = PathBuf::from(full_path);
+    let mut full_path = proc_macro::Span::call_site().source_file().path();
+    let _ = full_path.pop();
 
     match fce_test_impl(attrs, input.into(), full_path) {
         Ok(stream) => stream.into(),

@@ -117,13 +117,16 @@ pub(super) fn generate_test_glue_code(
     attrs: FCETestAttributes,
     full_path: PathBuf,
 ) -> TResult<TokenStream> {
-    let fce_config = TomlAppServiceConfig::load(&attrs.config_path)?;
+    let config_path = full_path.join(&attrs.config_path);
+
+    let fce_config = TomlAppServiceConfig::load(&config_path)?;
     let modules_dir = match config_utils::resolve_modules_dir(&fce_config, attrs.modules_dir) {
         Some(modules_dir) => modules_dir,
         None => return Err(TestGeneratorError::ModulesDirUnspecified),
     };
 
-    let app_service_ctor = generate_app_service_ctor(&attrs.config_path, &modules_dir, full_path);
+    let app_service_ctor = generate_app_service_ctor(&attrs.config_path, &modules_dir)?;
+    let modules_dir = full_path.join(modules_dir);
     let module_interfaces = fce_test::config_utils::collect_modules(&fce_config, modules_dir)?;
 
     let module_definitions =
@@ -155,15 +158,12 @@ pub(super) fn generate_test_glue_code(
     Ok(glue_code)
 }
 
-fn generate_app_service_ctor(config_path: &str, modules_dir: &Path, full_path: PathBuf) -> TokenStream {
-    let modules_dir = modules_dir.to_string_lossy().to_string();
+fn generate_app_service_ctor(config_path: &str, modules_dir: &Path) -> TResult<TokenStream> {
+    let modules_dir = modules_dir
+        .to_str()
+        .ok_or_else(|| TestGeneratorError::InvalidUTF8Path(modules_dir.to_path_buf()))?;
 
-    let config_path = full_path.join(config_path);
-    let config_path = config_path.to_str().unwrap();
-    let modules_dir = full_path.join(modules_dir);
-    let modules_dir = modules_dir.to_str().unwrap();
-
-    quote! {
+    let service_ctor = quote! {
         let tmp_dir = std::env::temp_dir();
         let service_id = fluence_test::internal::Uuid::new_v4().to_string();
 
@@ -171,16 +171,32 @@ fn generate_app_service_ctor(config_path: &str, modules_dir: &Path, full_path: P
         let tmp_dir = tmp_dir.to_string_lossy().to_string();
         std::fs::create_dir(&tmp_dir).expect("can't create a directory for service in tmp");
 
-        let mut __fce_generated_fce_config = fluence_test::internal::TomlAppServiceConfig::load(#config_path.to_string())
-            .unwrap_or_else(|e| panic!("app service located at `{}` config can't be loaded: {}", #config_path, e));
+        let backtrace = fluence_test::internal::backtrace::Backtrace::new();
+        let backtrace_path = backtrace.frames().iter()
+            .flat_map(fluence_test::internal::backtrace::BacktraceFrame::symbols)
+            .skip_while(|s| s.filename()
+                .map(|p|!p.ends_with(file!())).unwrap_or(true))
+            .nth(1 as usize).expect("can't obtain full path to a binary");
+        let module_path = backtrace_path.filename().expect("can't obtain filename");
+        let module_path = module_path.parent().expect("can't get a parent dir");
+
+        //let module_path = module_path.parent().expect("can't pop file name");
+        let config_path = module_path.join(#config_path);
+        let modules_dir = module_path.join(#modules_dir);
+        let modules_dir = modules_dir.to_str().expect("modules_dir contains invalid UTF8 string");
+
+        let mut __fce_generated_fce_config = fluence_test::internal::TomlAppServiceConfig::load(&config_path)
+            .unwrap_or_else(|e| panic!("app service config located at `{:?}` can't be loaded: {}", config_path, e));
         __fce_generated_fce_config.service_base_dir = Some(tmp_dir);
-        __fce_generated_fce_config.toml_faas_config.modules_dir = Some(#modules_dir.to_string());
+        __fce_generated_fce_config.toml_faas_config.modules_dir = Some(modules_dir.to_string());
 
         let fce = fluence_test::internal::AppService::new_with_empty_facade(__fce_generated_fce_config, service_id, std::collections::HashMap::new())
             .unwrap_or_else(|e| panic!("app service can't be created: {}", e));
 
         let fce = std::rc::Rc::new(std::cell::RefCell::new(fce));
-    }
+    };
+
+    Ok(service_ctor)
 }
 
 fn generate_module_ctors<'n>(

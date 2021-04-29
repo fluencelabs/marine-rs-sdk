@@ -22,5 +22,4 @@ fluence-sdk-test-macro-impl = { path = "../fce-test-macro-impl", version = "0.1.
 quote = "1.0.9"
 proc-macro2 = "1.0.24"
 proc-macro-error = { version = "1.0.4", default-features = false }
-caller_modpath = "0.1.1"
 syn = { version = '1.0.64', features = ['full'] }

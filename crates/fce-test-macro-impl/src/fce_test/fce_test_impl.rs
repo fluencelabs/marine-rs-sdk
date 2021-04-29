@@ -23,7 +23,11 @@ use darling::FromMeta;
 use syn::parse::Parser;
 use std::path::PathBuf;
 
-pub fn fce_test_impl(attrs: TokenStream, input: TokenStream, full_path: PathBuf) -> TResult<TokenStream> {
+pub fn fce_test_impl(
+    attrs: TokenStream,
+    input: TokenStream,
+    full_path: PathBuf,
+) -> TResult<TokenStream> {
     // from https://github.com/dtolnay/syn/issues/788
     let parser = syn::punctuated::Punctuated::<syn::NestedMeta, syn::Token![,]>::parse_terminated;
     let attrs = parser.parse2(attrs)?;

@@ -21,6 +21,8 @@ use darling::Error as DarlingError;
 use syn::Error as SynError;
 use thiserror::Error as ThisError;
 
+use std::path::PathBuf;
+
 #[derive(Debug, ThisError)]
 pub enum TestGeneratorError {
     #[error("Can't load Wasm modules into FCE: {0}")]
@@ -45,6 +47,9 @@ pub enum TestGeneratorError {
 
     #[error("a Wasm file compiled with newer version of sdk that supports multi-value")]
     ManyFnOutputsUnsupported,
+
+    #[error("{0} is invalid UTF8 path")]
+    InvalidUTF8Path(PathBuf),
 }
 
 #[derive(Debug, ThisError)]

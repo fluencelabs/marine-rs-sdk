@@ -20,6 +20,5 @@ darling = "0.12.2"
 quote = "1.0.9"
 proc-macro2 = "1.0.26"
 proc-macro-error = { version = "1.0.4", default-features = false }
-caller_modpath = "0.1.1"
 syn = { version = '1.0.64', features = ['full'] }
 thiserror = "1.0.24"

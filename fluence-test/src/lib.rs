@@ -34,6 +34,8 @@ pub mod internal {
     pub use fluence_app_service::AppService;
     pub use fluence_app_service::TomlAppServiceConfig;
 
+    pub use backtrace;
+
     pub use serde;
     pub use serde_json;
 
