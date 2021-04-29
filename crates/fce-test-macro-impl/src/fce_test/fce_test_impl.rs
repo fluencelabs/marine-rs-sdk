@@ -26,7 +26,7 @@ use std::path::PathBuf;
 pub fn fce_test_impl(
     attrs: TokenStream,
     input: TokenStream,
-    full_path: PathBuf,
+    file_path: PathBuf,
 ) -> TResult<TokenStream> {
     // from https://github.com/dtolnay/syn/issues/788
     let parser = syn::punctuated::Punctuated::<syn::NestedMeta, syn::Token![,]>::parse_terminated;
@@ -36,5 +36,5 @@ pub fn fce_test_impl(
 
     let func_item = syn::parse2::<syn::ItemFn>(input)?;
 
-    generate_test_glue_code(func_item, attrs, full_path)
+    generate_test_glue_code(func_item, attrs, file_path)
 }

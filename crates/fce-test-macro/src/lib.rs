@@ -46,10 +46,11 @@ use syn::spanned::Spanned;
 pub fn fce_test(attrs: TokenStream, input: TokenStream) -> TokenStream {
     let attrs: proc_macro2::TokenStream = attrs.into();
     let attrs_span = attrs.span();
-    let mut full_path = proc_macro::Span::call_site().source_file().path();
-    let _ = full_path.pop();
+    // here it obtains a path to the current file where macro is applied
+    let mut file_path = proc_macro::Span::call_site().source_file().path();
+    let _ = file_path.pop();
 
-    match fce_test_impl(attrs, input.into(), full_path) {
+    match fce_test_impl(attrs, input.into(), file_path) {
         Ok(stream) => stream.into(),
         Err(e) => proc_macro_error::abort!(attrs_span, format!("{}", e)),
     }
