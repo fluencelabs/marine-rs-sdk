@@ -23,7 +23,6 @@ use crate::fce_test::config_utils;
 use fluence_app_service::TomlAppServiceConfig;
 use proc_macro2::TokenStream;
 use quote::quote;
-//use quote::ToTokens;
 
 use std::path::Path;
 use std::path::PathBuf;
