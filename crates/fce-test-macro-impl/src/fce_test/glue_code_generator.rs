@@ -170,16 +170,35 @@ fn generate_app_service_ctor(config_path: &str, modules_dir: &Path) -> TResult<T
         let tmp_dir = tmp_dir.to_string_lossy().to_string();
         std::fs::create_dir(&tmp_dir).expect("can't create a directory for service in tmp");
 
-        let backtrace = fluence_test::internal::backtrace::Backtrace::new();
-        let backtrace_path = backtrace.frames().iter()
-            .flat_map(fluence_test::internal::backtrace::BacktraceFrame::symbols)
-            .skip_while(|s| s.filename()
-                .map(|p|!p.ends_with(file!())).unwrap_or(true))
-            .nth(1 as usize).expect("can't obtain full path to a binary");
-        let module_path = backtrace_path.filename().expect("can't obtain filename");
-        let module_path = module_path.parent().expect("can't get a parent dir");
+        let mut module_path = std::path::PathBuf::from(env!("CARGO_MANIFEST_DIR"));
+        let mut file_path = std::path::Path::new(file!()).components();
 
-        //let module_path = module_path.parent().expect("can't pop file name");
+        let mut truncated_file_path = Vec::new();
+        loop {
+            if module_path.ends_with(file_path.as_path()) {
+                break;
+            }
+
+            let (file_path_, remainder) = match file_path.next_back().and_then(|p| match p {
+                std::path::Component::Normal(_) | std::path::Component::CurDir | std::path::Component::ParentDir => {
+                    Some((file_path, p))
+                }
+                _ => None,
+            }) {
+                Some(t) => t,
+                None => break,
+            };
+            file_path = file_path_;
+
+            truncated_file_path.push(remainder);
+        }
+
+        for path in truncated_file_path.iter().rev() {
+            module_path.push(path);
+        }
+
+        let _ = module_path.pop();
+
         let config_path = module_path.join(#config_path);
         let modules_dir = module_path.join(#modules_dir);
         let modules_dir = modules_dir.to_str().expect("modules_dir contains invalid UTF8 string");
