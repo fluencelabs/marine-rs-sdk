@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-#![doc(html_root_url = "https://docs.rs/fluence-sdk-macro/0.5.0")]
+#![doc(html_root_url = "https://docs.rs/fluence-test-macro/0.1.4")]
 #![deny(
     dead_code,
     nonstandard_style,
@@ -24,6 +24,7 @@
     unused_unsafe,
     unreachable_patterns
 )]
+#![feature(proc_macro_span)]
 #![warn(rust_2018_idioms)]
 #![recursion_limit = "1024"]
 
@@ -45,8 +46,11 @@ use syn::spanned::Spanned;
 pub fn fce_test(attrs: TokenStream, input: TokenStream) -> TokenStream {
     let attrs: proc_macro2::TokenStream = attrs.into();
     let attrs_span = attrs.span();
+    // here it obtains a path to the current file where macro is applied
+    let mut file_path = proc_macro::Span::call_site().source_file().path();
+    let _ = file_path.pop();
 
-    match fce_test_impl(attrs, input.into()) {
+    match fce_test_impl(attrs, input.into(), file_path) {
         Ok(stream) => stream.into(),
         Err(e) => proc_macro_error::abort!(attrs_span, format!("{}", e)),
     }

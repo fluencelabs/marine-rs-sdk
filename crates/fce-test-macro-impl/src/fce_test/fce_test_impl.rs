@@ -21,8 +21,13 @@ use crate::fce_test::glue_code_generator::generate_test_glue_code;
 use proc_macro2::TokenStream;
 use darling::FromMeta;
 use syn::parse::Parser;
+use std::path::PathBuf;
 
-pub fn fce_test_impl(attrs: TokenStream, input: TokenStream) -> TResult<TokenStream> {
+pub fn fce_test_impl(
+    attrs: TokenStream,
+    input: TokenStream,
+    file_path: PathBuf,
+) -> TResult<TokenStream> {
     // from https://github.com/dtolnay/syn/issues/788
     let parser = syn::punctuated::Punctuated::<syn::NestedMeta, syn::Token![,]>::parse_terminated;
     let attrs = parser.parse2(attrs)?;
@@ -31,5 +36,5 @@ pub fn fce_test_impl(attrs: TokenStream, input: TokenStream) -> TResult<TokenStr
 
     let func_item = syn::parse2::<syn::ItemFn>(input)?;
 
-    generate_test_glue_code(func_item, attrs)
+    generate_test_glue_code(func_item, attrs, file_path)
 }
