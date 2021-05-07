@@ -33,6 +33,8 @@ pub use fluence_sdk_test_macro::fce_test;
 pub mod internal {
     pub use fluence_app_service::AppService;
     pub use fluence_app_service::TomlAppServiceConfig;
+    pub use fluence_app_service::CallParameters;
+    pub use fluence_app_service::SecurityTetraplet;
 
     pub use serde;
     pub use serde_json;

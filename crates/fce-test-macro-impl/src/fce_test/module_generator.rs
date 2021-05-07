@@ -15,6 +15,7 @@
  */
 
 mod methods_generator;
+mod methods_generator_utils;
 mod record_type_generator;
 
 use crate::fce_test::utils;
