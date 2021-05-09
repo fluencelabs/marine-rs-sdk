@@ -1,6 +1,6 @@
 [package]
 name = "fluence-test"
-version = "0.1.4"  # remember to update html_root_url
+version = "0.1.5"  # remember to update html_root_url
 description = "Fluence backend SDK for testing"
 documentation = "https://docs.rs/fluence/"
 repository = "https://github.com/fluencelabs/rust-sdk"
@@ -19,7 +19,7 @@ path = "src/lib.rs"
 doctest = false
 
 [dependencies]
-fluence-sdk-test-macro = { path = "../crates/fce-test-macro", version = "0.1.4" }
+fluence-sdk-test-macro = { path = "../crates/fce-test-macro", version = "0.1.5" }
 fluence-app-service = { version = "0.7.0", features = ["raw-module-api"] }
 
 serde = { version = "1.0.118", features = ["derive"] }
