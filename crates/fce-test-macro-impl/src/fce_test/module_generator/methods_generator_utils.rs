@@ -32,7 +32,6 @@ pub(super) enum CallParametersSettings {
     UserDefined,
 }
 
-#[allow(unused_variables)]
 pub(super) fn generate_module_method(
     module_name: &str,
     signature: &FCEFunctionSignature,
