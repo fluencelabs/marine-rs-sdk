@@ -18,18 +18,18 @@ use crate::TResult;
 
 use fluence_app_service::TomlAppServiceConfig;
 use marine_it_parser::module_raw_interface;
-use marine_it_parser::interface::FCEModuleInterface;
+use marine_it_parser::interface::MModuleInterface;
 
 use std::path::PathBuf;
 
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub(super) struct Module<'m> {
     pub name: &'m str,
-    pub interface: FCEModuleInterface,
+    pub interface: MModuleInterface,
 }
 
 impl<'m> Module<'m> {
-    fn new(name: &'m str, interface: FCEModuleInterface) -> Self {
+    fn new(name: &'m str, interface: MModuleInterface) -> Self {
         Self { name, interface }
     }
 }

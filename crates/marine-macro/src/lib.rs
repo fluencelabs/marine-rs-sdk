@@ -80,7 +80,7 @@ pub fn marine(_attr: TokenStream, input: TokenStream) -> TokenStream {
 // deprecated macro for backwards compatibility
 #[deprecated(since = "0.6.2", note = "please use the #[marine] macro instead")]
 #[proc_macro_attribute]
-pub fn marine(_attr: TokenStream, input: TokenStream) -> TokenStream {
+pub fn fce(_attr: TokenStream, input: TokenStream) -> TokenStream {
     // into converts proc_macro::TokenStream to proc_macro2::TokenStream
     match marine_impl(input.into()) {
         Ok(v) => v,

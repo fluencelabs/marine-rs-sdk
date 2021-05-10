@@ -75,7 +75,7 @@ mod mounted_binary;
 extern crate self as fluence;
 
 pub use marine_macro::marine;
-pub use marine_macro::marine;
+pub use marine_macro::fce;
 
 pub use call_parameters::CallParameters;
 pub use call_parameters::SecurityTetraplet;
