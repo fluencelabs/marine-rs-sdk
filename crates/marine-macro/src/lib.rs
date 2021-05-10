@@ -78,10 +78,7 @@ pub fn marine(_attr: TokenStream, input: TokenStream) -> TokenStream {
 }
 
 // deprecated macro for backwards compatibility
-#[deprecated(
-    since = "0.6.2",
-    note = "please use the #[marine] macro instead"
-)]
+#[deprecated(since = "0.6.2", note = "please use the #[marine] macro instead")]
 #[proc_macro_attribute]
 pub fn marine(_attr: TokenStream, input: TokenStream) -> TokenStream {
     // into converts proc_macro::TokenStream to proc_macro2::TokenStream
@@ -90,6 +87,6 @@ pub fn marine(_attr: TokenStream, input: TokenStream) -> TokenStream {
         // converts syn:error to proc_macro2::TokenStream
         Err(e) => e.to_compile_error(),
     }
-        // converts proc_macro2::TokenStream to proc_macro::TokenStream
-        .into()
+    // converts proc_macro2::TokenStream to proc_macro::TokenStream
+    .into()
 }

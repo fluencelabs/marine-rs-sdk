@@ -126,7 +126,8 @@ pub(super) fn generate_test_glue_code(
 
     let app_service_ctor = generate_app_service_ctor(&attrs.config_path, &modules_dir)?;
     let modules_dir = file_path.join(modules_dir);
-    let module_interfaces = marine_test::config_utils::collect_modules(&marine_config, modules_dir)?;
+    let module_interfaces =
+        marine_test::config_utils::collect_modules(&marine_config, modules_dir)?;
 
     let module_definitions =
         marine_test::module_generator::generate_module_definitions(module_interfaces.iter())?;
