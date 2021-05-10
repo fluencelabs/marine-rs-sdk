@@ -1,6 +1,6 @@
 [package]
 name = "fluence-test"
-version = "0.1.5"  # remember to update html_root_url
+version = "0.1.6"  # remember to update html_root_url
 description = "Fluence backend SDK for testing"
 documentation = "https://docs.rs/fluence/"
 repository = "https://github.com/fluencelabs/rust-sdk"
