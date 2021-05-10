@@ -19,8 +19,8 @@ path = "src/lib.rs"
 doctest = false
 
 [dependencies]
-marine-macro = { path = "../crates/marine-macro", version = "=0.6.2" }
-fluence-sdk-main = { path = "../crates/main", version = "=0.6.2" }
+marine-macro = { path = "../crates/marine-macro", version = "=0.6.3" }
+fluence-sdk-main = { path = "../crates/main", version = "=0.6.3" }
 marine-timestamp-macro = { path = "../crates/timestamp-macro", version = "=0.6.2" }
 
 serde = { version = "1.0.118", features = ["derive"]}
