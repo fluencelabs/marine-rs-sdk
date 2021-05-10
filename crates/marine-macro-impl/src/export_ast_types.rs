@@ -19,26 +19,26 @@ use crate::parsed_type::ParsedType;
 use serde::Serialize;
 use serde::Deserialize;
 
-#[derive(Clone, Serialize, Deserialize)]
+#[derive(Clone, Debug, Serialize, Deserialize)]
 pub struct FnArgument {
     pub name: String,
     pub ty: ParsedType,
 }
 
-#[derive(Clone, Serialize, Deserialize)]
+#[derive(Clone, Debug, Serialize, Deserialize)]
 pub struct FnSignature {
     pub name: String,
     pub arguments: Vec<FnArgument>,
     pub output_types: Vec<ParsedType>,
 }
 
-#[derive(Clone, Serialize, Deserialize)]
+#[derive(Clone, Debug, Serialize, Deserialize)]
 pub struct RecordType {
     pub name: String,
     pub fields: RecordFields,
 }
 
-#[derive(Clone, Serialize, Deserialize)]
+#[derive(Clone, Debug, Serialize, Deserialize)]
 pub enum RecordFields {
     Named(Vec<RecordField>),
     // named and unnamed variants have the same inner field types because of it's easy to handle it,
@@ -47,33 +47,33 @@ pub enum RecordFields {
     Unit,
 }
 
-#[derive(Debug, Clone, PartialEq, Serialize, Deserialize)]
+#[derive(Clone, Debug, PartialEq, Serialize, Deserialize)]
 pub struct RecordField {
     // fields of tuple structs haven't got name
     pub name: Option<String>,
     pub ty: ParsedType,
 }
 
-#[derive(Clone, Serialize, Deserialize)]
+#[derive(Clone, Debug, Serialize, Deserialize)]
 pub struct ExternFnType {
     pub link_name: Option<String>,
     // only imports are possible here
     pub signature: FnSignature,
 }
 
-#[derive(Clone, Serialize, Deserialize)]
+#[derive(Clone, Debug, Serialize, Deserialize)]
 pub struct ExternModType {
     pub namespace: String,
     // only imports are possible here
     pub imports: Vec<ExternFnType>,
 }
 
-#[derive(Clone, Serialize, Deserialize)]
+#[derive(Clone, Debug, Serialize, Deserialize)]
 pub struct FnType {
     pub signature: FnSignature,
 }
 
-#[derive(Clone, Serialize, Deserialize)]
+#[derive(Clone, Debug, Serialize, Deserialize)]
 #[serde(tag = "ast_type")]
 pub enum SDKAst {
     Function(FnType),

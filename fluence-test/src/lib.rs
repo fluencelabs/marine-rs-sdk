@@ -27,6 +27,8 @@
 #![warn(rust_2018_idioms)]
 
 pub use marine_test_macro::marine_test;
+pub use marine_test_macro::fce_test;
+
 pub use fluence_app_service::CallParameters;
 pub use fluence_app_service::SecurityTetraplet;
 
