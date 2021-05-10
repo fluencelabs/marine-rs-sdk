@@ -40,7 +40,7 @@ mod utils;
 mod wasm_type;
 
 pub use export_ast_types::*;
-pub use marine_macro_impl::marine;
+pub use crate::marine_macro_impl::marine;
 pub use parsed_type::ParsedType;
 pub use token_stream_generator::GENERATED_WRAPPER_FUNC_PREFIX;
 pub use token_stream_generator::GENERATED_SECTION_PREFIX;
