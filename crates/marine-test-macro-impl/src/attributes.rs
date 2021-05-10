@@ -16,9 +16,9 @@
 
 use darling::FromMeta;
 
-/// Describes attributes of `fce_test` macro.
+/// Describes attributes of `marine_test` macro.
 #[derive(Debug, Default, Clone, FromMeta)]
-pub(crate) struct FCETestAttributes {
+pub(crate) struct MTestAttributes {
     /// Path to a config file of a tested service.
     pub(crate) config_path: String,
 

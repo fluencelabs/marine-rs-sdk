@@ -14,17 +14,17 @@
  * limitations under the License.
  */
 
-//! Defines the #[fce] macro that should be used with all export functions, extern blocks.
+//! Defines the #[marine] macro that should be used with all export functions, extern blocks.
 //! At now, It supports the following types that could be used as parameters in export or foreign
 //! functions: i8, i16, i32, i64, u8, u16, u32, u64, f32, f64, bool, String, Vec<u8>. Also struct
 //! where all fields are public and have aforementioned types could be used as parameters. In this
-//! case #[fce] should be also applied to this structs.
+//! case #[marine] should be also applied to this structs.
 //!
 //! # Examples
 //!
 //! This example shows how a function could be exported:
 //! ```ignore
-//! #[fce]
+//! #[marine]
 //! pub fn greeting(name: String) -> String {
 //!     format!("Hi {}", name)
 //! }
@@ -36,13 +36,13 @@
 //! ```ignore
 //! use fluence::MountedBinaryResult;
 //!
-//! #[fce]
+//! #[marine]
 //! pub fn read_ipfs_file(file_path: String) -> MountedBinaryResult {
 //!     let hash = calculate_hash(file_path);
 //!     ipfs(vec![hash])
 //! }
 //!
-//! #[fce]
+//! #[marine]
 //! #[link(wasm_import_module = "ipfs_node")]
 //! extern "C" {
 //!     pub fn ipfs(file_hash: Vec<String>) -> MountedBinaryResult;
@@ -83,7 +83,7 @@ pub fn marine(_attr: TokenStream, input: TokenStream) -> TokenStream {
     note = "please use the #[marine] macro instead"
 )]
 #[proc_macro_attribute]
-pub fn fce(_attr: TokenStream, input: TokenStream) -> TokenStream {
+pub fn marine(_attr: TokenStream, input: TokenStream) -> TokenStream {
     // into converts proc_macro::TokenStream to proc_macro2::TokenStream
     match marine_impl(input.into()) {
         Ok(v) => v,

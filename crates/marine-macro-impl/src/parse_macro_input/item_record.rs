@@ -18,7 +18,7 @@ use super::ParseMacroInput;
 use crate::ast_types;
 use crate::ast_types::AstRecordField;
 use crate::ast_types::AstRecordFields;
-use crate::ast_types::FCEAst;
+use crate::ast_types::MarineAst;
 use crate::syn_error;
 use crate::parsed_type::ParsedType;
 
@@ -26,7 +26,7 @@ use syn::Result;
 use syn::spanned::Spanned;
 
 impl ParseMacroInput for syn::ItemStruct {
-    fn parse_macro_input(self) -> Result<FCEAst> {
+    fn parse_macro_input(self) -> Result<MarineAst> {
         check_record(&self)?;
 
         let fields = match &self.fields {
@@ -44,7 +44,7 @@ impl ParseMacroInput for syn::ItemStruct {
             original: self,
         };
 
-        Ok(FCEAst::Record(ast_record_item))
+        Ok(MarineAst::Record(ast_record_item))
     }
 }
 
@@ -55,7 +55,7 @@ fn check_record(record: &syn::ItemStruct) -> Result<()> {
     {
         return syn_error!(
             record.span(),
-            "#[fce] couldn't be applied to a struct with generics or lifetimes"
+            "#[marine] couldn't be applied to a struct with generics or lifetimes"
         );
     }
 
@@ -94,7 +94,7 @@ fn check_field(field: &syn::Field) -> Result<()> {
         _ => {
             return syn_error!(
                 field.span(),
-                "#[fce] could be applied only to struct with all public fields"
+                "#[marine] could be applied only to struct with all public fields"
             )
         }
     };

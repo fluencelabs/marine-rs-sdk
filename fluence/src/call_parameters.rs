@@ -60,7 +60,7 @@ pub fn get_call_parameters() -> CallParameters {
     unsafe {
         get_call_raw_parameters();
         let raw_call_parameters = crate::internal::get_result_ptr();
-        CallParameters::__fce_generated_deserialize(raw_call_parameters as _)
+        CallParameters::__m_generated_deserialize(raw_call_parameters as _)
     }
 }
 

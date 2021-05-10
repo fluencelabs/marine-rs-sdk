@@ -28,14 +28,14 @@
 #![warn(rust_2018_idioms)]
 #![recursion_limit = "1024"]
 
-use fluence_sdk_test_macro_impl::fce_test_impl;
+use marine_test_macro_impl::marine_test_impl;
 use proc_macro::TokenStream;
 use proc_macro_error::proc_macro_error;
 use syn::spanned::Spanned;
 
 /// This macro allows user to write tests for services in the following form:
 ///```rust
-/// #[fce_test(config = "/path/to/Config.toml", modules_dir = "path/to/service/modules")]
+/// #[marine_test(config = "/path/to/Config.toml", modules_dir = "path/to/service/modules")]
 /// fn test() {
 ///     let service_result = greeting.greeting("John".to_string());
 ///     assert_eq!(&service_result, "Hi, name!");
@@ -43,14 +43,14 @@ use syn::spanned::Spanned;
 ///```
 #[proc_macro_error]
 #[proc_macro_attribute]
-pub fn fce_test(attrs: TokenStream, input: TokenStream) -> TokenStream {
+pub fn marine_test(attrs: TokenStream, input: TokenStream) -> TokenStream {
     let attrs: proc_macro2::TokenStream = attrs.into();
     let attrs_span = attrs.span();
     // here it obtains a path to the current file where macro is applied
     let mut file_path = proc_macro::Span::call_site().source_file().path();
     let _ = file_path.pop();
 
-    match fce_test_impl(attrs, input.into(), file_path) {
+    match marine_test_impl(attrs, input.into(), file_path) {
         Ok(stream) => stream.into(),
         Err(e) => proc_macro_error::abort!(attrs_span, format!("{}", e)),
     }

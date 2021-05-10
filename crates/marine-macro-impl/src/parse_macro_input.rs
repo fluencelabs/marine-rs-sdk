@@ -19,14 +19,14 @@ mod item_foreign_mod;
 mod item_record;
 mod utils;
 
-use crate::ast_types::FCEAst;
+use crate::ast_types::MarineAst;
 
 pub(crate) trait ParseMacroInput {
-    fn parse_macro_input(self) -> syn::Result<FCEAst>;
+    fn parse_macro_input(self) -> syn::Result<MarineAst>;
 }
 
 impl ParseMacroInput for syn::Item {
-    fn parse_macro_input(self) -> syn::Result<FCEAst> {
+    fn parse_macro_input(self) -> syn::Result<MarineAst> {
         use syn::spanned::Spanned;
 
         match self {
@@ -35,7 +35,7 @@ impl ParseMacroInput for syn::Item {
             syn::Item::Struct(item_struct) => item_struct.parse_macro_input(),
             _ => Err(syn::Error::new(
                 self.span(),
-                "At now, #[fce] could be applied only to a function, extern block or struct",
+                "At now, #[marine] could be applied only to a function, extern block or struct",
             )),
         }
     }

@@ -17,8 +17,8 @@
 use crate::TResult;
 
 use fluence_app_service::TomlAppServiceConfig;
-use fce_wit_parser::module_raw_interface;
-use fce_wit_parser::interface::FCEModuleInterface;
+use marine_it_parser::module_raw_interface;
+use marine_it_parser::interface::FCEModuleInterface;
 
 use std::path::PathBuf;
 

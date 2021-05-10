@@ -21,22 +21,22 @@ use pretty_assertions::assert_eq;
 use std::io::Read;
 use std::path::Path;
 
-pub fn test_fce_token_streams<FP, EP>(fce_path: FP, expanded_path: EP) -> bool
+pub fn test_marine_token_streams<FP, EP>(marine_path: FP, expanded_path: EP) -> bool
 where
     FP: AsRef<Path>,
     EP: AsRef<Path>,
 {
-    let fce_item = stream_from_file(fce_path);
-    let test_token_stream = quote::quote! { #fce_item };
-    let fce_token_streams = marine(test_token_stream)
-        .unwrap_or_else(|e| panic!("failed to apply the fce macro due {}", e));
+    let marine_item = stream_from_file(marine_path);
+    let test_token_stream = quote::quote! { #marine_item };
+    let marine_token_streams = marine(test_token_stream)
+        .unwrap_or_else(|e| panic!("failed to apply the marine macro due {}", e));
 
     let expanded_item = items_from_file(expanded_path);
-    let fce_item = to_syn_item(fce_token_streams);
+    let marine_item = to_syn_item(marine_token_streams);
 
-    assert_eq!(expanded_item, fce_item);
+    assert_eq!(expanded_item, marine_item);
 
-    fce_item == expanded_item
+    marine_item == expanded_item
 }
 
 fn stream_from_file<P>(path: P) -> proc_macro2::TokenStream

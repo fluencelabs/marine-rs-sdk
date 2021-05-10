@@ -33,6 +33,6 @@ pub fn build_timestamp(_: TokenStream) -> TokenStream {
     let current_utc_date = chrono::Utc::now();
     let current_utc_date = current_utc_date.to_rfc3339();
 
-    let glue_code = quote::quote! { const __FCE_SDK_BUILD_TIME: &str = #current_utc_date; };
+    let glue_code = quote::quote! { const __M_SDK_BUILD_TIME: &str = #current_utc_date; };
     glue_code.into()
 }

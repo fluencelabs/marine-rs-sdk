@@ -14,11 +14,11 @@
  * limitations under the License.
  */
 
-use crate::attributes::FCETestAttributes;
+use crate::attributes::MTestAttributes;
 use crate::TResult;
 use crate::TestGeneratorError;
-use crate::fce_test;
-use crate::fce_test::config_utils;
+use crate::marine_test;
+use crate::marine_test::config_utils;
 
 use fluence_app_service::TomlAppServiceConfig;
 use proc_macro2::TokenStream;
@@ -30,7 +30,7 @@ use std::path::PathBuf;
 /// Generates glue code for tests.
 /// F.e. for this test for the greeting service
 ///```ignore
-/// #[fce_test(
+/// #[marine_test(
 ///     config_path = "/path/to/service/config/Config.toml",
 ///     modules_dir = "/path/to/modules/dir"
 /// )]
@@ -43,25 +43,25 @@ use std::path::PathBuf;
 /// the following glue code would be generated:
 ///```ignore
 /// // (0)
-///  pub mod __fce_generated_greeting {
-///     struct FCEGeneratedStructgreeting {
-///         fce: std::rc::Rc<std::cell::RefCell<fluence_test::internal::AppService>>,
+///  pub mod __m_generated_greeting {
+///     struct MGeneratedStructgreeting {
+///         marine: std::rc::Rc<std::cell::RefCell<fluence_test::internal::AppService>>,
 ///     }
 ///
-///     impl FCEGeneratedStructgreeting {
-///         pub fn new(fce: std::rc::Rc<std::cell::RefCell<fluence_test::internal::AppService>>) -> Self {
-///             Self { fce }
+///     impl MGeneratedStructgreeting {
+///         pub fn new(marine: std::rc::Rc<std::cell::RefCell<fluence_test::internal::AppService>>) -> Self {
+///             Self { marine }
 ///         }
 ///
 ///         pub fn greeting(&mut self, name: String) -> String {
 ///             use std::ops::DerefMut;
 ///             let arguments = fluence_test::internal::serde_json::json!([name]);
 ///             let result = self
-///                 .fce
+///                 .marine
 ///                 .as_ref
 ///                 .borrow_mut()
 ///                 .call_with_module_name("greeting", "greeting", arguments, <_>::default())
-///                 .expect("call to FCE failed");
+///                 .expect("call to Marine failed");
 ///             let result: String = fluence_test::internal::serde_json::from_value(result)
 ///                 .expect("the default deserializer shouldn't fail");
 ///             result
@@ -76,7 +76,7 @@ use std::path::PathBuf;
 /// let tmp_dir = tmp_dir.to_string_lossy().to_string();
 /// std::fs::create_dir(&tmp_dir).expect("can't create a directory for service in tmp");
 ///
-/// let mut __fce_generated_fce_config = fluence_test::internal::TomlAppServiceConfig::load("/path/to/greeting/Config.toml".to_string())
+/// let mut __m_generated_marine_config = fluence_test::internal::TomlAppServiceConfig::load("/path/to/greeting/Config.toml".to_string())
 ///     .unwrap_or_else(|e| {
 ///         panic!(
 ///              "app service located at `{}` config can't be loaded: {}",
@@ -84,19 +84,19 @@ use std::path::PathBuf;
 ///         )
 ///      });
 ///
-/// __fce_generated_fce_config.service_base_dir = Some("/path/to/tmp".to_string());
+/// __m_generated_marine_config.service_base_dir = Some("/path/to/tmp".to_string());
 ///
-/// let fce = fluence_test::internal::AppService::new_with_empty_facade(
-///         __fce_generated_fce_config,
+/// let marine = fluence_test::internal::AppService::new_with_empty_facade(
+///         __m_generated_marine_config,
 ///         "3640e972-92e3-47cb-b95f-4e3c5bcf0f14",
 ///         std::collections::HashMap::new(),
 ///     ).unwrap_or_else(|e| panic!("app service can't be created: {}", e));
 ///
-/// let fce = std::rc::Rc::new(std::cell::RefCell::new(fce));
+/// let marine = std::rc::Rc::new(std::cell::RefCell::new(marine));
 ///
 /// // (2)
 ///
-/// let mut greeting = __fce_generated_greeting::FCEGeneratedStructgreeting::new(fce);
+/// let mut greeting = __m_generated_greeting::MGeneratedStructgreeting::new(marine);
 ///
 /// // (3)
 ///
@@ -113,23 +113,23 @@ use std::path::PathBuf;
 ///      [(3), (4)] - original_block
 pub(super) fn generate_test_glue_code(
     func_item: syn::ItemFn,
-    attrs: FCETestAttributes,
+    attrs: MTestAttributes,
     file_path: PathBuf,
 ) -> TResult<TokenStream> {
     let config_path = file_path.join(&attrs.config_path);
 
-    let fce_config = TomlAppServiceConfig::load(&config_path)?;
-    let modules_dir = match config_utils::resolve_modules_dir(&fce_config, attrs.modules_dir) {
+    let marine_config = TomlAppServiceConfig::load(&config_path)?;
+    let modules_dir = match config_utils::resolve_modules_dir(&marine_config, attrs.modules_dir) {
         Some(modules_dir) => modules_dir,
         None => return Err(TestGeneratorError::ModulesDirUnspecified),
     };
 
     let app_service_ctor = generate_app_service_ctor(&attrs.config_path, &modules_dir)?;
     let modules_dir = file_path.join(modules_dir);
-    let module_interfaces = fce_test::config_utils::collect_modules(&fce_config, modules_dir)?;
+    let module_interfaces = marine_test::config_utils::collect_modules(&marine_config, modules_dir)?;
 
     let module_definitions =
-        fce_test::module_generator::generate_module_definitions(module_interfaces.iter())?;
+        marine_test::module_generator::generate_module_definitions(module_interfaces.iter())?;
 
     let module_iter = module_interfaces.iter().map(|module| module.name);
     let module_ctors = generate_module_ctors(module_iter)?;
@@ -143,7 +143,7 @@ pub(super) fn generate_test_glue_code(
             // definitions for wasm modules specified in config
             #(#module_definitions)*
 
-            // AppService constructor and instantiation to implicit `fce` variable
+            // AppService constructor and instantiation to implicit `marine` variable
             #app_service_ctor
 
             // constructors of all modules of the tested service
@@ -203,15 +203,15 @@ fn generate_app_service_ctor(config_path: &str, modules_dir: &Path) -> TResult<T
         let modules_dir = module_path.join(#modules_dir);
         let modules_dir = modules_dir.to_str().expect("modules_dir contains invalid UTF8 string");
 
-        let mut __fce_generated_fce_config = fluence_test::internal::TomlAppServiceConfig::load(&config_path)
+        let mut __m_generated_marine_config = fluence_test::internal::TomlAppServiceConfig::load(&config_path)
             .unwrap_or_else(|e| panic!("app service config located at `{:?}` can't be loaded: {}", config_path, e));
-        __fce_generated_fce_config.service_base_dir = Some(tmp_dir);
-        __fce_generated_fce_config.toml_faas_config.modules_dir = Some(modules_dir.to_string());
+        __m_generated_marine_config.service_base_dir = Some(tmp_dir);
+        __m_generated_marine_config.toml_faas_config.modules_dir = Some(modules_dir.to_string());
 
-        let fce = fluence_test::internal::AppService::new_with_empty_facade(__fce_generated_fce_config, service_id, std::collections::HashMap::new())
+        let marine = fluence_test::internal::AppService::new_with_empty_facade(__m_generated_marine_config, service_id, std::collections::HashMap::new())
             .unwrap_or_else(|e| panic!("app service can't be created: {}", e));
 
-        let fce = std::rc::Rc::new(std::cell::RefCell::new(fce));
+        let marine = std::rc::Rc::new(std::cell::RefCell::new(marine));
     };
 
     Ok(service_ctor)
@@ -224,12 +224,12 @@ fn generate_module_ctors<'n>(
         .map(|name| -> TResult<_> {
             // TODO: optimize these two call because they are called twice for each module name
             // and internally allocate memory in format call.
-            let module_name = fce_test::utils::generate_module_name(&name)?;
-            let struct_name = fce_test::utils::generate_struct_name(&name)?;
-            let name_for_user = fce_test::utils::new_ident(&name)?;
+            let module_name = marine_test::utils::generate_module_name(&name)?;
+            let struct_name = marine_test::utils::generate_struct_name(&name)?;
+            let name_for_user = marine_test::utils::new_ident(&name)?;
 
             let module_ctor =
-                quote! { let mut #name_for_user = #module_name::#struct_name::new(fce.clone()); };
+                quote! { let mut #name_for_user = #module_name::#struct_name::new(marine.clone()); };
 
             Ok(module_ctor)
         })

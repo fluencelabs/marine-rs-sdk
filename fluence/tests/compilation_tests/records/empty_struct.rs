@@ -1,6 +1,6 @@
-use fluence::fce;
+use fluence::marine;
 
 fn main() {}
 
-#[fce]
+#[marine]
 struct A {}

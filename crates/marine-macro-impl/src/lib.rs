@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-#![doc(html_root_url = "https://docs.rs/wit-support/0.5.0")]
+#![doc(html_root_url = "https://docs.rs/marine-macro-impl/0.6.2")]
 #![deny(
     dead_code,
     nonstandard_style,
@@ -32,7 +32,7 @@
 
 mod ast_types;
 mod export_ast_types;
-mod fce_macro_impl;
+mod marine_macro_impl;
 mod parsed_type;
 mod parse_macro_input;
 mod token_stream_generator;
@@ -40,7 +40,7 @@ mod utils;
 mod wasm_type;
 
 pub use export_ast_types::*;
-pub use fce_macro_impl::marine;
+pub use marine_macro_impl::marine;
 pub use parsed_type::ParsedType;
 pub use token_stream_generator::GENERATED_WRAPPER_FUNC_PREFIX;
 pub use token_stream_generator::GENERATED_SECTION_PREFIX;

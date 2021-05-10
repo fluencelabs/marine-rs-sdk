@@ -24,10 +24,10 @@ macro_rules! new_ident {
 
 #[macro_export]
 macro_rules! prepare_global_data {
-    ($fce_type: ident, $self: ident, $name: expr, $data: ident, $data_size: ident, $global_static_name: ident, $section_name: ident) => {
+    ($mtype: ident, $self: ident, $name: expr, $data: ident, $data_size: ident, $global_static_name: ident, $section_name: ident) => {
         // TODO: change serialization protocol
-        let fce_type = crate::export_ast_types::SDKAst::$fce_type($self.clone().into());
-        let $data = serde_json::to_vec(&fce_type).unwrap();
+        let mtype = crate::export_ast_types::SDKAst::$mtype($self.clone().into());
+        let $data = serde_json::to_vec(&mtype).unwrap();
         let $data_size = $data.len();
         let $data = syn::LitByteStr::new(&$data, proc_macro2::Span::call_site());
 

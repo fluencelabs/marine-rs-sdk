@@ -14,16 +14,16 @@
  * limitations under the License.
  */
 
-use crate::attributes::FCETestAttributes;
+use crate::attributes::MTestAttributes;
 use crate::TResult;
-use crate::fce_test::glue_code_generator::generate_test_glue_code;
+use crate::marine_test::glue_code_generator::generate_test_glue_code;
 
 use proc_macro2::TokenStream;
 use darling::FromMeta;
 use syn::parse::Parser;
 use std::path::PathBuf;
 
-pub fn fce_test_impl(
+pub fn marine_test_impl(
     attrs: TokenStream,
     input: TokenStream,
     file_path: PathBuf,
@@ -32,7 +32,7 @@ pub fn fce_test_impl(
     let parser = syn::punctuated::Punctuated::<syn::NestedMeta, syn::Token![,]>::parse_terminated;
     let attrs = parser.parse2(attrs)?;
     let attrs: Vec<syn::NestedMeta> = attrs.into_iter().collect();
-    let attrs = FCETestAttributes::from_list(&attrs)?;
+    let attrs = MTestAttributes::from_list(&attrs)?;
 
     let func_item = syn::parse2::<syn::ItemFn>(input)?;
 

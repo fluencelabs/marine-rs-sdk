@@ -18,18 +18,18 @@ mod fn_generator;
 mod foreign_mod_generator;
 mod record_generator;
 
-use crate::ast_types::FCEAst;
+use crate::ast_types::MarineAst;
 
-pub const GENERATED_WRAPPER_FUNC_PREFIX: &str = "__fce_generated_wrapper_func_";
-pub const GENERATED_SECTION_PREFIX: &str = "__fce_generated_section__";
-pub const GENERATED_GLOBAL_PREFIX: &str = "__fce_generated_static_global_";
+pub const GENERATED_WRAPPER_FUNC_PREFIX: &str = "__m_generated_wrapper_func_";
+pub const GENERATED_SECTION_PREFIX: &str = "__m_generated_section__";
+pub const GENERATED_GLOBAL_PREFIX: &str = "__m_generated_static_global_";
 
-impl quote::ToTokens for FCEAst {
+impl quote::ToTokens for MarineAst {
     fn to_tokens(&self, tokens: &mut proc_macro2::TokenStream) {
         match self {
-            FCEAst::Function(ast_function) => ast_function.to_tokens(tokens),
-            FCEAst::ExternMod(ast_extern) => ast_extern.to_tokens(tokens),
-            FCEAst::Record(ast_record) => ast_record.to_tokens(tokens),
+            MarineAst::Function(ast_function) => ast_function.to_tokens(tokens),
+            MarineAst::ExternMod(ast_extern) => ast_extern.to_tokens(tokens),
+            MarineAst::Record(ast_record) => ast_record.to_tokens(tokens),
         }
     }
 }

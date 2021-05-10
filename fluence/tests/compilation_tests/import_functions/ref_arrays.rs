@@ -1,17 +1,17 @@
 #![allow(improper_ctypes)]
 
-use fluence::fce;
+use fluence::marine;
 
 pub fn main() {}
 
-#[fce]
+#[marine]
 #[derive(Default)]
 pub struct TestRecord {
     pub field_0: i32,
     pub field_1: Vec<Vec<u8>>,
 }
 
-#[fce]
+#[marine]
 #[link(wasm_import_module = "arrays_passing_effector")]
 extern "C" {
     pub fn inner_arrays_1(arg: &Vec<Vec<Vec<Vec<u8>>>>) -> Vec<Vec<Vec<Vec<u8>>>>;

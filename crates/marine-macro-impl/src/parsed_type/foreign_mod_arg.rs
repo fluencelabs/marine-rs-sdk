@@ -35,7 +35,7 @@ impl ForeignModArgGlueCodeGenerator for ParsedType {
                 quote! { #arg.0 as _, #arg.1 as _ }
             }
             ParsedType::Record(..) => quote! {
-                #arg.__fce_generated_serialize() as _
+                #arg.__m_generated_serialize() as _
             },
             ty @ ParsedType::Boolean(_) => {
                 let deref_sign = maybe_deref(ty);

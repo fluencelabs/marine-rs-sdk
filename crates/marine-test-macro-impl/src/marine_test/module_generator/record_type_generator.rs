@@ -14,16 +14,16 @@
  * limitations under the License.
  */
 
-use crate::fce_test::utils;
+use crate::marine_test::utils;
 use crate::TResult;
 
-use fce_wit_parser::interface::it::IRecordFieldType;
-use fce_wit_parser::interface::FCERecordTypes;
+use marine_it_parser::interface::it::IRecordFieldType;
+use marine_it_parser::interface::MRecordTypes;
 
 use proc_macro2::TokenStream;
 use quote::quote;
 
-pub(super) fn generate_records(records: &FCERecordTypes) -> TResult<Vec<TokenStream>> {
+pub(super) fn generate_records(records: &MRecordTypes) -> TResult<Vec<TokenStream>> {
     use std::ops::Deref;
 
     records.iter().map(|(_, record)| -> TResult<_> {
@@ -45,7 +45,7 @@ pub(super) fn generate_records(records: &FCERecordTypes) -> TResult<Vec<TokenStr
 
 fn prepare_field<'f>(
     fields: impl ExactSizeIterator<Item = &'f IRecordFieldType>,
-    records: &FCERecordTypes,
+    records: &MRecordTypes,
 ) -> TResult<Vec<TokenStream>> {
     fields
         .map(|field| -> TResult<_> {

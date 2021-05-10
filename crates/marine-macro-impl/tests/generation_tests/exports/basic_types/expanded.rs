@@ -19,7 +19,7 @@ pub fn all_types(
 #[no_mangle]
 #[doc(hidden)]
 #[allow(clippy::all)]
-pub unsafe fn __fce_generated_wrapper_func_all_types(
+pub unsafe fn __m_generated_wrapper_func_all_types(
     arg_0: i8,
     arg_1: i16,
     arg_2: i32,
@@ -46,10 +46,10 @@ pub unsafe fn __fce_generated_wrapper_func_all_types(
     let converted_arg_8 = arg_8 as _;
     let converted_arg_9 = arg_9 as _;
     let converted_arg_10 = String::from_raw_parts(arg_10 as _, arg_11 as _, arg_11 as _);
-    unsafe fn __fce_generated_vec_deserializer_12(offset: u32, size: u32) -> Vec<u8> {
+    unsafe fn __m_generated_vec_deserializer_12(offset: u32, size: u32) -> Vec<u8> {
         Vec::from_raw_parts(offset as _, size as _, size as _)
     }
-    let converted_arg_12 = __fce_generated_vec_deserializer_12(arg_12 as _, arg_13 as _);
+    let converted_arg_12 = __m_generated_vec_deserializer_12(arg_12 as _, arg_13 as _);
     let result = all_types(
         converted_arg_0,
         converted_arg_1,
@@ -64,11 +64,11 @@ pub unsafe fn __fce_generated_wrapper_func_all_types(
         converted_arg_10,
         converted_arg_12
     );
-    unsafe fn __fce_generated_vec_serializer(arg: &Vec<u8>) -> (u32, u32) {
+    unsafe fn __m_generated_vec_serializer(arg: &Vec<u8>) -> (u32, u32) {
         (arg.as_ptr() as _, arg.len() as _)
     }
     {
-        let (serialized_vec_ptr, serialized_vec_size) = __fce_generated_vec_serializer(&result);
+        let (serialized_vec_ptr, serialized_vec_size) = __m_generated_vec_serializer(&result);
         fluence::internal::set_result_ptr(serialized_vec_ptr as _);
         fluence::internal::set_result_size(serialized_vec_size as _);
     }
@@ -77,7 +77,7 @@ pub unsafe fn __fce_generated_wrapper_func_all_types(
 #[cfg(target_arch = "wasm32")]
 #[doc(hidden)]
 #[allow(clippy::all)]
-#[link_section = "__fce_generated_section__all_types"]
-pub static __fce_generated_static_global_all_types: [u8; 636usize] = {
+#[link_section = "__m_generated_section__all_types"]
+pub static __m_generated_static_global_all_types: [u8; 636usize] = {
     * b"{\"ast_type\":\"Function\",\"signature\":{\"name\":\"all_types\",\"arguments\":[{\"name\":\"arg_0\",\"ty\":{\"I8\":\"ByValue\"}},{\"name\":\"arg_1\",\"ty\":{\"I16\":\"ByValue\"}},{\"name\":\"arg_2\",\"ty\":{\"I32\":\"ByValue\"}},{\"name\":\"arg_3\",\"ty\":{\"I64\":\"ByValue\"}},{\"name\":\"arg_4\",\"ty\":{\"U8\":\"ByValue\"}},{\"name\":\"arg_5\",\"ty\":{\"U16\":\"ByValue\"}},{\"name\":\"arg_6\",\"ty\":{\"U32\":\"ByValue\"}},{\"name\":\"arg_7\",\"ty\":{\"U64\":\"ByValue\"}},{\"name\":\"arg_8\",\"ty\":{\"F32\":\"ByValue\"}},{\"name\":\"arg_9\",\"ty\":{\"F64\":\"ByValue\"}},{\"name\":\"arg_10\",\"ty\":{\"Utf8String\":\"ByValue\"}},{\"name\":\"arg_11\",\"ty\":{\"Vector\":[{\"U8\":\"ByValue\"},\"ByValue\"]}}],\"output_types\":[{\"Vector\":[{\"U8\":\"ByValue\"},\"ByValue\"]}]}}"
 };

@@ -69,7 +69,7 @@ pub(super) fn record_der(record_name: &str) -> proc_macro2::TokenStream {
         let mut result = Vec::with_capacity(arg.len());
 
         for offset in arg {
-            let value = #record_name_ident::__fce_generated_deserialize(offset as _);
+            let value = #record_name_ident::__m_generated_deserialize(offset as _);
             result.push(value);
         }
 

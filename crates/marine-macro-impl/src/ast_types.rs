@@ -81,7 +81,7 @@ pub(crate) struct AstFn {
 }
 
 #[derive(Clone)]
-pub(crate) enum FCEAst {
+pub(crate) enum MarineAst {
     Function(AstFn),
     ExternMod(AstExternMod),
     Record(AstRecord),

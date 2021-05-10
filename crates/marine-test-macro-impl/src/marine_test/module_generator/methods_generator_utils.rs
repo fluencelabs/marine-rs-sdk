@@ -14,14 +14,14 @@
  * limitations under the License.
  */
 
-use crate::fce_test::utils::new_ident;
-use crate::fce_test::utils::itype_to_tokens;
+use crate::marine_test::utils::new_ident;
+use crate::marine_test::utils::itype_to_tokens;
 use crate::TResult;
 
-use fce_wit_parser::interface::it::IType;
-use fce_wit_parser::interface::it::IFunctionArg;
-use fce_wit_parser::interface::FCERecordTypes;
-use fce_wit_parser::interface::FCEFunctionSignature;
+use marine_it_parser::interface::it::IType;
+use marine_it_parser::interface::it::IFunctionArg;
+use marine_it_parser::interface::MRecordTypes;
+use marine_it_parser::interface::MFunctionSignature;
 
 use proc_macro2::TokenStream;
 use quote::quote;
@@ -34,13 +34,13 @@ pub(super) enum CallParametersSettings {
 
 pub(super) fn generate_module_method(
     module_name: &str,
-    signature: &FCEFunctionSignature,
+    signature: &MFunctionSignature,
     cp_setting: CallParametersSettings,
-    records: &FCERecordTypes,
+    records: &MRecordTypes,
 ) -> TResult<TokenStream> {
     let arguments = generate_arguments(signature.arguments.iter(), records)?;
     let output_type = generate_output_type(&signature.outputs, records)?;
-    let fce_call = generate_fce_call(module_name, cp_setting, &signature, records)?;
+    let mcall = generate_marine_call(module_name, cp_setting, &signature, records)?;
 
     let (cp, func_name) = match cp_setting {
         CallParametersSettings::Default => {
@@ -63,18 +63,18 @@ pub(super) fn generate_module_method(
 
     let module_method = quote! {
         pub fn #func_name(&mut self, #(#arguments),* #cp) #output_type {
-            #fce_call
+            #mcall
         }
     };
 
     Ok(module_method)
 }
 
-fn generate_fce_call(
+fn generate_marine_call(
     module_name: &str,
     cp_settings: CallParametersSettings,
-    method_signature: &FCEFunctionSignature,
-    records: &FCERecordTypes,
+    method_signature: &MFunctionSignature,
+    records: &MRecordTypes,
 ) -> TResult<TokenStream> {
     let args = method_signature.arguments.iter().map(|a| a.name.as_str());
     let convert_arguments = generate_arguments_converter(args)?;
@@ -122,7 +122,7 @@ fn generate_function_call(
         CallParametersSettings::UserDefined => quote! { cp },
     };
 
-    quote! { self.fce.as_ref().borrow_mut().call_module(#module_name, #method_name, arguments, #cp).expect("call to Marine failed"); }
+    quote! { self.marine.as_ref().borrow_mut().call_module(#module_name, #method_name, arguments, #cp).expect("call to Marine failed"); }
 }
 
 fn generate_set_result(output_type: &Option<&IType>) -> TokenStream {
@@ -134,7 +134,7 @@ fn generate_set_result(output_type: &Option<&IType>) -> TokenStream {
 
 fn generate_convert_to_output(
     output_type: &Option<&IType>,
-    records: &FCERecordTypes,
+    records: &MRecordTypes,
 ) -> TResult<TokenStream> {
     let result_stream = match output_type {
         Some(ty) => {
@@ -158,7 +158,7 @@ fn generate_ret(output_type: &Option<&IType>) -> TokenStream {
 
 fn generate_arguments<'a, 'r>(
     arguments: impl ExactSizeIterator<Item = &'a IFunctionArg>,
-    records: &'r FCERecordTypes,
+    records: &'r MRecordTypes,
 ) -> TResult<Vec<TokenStream>> {
     arguments
         .map(|argument| -> TResult<_> {
@@ -171,7 +171,7 @@ fn generate_arguments<'a, 'r>(
         .collect::<TResult<Vec<_>>>()
 }
 
-fn generate_output_type(output_types: &[IType], records: &FCERecordTypes) -> TResult<TokenStream> {
+fn generate_output_type(output_types: &[IType], records: &MRecordTypes) -> TResult<TokenStream> {
     let output_type = get_output_type(output_types)?;
     match output_type {
         None => Ok(TokenStream::new()),

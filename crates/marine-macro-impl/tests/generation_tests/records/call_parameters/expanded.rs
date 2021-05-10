@@ -16,7 +16,7 @@ pub struct CallParameters {
 #[doc(hidden)]
 #[allow(clippy::all)]
 impl CallParameters {
-    pub fn __fce_generated_serialize(&self) -> *const u8 {
+    pub fn __m_generated_serialize(&self) -> *const u8 {
         let mut raw_record: Vec<u8> = Vec::with_capacity(4 * 6usize);
         let field_ident_ptr = self.init_peer_id.as_ptr() as u32;
         raw_record.extend(&field_ident_ptr.to_le_bytes());
@@ -33,15 +33,15 @@ impl CallParameters {
         let field_ident_ptr = self.particle_id.as_ptr() as u32;
         raw_record.extend(&field_ident_ptr.to_le_bytes());
         raw_record.extend(&(self.particle_id.len() as u32).to_le_bytes());
-        unsafe fn __fce_generated_vec_serializer_tetraplets_5(
+        unsafe fn __m_generated_vec_serializer_tetraplets_5(
             arg: &Vec<Vec<SecurityTetraplet>>
         ) -> (u32, u32) {
-            unsafe fn __fce_generated_vec_serializer_tetraplets_5_SecurityTetraplet(
+            unsafe fn __m_generated_vec_serializer_tetraplets_5_SecurityTetraplet(
                 arg: &Vec<SecurityTetraplet>
             ) -> (u32, u32) {
                 let mut result: Vec<u32> = Vec::with_capacity(arg.len());
                 for value in arg {
-                    result.push(value.__fce_generated_serialize() as _);
+                    result.push(value.__m_generated_serialize() as _);
                 }
                 let result_ptr = result.as_ptr();
                 let result_len = result.len();
@@ -51,7 +51,7 @@ impl CallParameters {
             let mut result: Vec<u32> = Vec::with_capacity(2 * arg.len());
             for value in arg {
                 let (ptr, size) =
-                    __fce_generated_vec_serializer_tetraplets_5_SecurityTetraplet(&value);
+                    __m_generated_vec_serializer_tetraplets_5_SecurityTetraplet(&value);
                 result.push(ptr as _);
                 result.push(size as _);
             }
@@ -61,14 +61,14 @@ impl CallParameters {
             (result_ptr as _, result_len as _)
         }
         let serialized_arg_5 =
-            unsafe { __fce_generated_vec_serializer_tetraplets_5(&self.tetraplets) };
+            unsafe { __m_generated_vec_serializer_tetraplets_5(&self.tetraplets) };
         raw_record.extend(&serialized_arg_5.0.to_le_bytes());
         raw_record.extend(&serialized_arg_5.1.to_le_bytes());
         let raw_record_ptr = raw_record.as_ptr();
         fluence::internal::add_object_to_release(Box::new(raw_record));
         raw_record_ptr as _
     }
-    pub unsafe fn __fce_generated_deserialize(record_ptr: *const u8) -> Self {
+    pub unsafe fn __m_generated_deserialize(record_ptr: *const u8) -> Self {
         let raw_record: Vec<u8> = Vec::from_raw_parts(record_ptr as _, 48usize, 48usize);
         let field_0 = unsafe {
             let offset = u32::from_le_bytes([
@@ -145,18 +145,18 @@ impl CallParameters {
             ]);
             String::from_raw_parts(offset as _, size as _, size as _)
         };
-        unsafe fn __fce_generated_vec_deserializer_40(
+        unsafe fn __m_generated_vec_deserializer_40(
             offset: u32,
             size: u32
         ) -> Vec<Vec<SecurityTetraplet>> {
-            unsafe fn __fce_generated_vec_deserializer_40_SecurityTetraplet(
+            unsafe fn __m_generated_vec_deserializer_40_SecurityTetraplet(
                 offset: u32,
                 size: u32
             ) -> Vec<SecurityTetraplet> {
                 let mut arg: Vec<u32> = Vec::from_raw_parts(offset as _, size as _, size as _);
                 let mut result = Vec::with_capacity(arg.len());
                 for offset in arg {
-                    let value = SecurityTetraplet::__fce_generated_deserialize(offset as _);
+                    let value = SecurityTetraplet::__m_generated_deserialize(offset as _);
                     result.push(value);
                 }
                 result
@@ -168,7 +168,7 @@ impl CallParameters {
             let mut arg = arg.into_iter();
             while let Some(offset) = arg.next() {
                 let size = arg.next().unwrap();
-                let value = __fce_generated_vec_deserializer_40_SecurityTetraplet(
+                let value = __m_generated_vec_deserializer_40_SecurityTetraplet(
                     offset as _,
                     size as _
                 );
@@ -188,7 +188,7 @@ impl CallParameters {
             raw_record[40usize + 6],
             raw_record[40usize + 7],
         ]);
-        let field_5 = unsafe { __fce_generated_vec_deserializer_40(offset as _, size as _) };
+        let field_5 = unsafe { __m_generated_vec_deserializer_40(offset as _, size as _) };
         Self {
             init_peer_id: field_0,
             service_id: field_1,
@@ -202,7 +202,7 @@ impl CallParameters {
 #[cfg(target_arch = "wasm32")]
 #[doc(hidden)]
 #[allow(clippy::all)]
-#[link_section = "__fce_generated_section__CallParameters"]
-pub static __fce_generated_static_global_CallParameters: [u8; 455usize] = {
+#[link_section = "__m_generated_section__CallParameters"]
+pub static __m_generated_static_global_CallParameters: [u8; 455usize] = {
     * b"{\"ast_type\":\"Record\",\"name\":\"CallParameters\",\"fields\":{\"Named\":[{\"name\":\"init_peer_id\",\"ty\":{\"Utf8String\":\"ByValue\"}},{\"name\":\"service_id\",\"ty\":{\"Utf8String\":\"ByValue\"}},{\"name\":\"service_creator_peer_id\",\"ty\":{\"Utf8String\":\"ByValue\"}},{\"name\":\"host_id\",\"ty\":{\"Utf8String\":\"ByValue\"}},{\"name\":\"particle_id\",\"ty\":{\"Utf8String\":\"ByValue\"}},{\"name\":\"tetraplets\",\"ty\":{\"Vector\":[{\"Vector\":[{\"Record\":[\"SecurityTetraplet\",\"ByValue\"]},\"ByValue\"]},\"ByValue\"]}}]}}"
 };

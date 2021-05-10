@@ -52,7 +52,7 @@ impl RecordSerGlueCodeGenerator for AstRecord {
                 }
                 ParsedType::Vector(ty, _) => {
                     let generated_ser_name = format!(
-                        "__fce_generated_vec_serializer_{}_{}",
+                        "__m_generated_vec_serializer_{}_{}",
                         field.name.as_ref().unwrap(),
                         id
                     );
@@ -72,7 +72,7 @@ impl RecordSerGlueCodeGenerator for AstRecord {
                 }
                 ParsedType::Record(..) => {
                     quote! {
-                        let serialized_struct_ptr = #field_ident.__fce_generated_serialize() as usize;
+                        let serialized_struct_ptr = #field_ident.__m_generated_serialize() as usize;
                         raw_record.extend(&serialized_struct_ptr.to_le_bytes());
                     }
                 }

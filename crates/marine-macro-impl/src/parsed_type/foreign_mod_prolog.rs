@@ -128,7 +128,7 @@ impl ForeignModPrologGlueCodeGenerator for Vec<AstFnArgument> {
 }
 
 fn vector_arg_transforms(ty: &ParsedType, arg_name: &str) -> proc_macro2::TokenStream {
-    let generated_ser_name = format!("__fce_generated_vec_serializer_{}", arg_name);
+    let generated_ser_name = format!("__m_generated_vec_serializer_{}", arg_name);
     let generated_ser_name = crate::utils::prepare_ident(generated_ser_name);
     let generated_ser_ident = new_ident!(generated_ser_name);
     let arg_ident = new_ident!(arg_name);

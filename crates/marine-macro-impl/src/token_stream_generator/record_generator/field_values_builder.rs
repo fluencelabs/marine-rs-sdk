@@ -263,7 +263,7 @@ impl FieldValuesBuilder {
     }
 
     fn vector_der(&mut self, ty: &ParsedType, field: &syn::Ident) -> TokenStream {
-        let generated_der_name = format!("__fce_generated_vec_deserializer_{}", self.value_id);
+        let generated_der_name = format!("__m_generated_vec_deserializer_{}", self.value_id);
         let generated_der_name = crate::utils::prepare_ident(generated_der_name);
         let generated_der_ident = new_ident!(generated_der_name);
 
@@ -308,7 +308,7 @@ impl FieldValuesBuilder {
                 raw_record[#value_id + 3],
             ]);
 
-            let #field = #record_ident::__fce_generated_deserialize(offset as _);
+            let #field = #record_ident::__m_generated_deserialize(offset as _);
         };
 
         self.value_id += std::mem::size_of::<u32>();

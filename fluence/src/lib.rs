@@ -15,28 +15,28 @@
  */
 
 //! Rust backend SDK for applications on the Fluence network. This crate defines the procedure macro
-//! `#[fce]` that could be applied to a function, structure or extern block.
+//! `#[marine]` that could be applied to a function, structure or extern block.
 //!
-//! Structures with `#[fce]` (hereinafter they'll be called records) could be used then in function
+//! Structures with `#[marine]` (hereinafter they'll be called records) could be used then in function
 //! arguments and values. All fields of a record should be public and have one of the
 //! following primitive Rust types
 //! (`bool, u8, u16, u32, u64, i8, i16, i32, i64, f32, f64, String, Vec<u8>`).
 //! ```rust
-//! use fluence::fce;
+//! use fluence::marine;
 //!
-//! #[fce]
+//! #[marine]
 //! struct T {
 //!     pub field_1: i32,
 //!     pub field_2: Vec<u8>,
 //! }
 //! ```
 //!
-//! Functions with `#[fce]` will be exported from this module:
+//! Functions with `#[marine]` will be exported from this module:
 //!
 //! ```rust
-//! use fluence::fce;
+//! use fluence::marine;
 //!
-//! #[fce]
+//! #[marine]
 //! pub fn get(url: String) {
 //!     // ...
 //! }
@@ -46,9 +46,9 @@
 //!
 //! Finally, to import other wasm modules to your project use similar code:
 //! ```rust
-//! use fluence::fce;
+//! use fluence::marine;
 //!
-//! #[fce]
+//! #[marine]
 //! #[link(wasm_import_module = "wasm_curl.wasm")]
 //! extern "C" {
 //!     #[link_name = "get"]
@@ -75,7 +75,7 @@ mod mounted_binary;
 extern crate self as fluence;
 
 pub use marine_macro::marine;
-pub use marine_macro::fce;
+pub use marine_macro::marine;
 
 pub use call_parameters::CallParameters;
 pub use call_parameters::SecurityTetraplet;

@@ -18,8 +18,8 @@ mod methods_generator;
 mod methods_generator_utils;
 mod record_type_generator;
 
-use crate::fce_test::utils;
-use crate::fce_test::config_utils::Module;
+use crate::marine_test::utils;
+use crate::marine_test::config_utils::Module;
 use crate::TResult;
 
 use proc_macro2::TokenStream;
@@ -28,25 +28,25 @@ use quote::quote;
 /// Generates definitions of modules and records of this modules.
 /// F.e. for the greeting service the following definitions would be generated:
 ///```ignore
-/// pub mod __fce_generated_greeting {
-///     struct FCEGeneratedStructgreeting {
-///         fce: std::rc::Rc<std::cell::RefCell<fluence_test::internal::AppService>>,
+/// pub mod __m_generated_greeting {
+///     struct MGeneratedStructgreeting {
+///         marine: std::rc::Rc<std::cell::RefCell<fluence_test::internal::AppService>>,
 ///     }
 ///
-///     impl FCEGeneratedStructgreeting {
-///         pub fn new(fce: std::rc::Rc<std::cell::RefCell<fluence_test::internal::AppService>>) -> Self {
-///             Self { fce }
+///     impl MGeneratedStructgreeting {
+///         pub fn new(marine: std::rc::Rc<std::cell::RefCell<fluence_test::internal::AppService>>) -> Self {
+///             Self { marine }
 ///         }
 ///
 ///         pub fn greeting(&mut self, name: String) -> String {
 ///             use std::ops::DerefMut;
 ///             let arguments = fluence_test::internal::serde_json::json!([name]);
 ///             let result = self
-///                 .fce
+///                 .marine
 ///                 .as_ref
 ///                 .borrow_mut()
 ///                 .call_with_module_name("greeting", "greeting", arguments, <_>::default())
-///                 .expect("call to FCE failed");
+///                 .expect("call to Marine failed");
 ///             let result: String = fluence_test::internal::serde_json::from_value(result)
 ///                 .expect("the default deserializer shouldn't fail");
 ///             result
@@ -81,12 +81,12 @@ fn generate_module_definition(module: &Module<'_>) -> TResult<TokenStream> {
             #(#module_records)*
 
             pub struct #struct_name_ident {
-                fce: std::rc::Rc<std::cell::RefCell<fluence_test::internal::AppService>>,
+                marine: std::rc::Rc<std::cell::RefCell<fluence_test::internal::AppService>>,
             }
 
             impl #struct_name_ident {
-                pub fn new(fce: std::rc::Rc<std::cell::RefCell<fluence_test::internal::AppService>>) -> Self {
-                    Self { fce }
+                pub fn new(marine: std::rc::Rc<std::cell::RefCell<fluence_test::internal::AppService>>) -> Self {
+                    Self { marine }
                 }
             }
 

@@ -17,7 +17,7 @@
 use super::ParseMacroInput;
 use crate::ast_types;
 use crate::ParsedType;
-use crate::ast_types::FCEAst;
+use crate::ast_types::MarineAst;
 use crate::ast_types::AstFn;
 use crate::ast_types::AstFnArgument;
 use crate::syn_error;
@@ -26,7 +26,7 @@ use syn::Result;
 use syn::spanned::Spanned;
 
 impl ParseMacroInput for syn::ItemFn {
-    fn parse_macro_input(self) -> Result<FCEAst> {
+    fn parse_macro_input(self) -> Result<MarineAst> {
         let signature = try_to_ast_signature(self.sig.clone(), self.vis.clone())?;
 
         // this check specific only for export functions
@@ -38,7 +38,7 @@ impl ParseMacroInput for syn::ItemFn {
         check_args(parsed_args)?;
         check_output_type(&signature.output_type, self.sig.output.span())?;
 
-        let ast_fn = FCEAst::Function(AstFn {
+        let ast_fn = MarineAst::Function(AstFn {
             signature,
             original: self,
         });
@@ -96,7 +96,7 @@ pub(super) fn try_to_ast_signature(
     Ok(ast_function_item)
 }
 
-/// Check whether the #[fce] macro could be applied to a function.
+/// Check whether the #[marine] macro could be applied to a function.
 #[rustfmt::skip]
 fn check_function(signature: &syn::Signature) -> Result<()> {
     let syn::Signature {
@@ -109,19 +109,19 @@ fn check_function(signature: &syn::Signature) -> Result<()> {
     } = signature;
 
     if let Some(constness) = constness {
-        return syn_error!(constness.span, "FCE export function shouldn't be constant");
+        return syn_error!(constness.span, "Marine export function shouldn't be constant");
     }
     if let Some(unsafety) = unsafety {
-        return syn_error!(unsafety.span, "FCE export function shouldn't be unsafe");
+        return syn_error!(unsafety.span, "Marine export function shouldn't be unsafe");
     }
     if let Some(abi) = abi {
-        return syn_error!(abi.extern_token.span, "FCE export function shouldn't have any custom linkage");
+        return syn_error!(abi.extern_token.span, "Marine export function shouldn't have any custom linkage");
     }
     if generics.where_clause.is_some() {
-        return syn_error!(signature.span(), "FCE export function shouldn't use template parameters");
+        return syn_error!(signature.span(), "Marine export function shouldn't use template parameters");
     }
     if variadic.is_some() {
-        return syn_error!(variadic.span(), "FCE export function shouldn't use variadic interface");
+        return syn_error!(variadic.span(), "Marine export function shouldn't use variadic interface");
     }
 
     // TODO: check for a lifetime

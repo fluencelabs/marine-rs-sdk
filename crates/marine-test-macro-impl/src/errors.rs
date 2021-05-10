@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-use fce_wit_parser::WITParserError;
+use marine_it_parser::WITParserError;
 use fluence_app_service::AppServiceError;
 
 use darling::Error as DarlingError;
@@ -25,7 +25,7 @@ use std::path::PathBuf;
 
 #[derive(Debug, ThisError)]
 pub enum TestGeneratorError {
-    #[error("Can't load Wasm modules into FCE: {0}")]
+    #[error("Can't load Wasm modules into Marine: {0}")]
     WITParserError(#[from] WITParserError),
 
     #[error("{0}")]

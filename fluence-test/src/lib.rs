@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-#![doc(html_root_url = "https://docs.rs/fluence-test/0.5.0")]
+#![doc(html_root_url = "https://docs.rs/fluence-test/0.1.5")]
 #![deny(
     dead_code,
     nonstandard_style,
@@ -26,7 +26,7 @@
 )]
 #![warn(rust_2018_idioms)]
 
-pub use fluence_sdk_test_macro::fce_test;
+pub use marine_test_macro::marine_test;
 pub use fluence_app_service::CallParameters;
 pub use fluence_app_service::SecurityTetraplet;
 

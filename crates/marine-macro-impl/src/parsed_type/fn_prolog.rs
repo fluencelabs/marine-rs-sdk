@@ -130,7 +130,7 @@ fn generate_type_lifting_prolog(
                 },
                 ParsedType::Vector(ty, _) => {
                     let generated_der_name =
-                        format!("__fce_generated_vec_deserializer_{}", supplied_arg_start_id);
+                        format!("__m_generated_vec_deserializer_{}", supplied_arg_start_id);
                     let generated_der_name = crate::utils::prepare_ident(generated_der_name);
                     let generated_der_ident = new_ident!(generated_der_name);
 
@@ -145,7 +145,7 @@ fn generate_type_lifting_prolog(
                 ParsedType::Record(record_name, _) => {
                     let record_ident = new_ident!(record_name);
                     quote! {
-                        let #type_modifier #converted_arg_ident = #record_ident::__fce_generated_deserialize(#ptr as _);
+                        let #type_modifier #converted_arg_ident = #record_ident::__m_generated_deserialize(#ptr as _);
                     }
                 }
                 _ => panic!(

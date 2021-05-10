@@ -38,4 +38,4 @@ pub const VERSION_SECTION_NAME: &str = "__fluence_sdk_version";
 #[cfg(target_arch = "wasm32")]
 #[link_section = "__fluence_sdk_version"]
 #[doc(hidden)]
-pub static __FCE_SDK_VERSION: [u8; VERSION_SIZE] = sdk_version();
+pub static __M_SDK_VERSION: [u8; VERSION_SIZE] = sdk_version();

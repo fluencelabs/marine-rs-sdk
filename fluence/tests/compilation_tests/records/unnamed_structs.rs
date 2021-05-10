@@ -1,8 +1,8 @@
 #![allow(improper_ctypes)]
 
-use fluence::fce;
+use fluence::marine;
 
 fn main() {}
 
-#[fce]
+#[marine]
 struct A(pub i32, pub u32);

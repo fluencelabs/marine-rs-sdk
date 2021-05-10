@@ -65,7 +65,7 @@ pub(super) fn record_ser() -> proc_macro2::TokenStream {
         let mut result: Vec<u32> = Vec::with_capacity(arg.len());
 
         for value in arg {
-            result.push(value.__fce_generated_serialize() as _);
+            result.push(value.__m_generated_serialize() as _);
         }
 
         let result_ptr = result.as_ptr();

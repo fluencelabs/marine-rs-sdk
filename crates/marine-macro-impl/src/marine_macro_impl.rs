@@ -1,5 +1,5 @@
 /*
- * Copyright 2021 Fluence Labs Limited
+ * Copyright 2020 Fluence Labs Limited
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,10 +14,20 @@
  * limitations under the License.
  */
 
-mod config_utils;
-mod fce_test_impl;
-mod glue_code_generator;
-mod module_generator;
-mod utils;
+use crate::parse_macro_input::ParseMacroInput;
 
-pub use fce_test_impl::fce_test_impl;
+use proc_macro2::TokenStream;
+use quote::ToTokens;
+use syn::Result;
+
+pub fn marine(tokens: TokenStream) -> Result<TokenStream> {
+    let item = syn::parse2::<syn::Item>(tokens)?;
+    // convert proc_macro2 token to internal AST type
+    let marine_ast_item = item.parse_macro_input()?;
+
+    // convert internal AST type to sequence of tokens
+    let mut tokens = TokenStream::new();
+    marine_ast_item.to_tokens(&mut tokens);
+
+    Ok(tokens)
+}

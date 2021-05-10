@@ -28,9 +28,9 @@
 
 mod attributes;
 mod errors;
-mod fce_test;
+mod marine_test;
 
-pub use fce_test::fce_test_impl;
+pub use marine_test::marine_test_impl;
 pub use errors::TestGeneratorError;
 
 pub(crate) type TResult<T> = std::result::Result<T, TestGeneratorError>;

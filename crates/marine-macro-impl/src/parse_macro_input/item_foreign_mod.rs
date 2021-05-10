@@ -16,7 +16,7 @@
 
 use super::ParseMacroInput;
 use crate::ast_types;
-use crate::ast_types::FCEAst;
+use crate::ast_types::MarineAst;
 use crate::syn_error;
 
 use syn::Result;
@@ -27,7 +27,7 @@ const LINK_NAME_DIRECTIVE_NAME: &str = "link_name";
 const WASM_IMPORT_MODULE_DIRECTIVE_NAME: &str = "wasm_import_module";
 
 impl ParseMacroInput for syn::ItemForeignMod {
-    fn parse_macro_input(self) -> Result<FCEAst> {
+    fn parse_macro_input(self) -> Result<MarineAst> {
         check_foreign_section(&self)?;
 
         let wasm_import_module: Option<String> = parse_wasm_import_module(&self);
@@ -41,7 +41,7 @@ impl ParseMacroInput for syn::ItemForeignMod {
             imports,
             original: self,
         };
-        Ok(FCEAst::ExternMod(extern_mod_item))
+        Ok(MarineAst::ExternMod(extern_mod_item))
     }
 }
 
@@ -135,7 +135,7 @@ fn parse_raw_foreign_item(raw_item: syn::ForeignItem) -> Result<ast_types::AstEx
         _ => {
             return syn_error!(
                 raw_item.span(),
-                "#[fce] could be applied only to a function, struct ot extern block"
+                "#[marine] could be applied only to a function, struct ot extern block"
             )
         }
     };

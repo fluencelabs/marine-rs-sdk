@@ -1,10 +1,10 @@
 #![allow(improper_ctypes)]
 
-use fluence::fce;
+use fluence::marine;
 
 fn main() {}
 
-#[fce]
+#[marine]
 struct StructWithPrivateFields {
     a: i32,
     b: usize,

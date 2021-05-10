@@ -1,13 +1,13 @@
-error: cannot find attribute `fce` in this scope
+error: cannot find attribute `marine` in this scope
  --> $DIR/inner_vec_refs.rs:8:3
   |
-8 | #[fce]
+8 | #[marine]
   |   ^^^
 
-error: cannot find attribute `fce` in this scope
+error: cannot find attribute `marine` in this scope
  --> $DIR/inner_vec_refs.rs:3:3
   |
-3 | #[fce]
+3 | #[marine]
   |   ^^^
 
 error[E0601]: `main` function not found in crate `$CRATE`
@@ -15,7 +15,7 @@ error[E0601]: `main` function not found in crate `$CRATE`
    |
 1  | / #![allow(improper_ctypes)]
 2  | |
-3  | | #[fce]
+3  | | #[marine]
 4  | | pub fn inner_arrays_2(_arg: &Vec<Vec<Vec<Vec<u8>>>>) -> &Vec<Vec<&Vec<Vec<u8>>>> {
 ...  |
 10 | |     unimplemented!()

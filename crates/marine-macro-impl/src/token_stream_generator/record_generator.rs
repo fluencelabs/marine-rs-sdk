@@ -46,8 +46,6 @@ impl quote::ToTokens for AstRecord {
         let glue_code = quote::quote! {
             #original
 
-            // used_id_fce is a special feature that indicates that this struct will be used inside
-            // FCE for some internal needs
             #[cfg(target_arch = "wasm32")]
             #[doc(hidden)]
             #[allow(clippy::all)]
@@ -77,7 +75,7 @@ fn generate_serializer_fn(record: &AstRecord) -> proc_macro2::TokenStream {
     };
 
     quote::quote! {
-        pub fn __fce_generated_serialize(&self) -> *const u8 {
+        pub fn __m_generated_serialize(&self) -> *const u8 {
             // 4 is an average size of a possible record field
             let mut raw_record: Vec<u8> = Vec::with_capacity(4 * #fields_count);
 
@@ -106,7 +104,7 @@ fn generate_deserializer_fn(record: &AstRecord) -> proc_macro2::TokenStream {
     let record_size = crate::utils::get_record_size(fields.iter().map(|ast_field| &ast_field.ty));
 
     quote::quote! {
-        pub unsafe fn __fce_generated_deserialize(record_ptr: *const u8) -> Self {
+        pub unsafe fn __m_generated_deserialize(record_ptr: *const u8) -> Self {
             let raw_record: Vec<u8> = Vec::from_raw_parts(record_ptr as _, #record_size, #record_size);
 
             #fields_der

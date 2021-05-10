@@ -57,7 +57,7 @@ impl ForeignModEpilogGlueCodeGenerator for Option<ParsedType> {
                 )
             },
             Some(ParsedType::Vector(ty, _)) => {
-                let generated_der_name = "__fce_generated_vec_deserializer";
+                let generated_der_name = "__m_generated_vec_deserializer";
                 let generated_der_ident = new_ident!(generated_der_name);
                 let vector_deserializer =
                     super::vector_ser_der::generate_vector_der(ty, generated_der_name);
@@ -74,7 +74,7 @@ impl ForeignModEpilogGlueCodeGenerator for Option<ParsedType> {
                 let record_ident = new_ident!(record_name);
 
                 quote! {
-                    #record_ident::__fce_generated_deserialize(fluence::internal::get_result_ptr() as _)
+                    #record_ident::__m_generated_deserialize(fluence::internal::get_result_ptr() as _)
                 }
             }
             _ => panic!(

@@ -106,7 +106,7 @@ fn generate_epilog(ty: &Option<ParsedType>) -> proc_macro2::TokenStream {
         None => quote!(),
         Some(ParsedType::Record(..)) => {
             quote! {
-                let result_ptr = result.__fce_generated_serialize();
+                let result_ptr = result.__m_generated_serialize();
                 fluence::internal::set_result_ptr(result_ptr as _);
             }
         }
@@ -117,7 +117,7 @@ fn generate_epilog(ty: &Option<ParsedType>) -> proc_macro2::TokenStream {
             }
         }
         Some(ParsedType::Vector(ty, _)) => {
-            let generated_serializer_name = "__fce_generated_vec_serializer";
+            let generated_serializer_name = "__m_generated_vec_serializer";
             let generated_serializer_ident = new_ident!(generated_serializer_name);
             let vector_serializer =
                 super::vector_ser_der::generate_vector_ser(ty, generated_serializer_name);
