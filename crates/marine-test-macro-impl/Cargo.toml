@@ -1,8 +1,8 @@
 [package]
-name = "fluence-sdk-test-macro-impl"
+name = "marine-test-macro-impl"
 version = "0.1.5"  # remember to update html_root_url
 edition = "2018"
-description = "Implementation of the `#[fce_test]` macro"
+description = "Implementation of the `#[marine_test]` macro"
 repository = "https://github.com/fluencelabs/rust-sdk/crates/macro-test"
 authors = ["Fluence Labs"]
 keywords = ["fluence", "sdk", "webassembly", "procedural_macros"]
@@ -13,7 +13,7 @@ license = "Apache-2.0"
 all-features = true
 
 [dependencies]
-fluence-app-service = { version = "0.7.0", features = ["raw-module-api"] }
+#fluence-app-service = { version = "0.7.0", features = ["raw-module-api"] }
 fce-wit-parser = "0.5.0"
 
 darling = "0.12.2"

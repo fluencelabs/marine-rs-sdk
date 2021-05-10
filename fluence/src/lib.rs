@@ -74,7 +74,8 @@ mod mounted_binary;
 // fluence is used inside CallParameters and MountedBinaryResult glue code
 extern crate self as fluence;
 
-pub use fluence_sdk_macro::fce;
+pub use marine_macro::marine;
+pub use marine_macro::fce;
 
 pub use call_parameters::CallParameters;
 pub use call_parameters::SecurityTetraplet;
@@ -99,5 +100,5 @@ pub mod internal {
     pub use fluence_sdk_main::set_result_ptr;
     pub use fluence_sdk_main::set_result_size;
     pub use fluence_sdk_main::add_object_to_release;
-    pub use fce_timestamp_macro::build_timestamp;
+    pub use marine_timestamp_macro::build_timestamp;
 }

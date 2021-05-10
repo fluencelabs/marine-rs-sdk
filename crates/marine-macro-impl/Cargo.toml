@@ -1,12 +1,12 @@
 [package]
-name = "fluence-sdk-wit"
-version = "0.6.1"  # remember to update html_root_url
+name = "marine-macro-impl"
+version = "0.6.2"  # remember to update html_root_url
 edition = "2018"
-description = "Webassembly interface-types generator"
-documentation = "https://docs.rs/fluence/fluence-sdk-macro"
+description = "Implementation of the `#[marine]` macro"
+documentation = "https://docs.rs/fluence/marine-macro"
 repository = "https://github.com/fluencelabs/rust-sdk/crates/macro"
 authors = ["Fluence Labs"]
-keywords = ["fluence", "sdk", "webassembly", "wit", "interface-types"]
+keywords = ["fluence", "sdk", "webassembly", "it", "interface-types"]
 categories = ["api-bindings", "wasm"]
 license = "Apache-2.0"
 

@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-use fluence_sdk_wit::fce;
+use marine_macro_impl::marine;
 
 use pretty_assertions::assert_eq;
 
@@ -28,7 +28,7 @@ where
 {
     let fce_item = stream_from_file(fce_path);
     let test_token_stream = quote::quote! { #fce_item };
-    let fce_token_streams = fce(test_token_stream)
+    let fce_token_streams = marine(test_token_stream)
         .unwrap_or_else(|e| panic!("failed to apply the fce macro due {}", e));
 
     let expanded_item = items_from_file(expanded_path);

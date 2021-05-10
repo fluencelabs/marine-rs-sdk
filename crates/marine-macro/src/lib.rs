@@ -50,7 +50,7 @@
 //!
 //! ```
 
-#![doc(html_root_url = "https://docs.rs/fluence-sdk-macro/0.5.0")]
+#![doc(html_root_url = "https://docs.rs/marine-macro/0.5.0")]
 #![deny(
     dead_code,
     nonstandard_style,
@@ -62,17 +62,34 @@
 #![warn(rust_2018_idioms)]
 #![recursion_limit = "1024"]
 
-use fluence_sdk_wit::fce as fce_impl;
+use marine_macro_impl::marine as marine_impl;
 use proc_macro::TokenStream;
 
 #[proc_macro_attribute]
-pub fn fce(_attr: TokenStream, input: TokenStream) -> TokenStream {
+pub fn marine(_attr: TokenStream, input: TokenStream) -> TokenStream {
     // into converts proc_macro::TokenStream to proc_macro2::TokenStream
-    match fce_impl(input.into()) {
+    match marine_impl(input.into()) {
         Ok(v) => v,
         // converts syn:error to proc_macro2::TokenStream
         Err(e) => e.to_compile_error(),
     }
     // converts proc_macro2::TokenStream to proc_macro::TokenStream
     .into()
+}
+
+// deprecated macro for backwards compatibility
+#[deprecated(
+    since = "0.6.2",
+    note = "please use the #[marine] macro instead"
+)]
+#[proc_macro_attribute]
+pub fn fce(_attr: TokenStream, input: TokenStream) -> TokenStream {
+    // into converts proc_macro::TokenStream to proc_macro2::TokenStream
+    match marine_impl(input.into()) {
+        Ok(v) => v,
+        // converts syn:error to proc_macro2::TokenStream
+        Err(e) => e.to_compile_error(),
+    }
+        // converts proc_macro2::TokenStream to proc_macro::TokenStream
+        .into()
 }

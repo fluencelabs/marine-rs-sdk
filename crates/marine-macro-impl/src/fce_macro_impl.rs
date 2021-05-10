@@ -20,7 +20,7 @@ use proc_macro2::TokenStream;
 use quote::ToTokens;
 use syn::Result;
 
-pub fn fce(tokens: TokenStream) -> Result<TokenStream> {
+pub fn marine(tokens: TokenStream) -> Result<TokenStream> {
     let item = syn::parse2::<syn::Item>(tokens)?;
     // convert proc_macro2 token to internal AST type
     let fce_ast_item = item.parse_macro_input()?;
