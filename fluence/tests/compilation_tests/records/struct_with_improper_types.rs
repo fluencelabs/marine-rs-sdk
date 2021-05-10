@@ -1,18 +1,18 @@
-use fluence::fce;
+use fluence::marine;
 
 fn main() {}
 
-#[fce]
+#[marine]
 struct StructWithBox {
     pub a: Box<i32>,
 }
 
-#[fce]
+#[marine]
 struct StructWithRc {
     pub a: std::rc::Rc<i32>,
 }
 
-#[fce]
+#[marine]
 struct StructWithHashMap {
     pub a: std::collections::HashMap<i32, String>,
 }

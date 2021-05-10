@@ -14,13 +14,13 @@
  * limitations under the License.
  */
 
-use fluence_sdk_macro::fce;
+use marine_macro::marine;
 
 use serde::Serialize;
 use serde::Deserialize;
 
 /// Describes an origin that set an argument.
-#[fce]
+#[marine]
 #[derive(Clone, PartialEq, Default, Eq, Debug, Serialize, Deserialize)]
 pub struct SecurityTetraplet {
     pub peer_pk: String,
@@ -30,7 +30,7 @@ pub struct SecurityTetraplet {
 }
 
 /// This struct contains parameters that would be accessible by Wasm modules.
-#[fce]
+#[marine]
 #[derive(Clone, PartialEq, Default, Eq, Debug, Serialize, Deserialize)]
 pub struct CallParameters {
     /// Peer id of the AIR script initiator.
@@ -60,7 +60,7 @@ pub fn get_call_parameters() -> CallParameters {
     unsafe {
         get_call_raw_parameters();
         let raw_call_parameters = crate::internal::get_result_ptr();
-        CallParameters::__fce_generated_deserialize(raw_call_parameters as _)
+        CallParameters::__m_generated_deserialize(raw_call_parameters as _)
     }
 }
 

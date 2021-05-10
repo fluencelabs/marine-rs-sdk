@@ -1,6 +1,6 @@
 error: import function can't return a value with references
   --> $DIR/arrays_out_inner_refs.rs:10:5
    |
-10 | /     #[fce]
+10 | /     #[marine]
 11 | |     pub fn func_1() -> &String;
    | |_______________________________^

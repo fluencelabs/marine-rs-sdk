@@ -15,28 +15,28 @@
  */
 
 //! Rust backend SDK for applications on the Fluence network. This crate defines the procedure macro
-//! `#[fce]` that could be applied to a function, structure or extern block.
+//! `#[marine]` that could be applied to a function, structure or extern block.
 //!
-//! Structures with `#[fce]` (hereinafter they'll be called records) could be used then in function
+//! Structures with `#[marine]` (hereinafter they'll be called records) could be used then in function
 //! arguments and values. All fields of a record should be public and have one of the
 //! following primitive Rust types
 //! (`bool, u8, u16, u32, u64, i8, i16, i32, i64, f32, f64, String, Vec<u8>`).
 //! ```rust
-//! use fluence::fce;
+//! use fluence::marine;
 //!
-//! #[fce]
+//! #[marine]
 //! struct T {
 //!     pub field_1: i32,
 //!     pub field_2: Vec<u8>,
 //! }
 //! ```
 //!
-//! Functions with `#[fce]` will be exported from this module:
+//! Functions with `#[marine]` will be exported from this module:
 //!
 //! ```rust
-//! use fluence::fce;
+//! use fluence::marine;
 //!
-//! #[fce]
+//! #[marine]
 //! pub fn get(url: String) {
 //!     // ...
 //! }
@@ -46,9 +46,9 @@
 //!
 //! Finally, to import other wasm modules to your project use similar code:
 //! ```rust
-//! use fluence::fce;
+//! use fluence::marine;
 //!
-//! #[fce]
+//! #[marine]
 //! #[link(wasm_import_module = "wasm_curl.wasm")]
 //! extern "C" {
 //!     #[link_name = "get"]
@@ -74,7 +74,8 @@ mod mounted_binary;
 // fluence is used inside CallParameters and MountedBinaryResult glue code
 extern crate self as fluence;
 
-pub use fluence_sdk_macro::fce;
+pub use marine_macro::marine;
+pub use marine_macro::fce;
 
 pub use call_parameters::CallParameters;
 pub use call_parameters::SecurityTetraplet;
@@ -99,5 +100,5 @@ pub mod internal {
     pub use fluence_sdk_main::set_result_ptr;
     pub use fluence_sdk_main::set_result_size;
     pub use fluence_sdk_main::add_object_to_release;
-    pub use fce_timestamp_macro::build_timestamp;
+    pub use marine_timestamp_macro::build_timestamp;
 }

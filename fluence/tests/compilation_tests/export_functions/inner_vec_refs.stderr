@@ -1,23 +1,11 @@
-error: cannot find attribute `fce` in this scope
- --> $DIR/inner_vec_refs.rs:8:3
+error: a vector type in output types of export functions shouldn't contain references
+ --> $DIR/inner_vec_refs.rs:8:54
   |
-8 | #[fce]
-  |   ^^^
+8 | pub fn inner_arrays_2(_arg: &Vec<Vec<Vec<Vec<u8>>>>) -> &Vec<Vec<&Vec<Vec<u8>>>> {
+  |                                                      ^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-error: cannot find attribute `fce` in this scope
- --> $DIR/inner_vec_refs.rs:3:3
-  |
-3 | #[fce]
-  |   ^^^
-
-error[E0601]: `main` function not found in crate `$CRATE`
-  --> $DIR/inner_vec_refs.rs:1:1
+error: a vector type in output types of export functions shouldn't contain references
+  --> $DIR/inner_vec_refs.rs:13:54
    |
-1  | / #![allow(improper_ctypes)]
-2  | |
-3  | | #[fce]
-4  | | pub fn inner_arrays_2(_arg: &Vec<Vec<Vec<Vec<u8>>>>) -> &Vec<Vec<&Vec<Vec<u8>>>> {
-...  |
-10 | |     unimplemented!()
-11 | | }
-   | |_^ consider adding a `main` function to `$DIR/tests/compilation_tests/export_functions/inner_vec_refs.rs`
+13 | pub fn inner_arrays_3(_arg: &Vec<Vec<Vec<Vec<u8>>>>) -> &Vec<&Vec<&Vec<&Vec<&u8>>>> {
+   |                                                      ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^

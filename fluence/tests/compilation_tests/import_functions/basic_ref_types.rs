@@ -1,10 +1,10 @@
 #![allow(improper_ctypes)]
 
-use fluence::fce;
+use fluence::marine;
 
 fn main() {}
 
-#[fce]
+#[marine]
 #[link(wasm_import_module = "arguments_passing_effector")]
 extern "C" {
     pub fn all_ref_types(

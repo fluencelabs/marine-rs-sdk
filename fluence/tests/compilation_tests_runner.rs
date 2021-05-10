@@ -1,5 +1,5 @@
 #[test]
-fn fce_compilation_tests() {
+fn marine_compilation_tests() {
     let tests = trybuild::TestCases::new();
     tests.compile_fail("tests/compilation_tests/export_functions/array_inner_refs.rs");
     tests.pass("tests/compilation_tests/export_functions/arrays.rs");

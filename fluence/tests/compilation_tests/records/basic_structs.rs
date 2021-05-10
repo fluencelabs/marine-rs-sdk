@@ -1,8 +1,8 @@
-use fluence::fce;
+use fluence::marine;
 
 fn main() {}
 
-#[fce]
+#[marine]
 pub struct TestRecord {
     pub field_0: bool,
     pub field_1: i8,
@@ -19,7 +19,7 @@ pub struct TestRecord {
     pub field_12: Vec<u8>,
 }
 
-#[fce]
+#[marine]
 pub struct Tx {
     pub block_hash: String,
     pub block_number: String,
@@ -34,7 +34,7 @@ pub struct Tx {
     pub value: String,
 }
 
-#[fce]
+#[marine]
 #[derive(Debug)]
 pub struct JsonRpcResult {
     pub json_rpc: String,
@@ -43,7 +43,7 @@ pub struct JsonRpcResult {
     pub id: u64,
 }
 
-#[fce]
+#[marine]
 #[derive(Clone, Debug, Default, Eq, PartialEq, Hash)]
 pub struct User {
     pub peer_id: String,
@@ -52,27 +52,27 @@ pub struct User {
     pub name: String,
 }
 
-#[fce]
+#[marine]
 pub struct GetUsersServiceResult {
     pub ret_code: i32,
     pub err_msg: String,
     pub users: Vec<User>,
 }
 
-#[fce]
+#[marine]
 pub struct EmptyServiceResult {
     pub ret_code: i32,
     pub err_msg: String,
 }
 
-#[fce]
+#[marine]
 pub struct ExistsServiceResult {
     pub ret_code: i32,
     pub err_msg: String,
     pub is_exists: bool,
 }
 
-#[fce]
+#[marine]
 pub struct AuthResult {
     pub ret_code: i32,
     pub err_msg: String,

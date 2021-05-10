@@ -1,24 +1,24 @@
 #![allow(improper_ctypes)]
 
-use fluence::fce;
+use fluence::marine;
 
 pub fn main() {}
 
-#[fce]
+#[marine]
 #[link(wasm_import_module = "arguments_passing_effector")]
 extern "C" {
-    #[fce]
+    #[marine]
     fn test(_arg_1: Box<i32>);
 
-    #[fce]
+    #[marine]
     fn test2(_arg_1: std::rc::Rc<i32>);
 
-    #[fce]
+    #[marine]
     fn test3(_arg_1: std::collections::HashMap<i32, String>);
 
-    #[fce]
+    #[marine]
     fn test4(_arg_1: i32) -> (i32, i32);
 
-    #[fce]
+    #[marine]
     fn test5(_arg_1: i32) -> Box<i32>;
 }
