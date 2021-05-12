@@ -46,3 +46,5 @@ pub use token_stream_generator::GENERATED_WRAPPER_FUNC_PREFIX;
 pub use token_stream_generator::GENERATED_SECTION_PREFIX;
 pub use token_stream_generator::GENERATED_GLOBAL_PREFIX;
 pub use wasm_type::RustType;
+
+pub const GENERATED_SECTION_PREFIX_FCE: &str = "__fce_generated_section__";
