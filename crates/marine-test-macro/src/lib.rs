@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-#![doc(html_root_url = "https://docs.rs/fluence-test-macro/0.1.7")]
+#![doc(html_root_url = "https://docs.rs/fluence-test-macro/0.1.8")]
 #![deny(
     dead_code,
     nonstandard_style,
