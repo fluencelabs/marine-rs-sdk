@@ -41,8 +41,8 @@ jobs:
       - name: Install jq
         run: sudo apt-get update && sudo apt-get --yes --force-yes install jq
 
-      - name: Install cargo-workspaces toml-cli
-        run: cargo install cargo-workspaces toml-cli || true
+      - name: Install cargo-workspaces
+        run: cargo install cargo-workspaces || true
 
       ### === Rust package release ===
       - name: Login to crates.io
