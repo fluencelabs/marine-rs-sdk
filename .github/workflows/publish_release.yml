@@ -63,7 +63,7 @@ jobs:
           # For all crates in the workspace accumulate its max_version
           for CRATE_NAME in $(cargo ws list)
           do
-            CRATE_VERSION="$((cargo show --json "$CRATE_NAME" | jq -r .crate.max_version) 2>/dev/null || true)"
+            CRATE_VERSION="$((cargo show --json "$CRATE_NAME" | jq -r .crate.max_stable_version) 2>/dev/null || true)"
             ALL_CRATES_VERSIONS+=($CRATE_VERSION)
           done
           # Take the highest version of all
