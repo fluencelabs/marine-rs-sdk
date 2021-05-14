@@ -1,6 +1,11 @@
+# We keep Cargo.lock in the repo even though crates here are meant to be used as libraries. Reasons for that are:
+# 1. It makes builds more stable
+# 2. It doesn't affect users of the libraries in any way: Cargo.lock isn't included in the package distribution
+# 3. If one of the dependencies breaks our build, we can always say when and why that happened
+# 4. Since Cargo.lock isn't distributed (which is a good thing), we tend to specify inner dependencies with =x.x.x
+
 # Rust artifacts
 target
-Cargo.lock
 
 # IDE metadate
 .idea
