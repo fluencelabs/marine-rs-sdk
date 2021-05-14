@@ -1,10 +1,10 @@
 [package]
 name = "marine-macro"
-version = "0.6.4"  # remember to update html_root_url
+version = "0.6.8"  # remember to update html_root_url
 edition = "2018"
 description = "Definition of the `#[marine]` macro"
 documentation = "https://docs.rs/fluence/marine-macro"
-repository = "https://github.com/fluencelabs/rust-sdk/crates/macro"
+repository = "https://github.com/fluencelabs/rust-sdk/tree/master/crates/marine-macro"
 authors = ["Fluence Labs"]
 keywords = ["fluence", "sdk", "webassembly", "procedural_macros"]
 categories = ["api-bindings", "wasm"]
@@ -18,4 +18,4 @@ proc-macro = true
 doctest = false
 
 [dependencies]
-marine-macro-impl = { path = "../marine-macro-impl", version = "=0.6.4" }
+marine-macro-impl = { path = "../marine-macro-impl", version = "=0.6.8" }
