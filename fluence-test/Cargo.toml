@@ -1,13 +1,12 @@
 [package]
 name = "fluence-test"
-version = "0.1.7"  # remember to update html_root_url
+version = "0.1.8"  # remember to update html_root_url
 description = "Fluence backend SDK for testing"
-documentation = "https://docs.rs/fluence/"
-repository = "https://github.com/fluencelabs/rust-sdk"
+documentation = "https://docs.rs/fluence-test"
+repository = "https://github.com/fluencelabs/rust-sdk/tree/master/fluence-test"
 authors = ["Fluence Labs"]
-#readme = "README.md"
-keywords = ["fluence", "sdk", "webassembly"]
-categories = ["api-bindings", "wasm"]
+keywords = ["fluence", "sdk", "webassembly", "test"]
+categories = ["api-bindings", "wasm", "development-tools::testing"]
 license = "Apache-2.0"
 edition = "2018"
 
@@ -19,7 +18,7 @@ path = "src/lib.rs"
 doctest = false
 
 [dependencies]
-marine-test-macro = { path = "../crates/marine-test-macro", version = "0.1.6" }
+marine-test-macro = { path = "../crates/marine-test-macro", version = "0.1.8" }
 fluence-app-service = { version = "0.7.0", features = ["raw-module-api"] }
 
 serde = { version = "1.0.118", features = ["derive"] }
