@@ -1,10 +1,10 @@
 [package]
 name = "fluence-sdk-main"
-version = "0.6.6"  # remember to update html_root_url
+version = "0.6.8"  # remember to update html_root_url
 edition = "2018"
 description = "Rust SDK for applications for the Fluence network"
-documentation = "https://docs.rs/fluence/marine-macro"
-repository = "https://github.com/fluencelabs/rust-sdk/crates/main"
+documentation = "https://docs.rs/fluence-sdk-main"
+repository = "https://github.com/fluencelabs/rust-sdk/tree/master/crates/main"
 authors = ["Fluence Labs"]
 keywords = ["fluence", "sdk", "webassembly"]
 categories = ["api-bindings", "wasm"]
@@ -19,7 +19,7 @@ crate-type = ["rlib"]
 doctest = false
 
 [dependencies]
-marine-macro = { path = "../marine-macro", version = "=0.6.6" }
+marine-macro = { path = "../marine-macro", version = "=0.6.8" }
 
 log = { version = "0.4.8", features = ["std"] }
 serde = "=1.0.118"

@@ -2,12 +2,11 @@
 name = "fluence-test"
 version = "0.1.7"  # remember to update html_root_url
 description = "Fluence backend SDK for testing"
-documentation = "https://docs.rs/fluence/"
-repository = "https://github.com/fluencelabs/rust-sdk"
+documentation = "https://docs.rs/fluence-test"
+repository = "https://github.com/fluencelabs/rust-sdk/tree/master/fluence-test"
 authors = ["Fluence Labs"]
-#readme = "README.md"
-keywords = ["fluence", "sdk", "webassembly"]
-categories = ["api-bindings", "wasm"]
+keywords = ["fluence", "sdk", "webassembly", "test"]
+categories = ["api-bindings", "wasm", "development-tools::testing"]
 license = "Apache-2.0"
 edition = "2018"
 

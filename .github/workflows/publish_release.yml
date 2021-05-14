@@ -2,8 +2,8 @@ name: "publish-release"
 
 on:
   push:
-#    branches:
-#      - "master"
+    branches:
+      - "master"
 
 jobs:
   npm-publish:
