@@ -65,8 +65,9 @@ pub(super) fn generate_module_definitions<'i>(
 
 fn generate_module_definition(module: &Module<'_>) -> TResult<TokenStream> {
     let module_name = module.name;
-    let module_name_ident = utils::generate_module_name(module_name)?;
-    let struct_name_ident = utils::generate_struct_name(module_name)?;
+    let module_ident = utils::generate_module_name(module_name)?;
+    let structs_module_ident = utils::generate_structs_module_name(module_name)?;
+    let struct_ident = utils::generate_struct_name(module_name)?;
 
     let module_interface = &module.interface;
     let module_records = record_type_generator::generate_records(&module_interface.record_types)?;
@@ -77,20 +78,22 @@ fn generate_module_definition(module: &Module<'_>) -> TResult<TokenStream> {
     )?;
 
     let module_definition = quote! {
-        pub mod #module_name_ident {
+        pub mod #structs_module_ident {
             #(#module_records)*
+        }
 
-            pub struct #struct_name_ident {
+        pub mod #module_ident {
+            pub struct #struct_ident {
                 marine: std::rc::Rc<std::cell::RefCell<fluence_test::internal::AppService>>,
             }
 
-            impl #struct_name_ident {
+            impl #struct_ident {
                 pub fn new(marine: std::rc::Rc<std::cell::RefCell<fluence_test::internal::AppService>>) -> Self {
                     Self { marine }
                 }
             }
 
-            impl #struct_name_ident {
+            impl #struct_ident {
                 #(#module_functions)*
             }
         }
