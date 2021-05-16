@@ -84,6 +84,8 @@ fn generate_module_definition(module: &Module<'_>) -> TResult<TokenStream> {
 
         pub mod #module_ident {
             pub struct #struct_ident {
+                use super::#structs_module_ident::*;
+
                 marine: std::rc::Rc<std::cell::RefCell<fluence_test::internal::AppService>>,
             }
 
