@@ -21,9 +21,14 @@ use marine_it_parser::interface::it::IType;
 use proc_macro2::TokenStream;
 use quote::quote;
 
-pub(super) fn generate_module_name(module_name: &str) -> TResult<syn::Ident> {
-    let extended_module_name = format!("__m_generated_{}", module_name);
-    new_ident(&extended_module_name)
+pub(super) fn generate_module_ident(module_name: &str) -> TResult<syn::Ident> {
+    let generated_module_name = format!("__m_generated_{}", module_name);
+    new_ident(&generated_module_name)
+}
+
+pub(super) fn generate_structs_module_ident(module_name: &str) -> TResult<syn::Ident> {
+    let generated_module_name = format!("{}_structs", module_name);
+    new_ident(&generated_module_name)
 }
 
 pub(super) fn generate_record_name(record_name: &str) -> TResult<syn::Ident> {

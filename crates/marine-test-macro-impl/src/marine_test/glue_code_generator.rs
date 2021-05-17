@@ -225,7 +225,7 @@ fn generate_module_ctors<'n>(
         .map(|name| -> TResult<_> {
             // TODO: optimize these two call because they are called twice for each module name
             // and internally allocate memory in format call.
-            let module_name = marine_test::utils::generate_module_name(&name)?;
+            let module_name = marine_test::utils::generate_structs_module_ident(&name)?;
             let struct_name = marine_test::utils::generate_struct_name(&name)?;
             let name_for_user = marine_test::utils::new_ident(&name)?;
 
