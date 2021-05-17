@@ -65,8 +65,8 @@ pub(super) fn generate_module_definitions<'i>(
 
 fn generate_module_definition(module: &Module<'_>) -> TResult<TokenStream> {
     let module_name = module.name;
-    let module_ident = utils::generate_module_name(module_name)?;
-    let structs_module_ident = utils::generate_structs_module_name(module_name)?;
+    let module_ident = utils::generate_module_ident(module_name)?;
+    let structs_module_ident = utils::generate_structs_module_ident(module_name)?;
     let struct_ident = utils::generate_struct_name(module_name)?;
 
     let module_interface = &module.interface;
@@ -78,25 +78,27 @@ fn generate_module_definition(module: &Module<'_>) -> TResult<TokenStream> {
     )?;
 
     let module_definition = quote! {
+        // it's a sort of hack: this module structure allows user to import structs by
+        // use module_name_structs::StructName;
         pub mod #structs_module_ident {
-            #(#module_records)*
-        }
+            pub use #module_ident::*;
 
-        pub mod #module_ident {
-            use super::#structs_module_ident::*;
+            pub mod #module_ident {
+                #(#module_records)*
 
-            pub struct #struct_ident {
-                marine: std::rc::Rc<std::cell::RefCell<fluence_test::internal::AppService>>,
-            }
-
-            impl #struct_ident {
-                pub fn new(marine: std::rc::Rc<std::cell::RefCell<fluence_test::internal::AppService>>) -> Self {
-                    Self { marine }
+                pub struct #struct_ident {
+                    marine: std::rc::Rc<std::cell::RefCell<fluence_test::internal::AppService>>,
                 }
-            }
 
-            impl #struct_ident {
-                #(#module_functions)*
+                impl #struct_ident {
+                    pub fn new(marine: std::rc::Rc<std::cell::RefCell<fluence_test::internal::AppService>>) -> Self {
+                        Self { marine }
+                    }
+                }
+
+                impl #struct_ident {
+                    #(#module_functions)*
+                }
             }
         }
     };
