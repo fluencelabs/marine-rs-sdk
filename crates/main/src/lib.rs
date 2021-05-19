@@ -19,7 +19,7 @@
 
 #![allow(clippy::missing_safety_doc)]
 #![allow(clippy::needless_doctest_main)]
-#![doc(html_root_url = "https://docs.rs/fluence-sdk-main/0.6.8")]
+#![doc(html_root_url = "https://docs.rs/fluence-sdk-main/0.6.9")]
 #![deny(
     dead_code,
     nonstandard_style,

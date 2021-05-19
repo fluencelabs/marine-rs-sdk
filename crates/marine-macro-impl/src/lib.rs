@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-#![doc(html_root_url = "https://docs.rs/marine-macro-impl/0.6.8")]
+#![doc(html_root_url = "https://docs.rs/marine-macro-impl/0.6.9")]
 #![deny(
     dead_code,
     nonstandard_style,
@@ -42,6 +42,7 @@ mod wasm_type;
 pub use export_ast_types::*;
 pub use crate::marine_macro_impl::marine;
 pub use parsed_type::ParsedType;
+pub use parsed_type::PassingStyle;
 pub use token_stream_generator::GENERATED_WRAPPER_FUNC_PREFIX;
 pub use token_stream_generator::GENERATED_SECTION_PREFIX;
 pub use token_stream_generator::GENERATED_GLOBAL_PREFIX;
