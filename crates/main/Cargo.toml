@@ -1,12 +1,12 @@
 [package]
-name = "fluence-sdk-main"
+name = "marine-rs-sdk-main"
 version = "0.6.9"  # remember to update html_root_url
 edition = "2018"
-description = "Rust SDK for applications for the Fluence network"
-documentation = "https://docs.rs/fluence-sdk-main"
-repository = "https://github.com/fluencelabs/rust-sdk/tree/master/crates/main"
+description = "Contains logger, allocators and several other modules for marine-rs-sdk"
+documentation = "https://docs.rs/marine-rs-sdk-main"
+repository = "https://github.com/fluencelabs/marine-rs-sdk/tree/master/crates/main"
 authors = ["Fluence Labs"]
-keywords = ["fluence", "sdk", "webassembly"]
+keywords = ["fluence", "marine", "sdk", "webassembly"]
 categories = ["api-bindings", "wasm"]
 license = "Apache-2.0"
 

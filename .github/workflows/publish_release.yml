@@ -48,7 +48,7 @@ jobs:
       - name: Login to crates.io
         run: cargo login ${{ secrets.CRATES_IO_TOKEN }}
 
-      - name: Save fluence's crate version to env
+      - name: Save sdk's crate version to env
         run: |
           set -x
           PKG_NAME=fluence

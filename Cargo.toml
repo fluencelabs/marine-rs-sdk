@@ -6,6 +6,6 @@ members = [
   "crates/marine-test-macro",
   "crates/marine-test-macro-impl",
   "crates/timestamp-macro",
-  "fluence",
-  "fluence-test"
+  "sdk",
+  "sdk-test"
   ]

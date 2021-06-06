@@ -4,9 +4,9 @@ version = "0.1.9"  # remember to update html_root_url
 edition = "2018"
 description = "Implementation of the `#[marine_test]` macro"
 documentation = "https://docs.rs/fluence/marine-test-macro-impl"
-repository = "https://github.com/fluencelabs/rust-sdk/tree/master/crates/marine-test-macro-impl"
+repository = "https://github.com/fluencelabs/marine-rs-sdk/tree/master/crates/marine-test-macro-impl"
 authors = ["Fluence Labs"]
-keywords = ["fluence", "sdk", "webassembly", "procedural_macros"]
+keywords = ["fluence", "marine", "sdk", "webassembly", "procedural_macros"]
 categories = ["api-bindings", "wasm", "development-tools::testing"]
 license = "Apache-2.0"
 

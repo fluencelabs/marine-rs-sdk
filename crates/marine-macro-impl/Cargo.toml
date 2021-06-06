@@ -4,9 +4,9 @@ version = "0.6.9"  # remember to update html_root_url
 edition = "2018"
 description = "Implementation of the `#[marine]` macro"
 documentation = "https://docs.rs/fluence/marine-macro-impl"
-repository = "https://github.com/fluencelabs/rust-sdk/tree/master/crates/marine-macro-impl"
+repository = "https://github.com/fluencelabs/marine-rs-sdk/tree/master/crates/marine-macro-impl"
 authors = ["Fluence Labs"]
-keywords = ["fluence", "sdk", "webassembly", "it", "interface-types"]
+keywords = ["fluence", "marine", "sdk", "webassembly", "it", "interface-types"]
 categories = ["api-bindings", "wasm"]
 license = "Apache-2.0"
 
