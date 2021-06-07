@@ -82,9 +82,9 @@ pub use call_parameters::SecurityTetraplet;
 pub use call_parameters::get_call_parameters;
 
 #[cfg(feature = "logger")]
-pub use fluence_sdk_main::WasmLoggerBuilder;
+pub use marine_rs_sdk_main::WasmLoggerBuilder;
 #[cfg(feature = "logger")]
-pub use fluence_sdk_main::TargetMap;
+pub use marine_rs_sdk_main::TargetMap;
 
 pub use mounted_binary::MountedBinaryResult;
 pub use mounted_binary::MountedBinaryStringResult;
