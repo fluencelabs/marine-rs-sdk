@@ -23,7 +23,7 @@
 //! Macros from crate [`log`] are used as a logging facade.
 //!
 //! ```ignore
-//!     use sdk::logger;
+//!     use marine_rs_sdk::logger;
 //!     use log::{error, trace};
 //!     use simple_logger;
 //!
@@ -141,7 +141,7 @@ impl WasmLoggerBuilder {
     /// Returns a error
     ///
     /// ```ignore
-    /// # use sdk::logger;
+    /// # use marine_rs_sdk::logger;
     /// # use log::info;
     /// #
     /// # fn main() {
