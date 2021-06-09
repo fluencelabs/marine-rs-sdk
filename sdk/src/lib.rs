@@ -72,7 +72,7 @@ mod mounted_binary;
 
 #[allow(unused_extern_crates)]
 // sdk is used inside CallParameters and MountedBinaryResult glue code
-extern crate self as fluence;
+extern crate self as marine_rs_sdk;
 
 pub use marine_macro::marine;
 pub use marine_macro::fce;
