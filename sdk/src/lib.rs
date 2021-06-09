@@ -22,7 +22,7 @@
 //! following primitive Rust types
 //! (`bool, u8, u16, u32, u64, i8, i16, i32, i64, f32, f64, String, Vec<u8>`).
 //! ```rust
-//! use sdk::marine;
+//! use marine_rs_sdk::marine;
 //!
 //! #[marine]
 //! struct T {
@@ -34,7 +34,7 @@
 //! Functions with `#[marine]` will be exported from this module:
 //!
 //! ```rust
-//! use sdk::marine;
+//! use marine_rs_sdk::marine;
 //!
 //! #[marine]
 //! pub fn get(url: String) {
@@ -46,7 +46,7 @@
 //!
 //! Finally, to import other wasm modules to your project use similar code:
 //! ```rust
-//! use sdk::marine;
+//! use marine_rs_sdk::marine;
 //!
 //! #[marine]
 //! #[link(wasm_import_module = "wasm_curl.wasm")]
