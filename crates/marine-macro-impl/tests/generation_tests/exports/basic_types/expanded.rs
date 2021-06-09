@@ -69,10 +69,10 @@ pub unsafe fn __m_generated_wrapper_func_all_types(
     }
     {
         let (serialized_vec_ptr, serialized_vec_size) = __m_generated_vec_serializer(&result);
-        fluence::internal::set_result_ptr(serialized_vec_ptr as _);
-        fluence::internal::set_result_size(serialized_vec_size as _);
+        marine_rs_sdk::internal::set_result_ptr(serialized_vec_ptr as _);
+        marine_rs_sdk::internal::set_result_size(serialized_vec_size as _);
     }
-    fluence::internal::add_object_to_release(Box::new(result));
+    marine_rs_sdk::internal::add_object_to_release(Box::new(result));
 }
 #[cfg(target_arch = "wasm32")]
 #[doc(hidden)]

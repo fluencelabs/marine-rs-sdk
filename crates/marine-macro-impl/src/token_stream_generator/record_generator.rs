@@ -82,7 +82,7 @@ fn generate_serializer_fn(record: &AstRecord) -> proc_macro2::TokenStream {
             #serializer
 
             let raw_record_ptr = raw_record.as_ptr();
-            fluence::internal::add_object_to_release(Box::new(raw_record));
+            marine_rs_sdk::internal::add_object_to_release(Box::new(raw_record));
 
             raw_record_ptr as _
         }

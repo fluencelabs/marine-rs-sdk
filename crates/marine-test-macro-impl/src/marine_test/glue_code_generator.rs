@@ -45,24 +45,24 @@ use std::path::PathBuf;
 /// // (0)
 ///  pub mod __m_generated_greeting {
 ///     struct MGeneratedStructgreeting {
-///         marine: std::rc::Rc<std::cell::RefCell<fluence_test::internal::AppService>>,
+///         marine: std::rc::Rc<std::cell::RefCell<marine_rs_sdk_test::internal::AppService>>,
 ///     }
 ///
 ///     impl MGeneratedStructgreeting {
-///         pub fn new(marine: std::rc::Rc<std::cell::RefCell<fluence_test::internal::AppService>>) -> Self {
+///         pub fn new(marine: std::rc::Rc<std::cell::RefCell<marine_rs_sdk_test::internal::AppService>>) -> Self {
 ///             Self { marine }
 ///         }
 ///
 ///         pub fn greeting(&mut self, name: String) -> String {
 ///             use std::ops::DerefMut;
-///             let arguments = fluence_test::internal::serde_json::json!([name]);
+///             let arguments = marine_rs_sdk_test::internal::serde_json::json!([name]);
 ///             let result = self
 ///                 .marine
 ///                 .as_ref
 ///                 .borrow_mut()
 ///                 .call_with_module_name("greeting", "greeting", arguments, <_>::default())
 ///                 .expect("call to Marine failed");
-///             let result: String = fluence_test::internal::serde_json::from_value(result)
+///             let result: String = marine_rs_sdk_test::internal::serde_json::from_value(result)
 ///                 .expect("the default deserializer shouldn't fail");
 ///             result
 ///         }
@@ -70,13 +70,13 @@ use std::path::PathBuf;
 ///}
 /// // (1)
 /// let tmp_dir = std::env::temp_dir();
-/// let service_id = fluence_test::internal::Uuid::new_v4().to_string();
+/// let service_id = marine_rs_sdk_test::internal::Uuid::new_v4().to_string();
 ///
 /// let tmp_dir = tmp_dir.join(&service_id);
 /// let tmp_dir = tmp_dir.to_string_lossy().to_string();
 /// std::fs::create_dir(&tmp_dir).expect("can't create a directory for service in tmp");
 ///
-/// let mut __m_generated_marine_config = fluence_test::internal::TomlAppServiceConfig::load("/path/to/greeting/Config.toml".to_string())
+/// let mut __m_generated_marine_config = marine_rs_sdk_test::internal::TomlAppServiceConfig::load("/path/to/greeting/Config.toml".to_string())
 ///     .unwrap_or_else(|e| {
 ///         panic!(
 ///              "app service located at `{}` config can't be loaded: {}",
@@ -86,7 +86,7 @@ use std::path::PathBuf;
 ///
 /// __m_generated_marine_config.service_base_dir = Some("/path/to/tmp".to_string());
 ///
-/// let marine = fluence_test::internal::AppService::new_with_empty_facade(
+/// let marine = marine_rs_sdk_test::internal::AppService::new_with_empty_facade(
 ///         __m_generated_marine_config,
 ///         "3640e972-92e3-47cb-b95f-4e3c5bcf0f14",
 ///         std::collections::HashMap::new(),
@@ -165,7 +165,7 @@ fn generate_app_service_ctor(config_path: &str, modules_dir: &Path) -> TResult<T
 
     let service_ctor = quote! {
         let tmp_dir = std::env::temp_dir();
-        let service_id = fluence_test::internal::Uuid::new_v4().to_string();
+        let service_id = marine_rs_sdk_test::internal::Uuid::new_v4().to_string();
 
         let tmp_dir = tmp_dir.join(&service_id);
         let tmp_dir = tmp_dir.to_string_lossy().to_string();
@@ -204,12 +204,12 @@ fn generate_app_service_ctor(config_path: &str, modules_dir: &Path) -> TResult<T
         let modules_dir = module_path.join(#modules_dir);
         let modules_dir = modules_dir.to_str().expect("modules_dir contains invalid UTF8 string");
 
-        let mut __m_generated_marine_config = fluence_test::internal::TomlAppServiceConfig::load(&config_path)
+        let mut __m_generated_marine_config = marine_rs_sdk_test::internal::TomlAppServiceConfig::load(&config_path)
             .unwrap_or_else(|e| panic!("app service config located at `{:?}` can't be loaded: {}", config_path, e));
         __m_generated_marine_config.service_base_dir = Some(tmp_dir);
         __m_generated_marine_config.toml_faas_config.modules_dir = Some(modules_dir.to_string());
 
-        let marine = fluence_test::internal::AppService::new_with_empty_facade(__m_generated_marine_config, service_id, std::collections::HashMap::new())
+        let marine = marine_rs_sdk_test::internal::AppService::new_with_empty_facade(__m_generated_marine_config, service_id, std::collections::HashMap::new())
             .unwrap_or_else(|e| panic!("app service can't be created: {}", e));
 
         let marine = std::rc::Rc::new(std::cell::RefCell::new(marine));
