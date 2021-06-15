@@ -34,7 +34,7 @@ pub(crate) fn generate_vector_ser(
                 let ptr = converted_bool_vector.as_ptr();
                 let len = converted_bool_vector.len();
 
-                fluence::internal::add_object_to_release(Box::new(converted_bool_vector));
+                marine_rs_sdk::internal::add_object_to_release(Box::new(converted_bool_vector));
 
                 (ptr as _, len as _)
             }

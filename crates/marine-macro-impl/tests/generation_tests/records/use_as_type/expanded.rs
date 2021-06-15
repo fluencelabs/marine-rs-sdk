@@ -88,7 +88,7 @@ pub unsafe fn __m_generated_wrapper_func_inner_arrays_2(arg_0: u32, arg_1: u32) 
                     }
                     let result_ptr = result.as_ptr();
                     let result_len = result.len();
-                    fluence::internal::add_object_to_release(Box::new(result));
+                    marine_rs_sdk::internal::add_object_to_release(Box::new(result));
                     (result_ptr as _, result_len as _)
                 }
                 let mut result: Vec<u32> = Vec::with_capacity(2 * arg.len());
@@ -99,7 +99,7 @@ pub unsafe fn __m_generated_wrapper_func_inner_arrays_2(arg_0: u32, arg_1: u32) 
                 }
                 let result_ptr = result.as_ptr();
                 let result_len = result.len() / 2;
-                fluence::internal::add_object_to_release(Box::new(result));
+                marine_rs_sdk::internal::add_object_to_release(Box::new(result));
                 (result_ptr as _, result_len as _)
             }
             let mut result: Vec<u32> = Vec::with_capacity(2 * arg.len());
@@ -111,7 +111,7 @@ pub unsafe fn __m_generated_wrapper_func_inner_arrays_2(arg_0: u32, arg_1: u32) 
             }
             let result_ptr = result.as_ptr();
             let result_len = result.len() / 2;
-            fluence::internal::add_object_to_release(Box::new(result));
+            marine_rs_sdk::internal::add_object_to_release(Box::new(result));
             (result_ptr as _, result_len as _)
         }
         let mut result: Vec<u32> = Vec::with_capacity(2 * arg.len());
@@ -122,15 +122,15 @@ pub unsafe fn __m_generated_wrapper_func_inner_arrays_2(arg_0: u32, arg_1: u32) 
         }
         let result_ptr = result.as_ptr();
         let result_len = result.len() / 2;
-        fluence::internal::add_object_to_release(Box::new(result));
+        marine_rs_sdk::internal::add_object_to_release(Box::new(result));
         (result_ptr as _, result_len as _)
     }
     {
         let (serialized_vec_ptr, serialized_vec_size) = __m_generated_vec_serializer(&result);
-        fluence::internal::set_result_ptr(serialized_vec_ptr as _);
-        fluence::internal::set_result_size(serialized_vec_size as _);
+        marine_rs_sdk::internal::set_result_ptr(serialized_vec_ptr as _);
+        marine_rs_sdk::internal::set_result_size(serialized_vec_size as _);
     }
-    fluence::internal::add_object_to_release(Box::new(result));
+    marine_rs_sdk::internal::add_object_to_release(Box::new(result));
 }
 #[cfg(target_arch = "wasm32")]
 #[doc(hidden)]

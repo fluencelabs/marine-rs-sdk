@@ -388,21 +388,10 @@ version = "0.6.8"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "a92116bbed3be3afee952d62d6009f1a365bde985a1cf59fb933144308660743"
 dependencies = [
- "fluence-sdk-main 0.6.8",
+ "fluence-sdk-main",
  "marine-macro 0.6.8",
  "marine-timestamp-macro 0.6.8",
  "serde",
-]
-
-[[package]]
-name = "fluence"
-version = "0.6.9"
-dependencies = [
- "fluence-sdk-main 0.6.9",
- "marine-macro 0.6.9",
- "marine-timestamp-macro 0.6.9",
- "serde",
- "trybuild",
 ]
 
 [[package]]
@@ -428,8 +417,8 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "9421599c5540e50f3854a0a48702c31408ac1cfb06314fe391792daa3a9d800b"
 dependencies = [
  "cmd_lib",
- "fluence 0.6.8",
- "fluence-sdk-main 0.6.8",
+ "fluence",
+ "fluence-sdk-main",
  "itertools 0.9.0",
  "log",
  "marine-runtime",
@@ -470,17 +459,6 @@ dependencies = [
 ]
 
 [[package]]
-name = "fluence-sdk-main"
-version = "0.6.9"
-dependencies = [
- "lazy_static",
- "log",
- "marine-macro 0.6.9",
- "serde",
- "simple_logger",
-]
-
-[[package]]
 name = "fluence-sdk-wit"
 version = "0.6.1"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -491,17 +469,6 @@ dependencies = [
  "serde",
  "serde_json",
  "syn",
- "uuid",
-]
-
-[[package]]
-name = "fluence-test"
-version = "0.1.9"
-dependencies = [
- "fluence-app-service",
- "marine-test-macro",
- "serde",
- "serde_json",
  "uuid",
 ]
 
@@ -863,12 +830,45 @@ checksum = "003017e314cebb5c774569a4257f5eca82106cff170b124c6712f2fcd3ceefef"
 dependencies = [
  "anyhow",
  "chrono",
- "fluence-sdk-main 0.6.8",
+ "fluence-sdk-main",
  "semver 0.11.0",
  "serde",
  "thiserror",
  "walrus",
  "wasmer-runtime-core-fl",
+]
+
+[[package]]
+name = "marine-rs-sdk"
+version = "0.6.9"
+dependencies = [
+ "marine-macro 0.6.9",
+ "marine-rs-sdk-main",
+ "marine-timestamp-macro 0.6.9",
+ "serde",
+ "trybuild",
+]
+
+[[package]]
+name = "marine-rs-sdk-main"
+version = "0.6.9"
+dependencies = [
+ "lazy_static",
+ "log",
+ "marine-macro 0.6.9",
+ "serde",
+ "simple_logger",
+]
+
+[[package]]
+name = "marine-rs-sdk-test"
+version = "0.1.9"
+dependencies = [
+ "fluence-app-service",
+ "marine-test-macro",
+ "serde",
+ "serde_json",
+ "uuid",
 ]
 
 [[package]]

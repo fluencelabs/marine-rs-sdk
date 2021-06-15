@@ -48,10 +48,10 @@ jobs:
       - name: Login to crates.io
         run: cargo login ${{ secrets.CRATES_IO_TOKEN }}
 
-      - name: Save fluence's crate version to env
+      - name: Save marine-rs-sdk's crate version to env
         run: |
           set -x
-          PKG_NAME=fluence
+          PKG_NAME=marine-rs-sdk
           VERSION=$(cargo ws list -l | grep "$PKG_NAME"$ | head -n1 | awk '{ print $2 }')
           echo "VERSION=$VERSION" | tee -a $GITHUB_ENV
           echo "PKG_NAME=$PKG_NAME" | tee -a $GITHUB_ENV
@@ -67,7 +67,7 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
           tag_name: ${{ env.VERSION }}
-          release_name: Fluence Rust SDK ${{ env.VERSION }}
+          release_name: Marine Rust SDK ${{ env.VERSION }}
           body: |
             - [${{ env.VERSION }} @ crates.io](https://crates.io/crates/${{ env.PKG_NAME }}/${{ env.VERSION }})
           draft: false

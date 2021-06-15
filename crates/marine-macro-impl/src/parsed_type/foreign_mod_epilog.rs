@@ -51,9 +51,9 @@ impl ForeignModEpilogGlueCodeGenerator for Option<ParsedType> {
             },
             Some(ParsedType::Utf8String(_)) => quote! {
                 String::from_raw_parts(
-                    fluence::internal::get_result_ptr() as _,
-                    fluence::internal::get_result_size() as _,
-                    fluence::internal::get_result_size() as _
+                    marine_rs_sdk::internal::get_result_ptr() as _,
+                    marine_rs_sdk::internal::get_result_size() as _,
+                    marine_rs_sdk::internal::get_result_size() as _
                 )
             },
             Some(ParsedType::Vector(ty, _)) => {
@@ -65,8 +65,8 @@ impl ForeignModEpilogGlueCodeGenerator for Option<ParsedType> {
                 quote! {
                     #vector_deserializer
                     #generated_der_ident(
-                        fluence::internal::get_result_ptr() as _,
-                        fluence::internal::get_result_size() as _,
+                        marine_rs_sdk::internal::get_result_ptr() as _,
+                        marine_rs_sdk::internal::get_result_size() as _,
                     )
                 }
             }
@@ -74,7 +74,7 @@ impl ForeignModEpilogGlueCodeGenerator for Option<ParsedType> {
                 let record_ident = new_ident!(record_name);
 
                 quote! {
-                    #record_ident::__m_generated_deserialize(fluence::internal::get_result_ptr() as _)
+                    #record_ident::__m_generated_deserialize(marine_rs_sdk::internal::get_result_ptr() as _)
                 }
             }
             _ => panic!(

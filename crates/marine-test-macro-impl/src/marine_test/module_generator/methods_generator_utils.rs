@@ -54,7 +54,7 @@ pub(super) fn generate_module_method(
                 quote! { , }
             };
 
-            let cp = quote! { #maybe_comma cp: fluence_test::CallParameters };
+            let cp = quote! { #maybe_comma cp: marine_rs_sdk_test::CallParameters };
             let func_name = format!("{}_cp", signature.name);
             let func_name = new_ident(&func_name)?;
             (cp, func_name)
@@ -106,8 +106,7 @@ fn generate_arguments_converter<'a>(
 ) -> TResult<TokenStream> {
     let arg_idents: Vec<syn::Ident> = args.map(new_ident).collect::<Result<_, _>>()?;
 
-    let args_converter =
-        quote! { let arguments = fluence_test::internal::serde_json::json!([#(#arg_idents),*]); };
+    let args_converter = quote! { let arguments = marine_rs_sdk_test::internal::serde_json::json!([#(#arg_idents),*]); };
 
     Ok(args_converter)
 }
@@ -140,7 +139,7 @@ fn generate_convert_to_output(
         Some(ty) => {
             let ty = itype_to_tokens(ty, records)?;
             quote! {
-                let result: #ty = fluence_test::internal::serde_json::from_value(result).expect("the default deserializer shouldn't fail");
+                let result: #ty = marine_rs_sdk_test::internal::serde_json::from_value(result).expect("the default deserializer shouldn't fail");
             }
         }
         None => TokenStream::new(),

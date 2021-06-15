@@ -34,7 +34,7 @@
 //! and how a struct could be passed:
 //!
 //! ```ignore
-//! use fluence::MountedBinaryResult;
+//! use marine_rs_sdk::MountedBinaryResult;
 //!
 //! #[marine]
 //! pub fn read_ipfs_file(file_path: String) -> MountedBinaryResult {

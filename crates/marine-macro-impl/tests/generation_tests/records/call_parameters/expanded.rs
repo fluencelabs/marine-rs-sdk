@@ -45,7 +45,7 @@ impl CallParameters {
                 }
                 let result_ptr = result.as_ptr();
                 let result_len = result.len();
-                fluence::internal::add_object_to_release(Box::new(result));
+                marine_rs_sdk::internal::add_object_to_release(Box::new(result));
                 (result_ptr as _, result_len as _)
             }
             let mut result: Vec<u32> = Vec::with_capacity(2 * arg.len());
@@ -57,7 +57,7 @@ impl CallParameters {
             }
             let result_ptr = result.as_ptr();
             let result_len = result.len() / 2;
-            fluence::internal::add_object_to_release(Box::new(result));
+            marine_rs_sdk::internal::add_object_to_release(Box::new(result));
             (result_ptr as _, result_len as _)
         }
         let serialized_arg_5 =
@@ -65,7 +65,7 @@ impl CallParameters {
         raw_record.extend(&serialized_arg_5.0.to_le_bytes());
         raw_record.extend(&serialized_arg_5.1.to_le_bytes());
         let raw_record_ptr = raw_record.as_ptr();
-        fluence::internal::add_object_to_release(Box::new(raw_record));
+        marine_rs_sdk::internal::add_object_to_release(Box::new(raw_record));
         raw_record_ptr as _
     }
     pub unsafe fn __m_generated_deserialize(record_ptr: *const u8) -> Self {

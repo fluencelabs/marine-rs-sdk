@@ -30,24 +30,24 @@ use quote::quote;
 ///```ignore
 /// pub mod __m_generated_greeting {
 ///     struct MGeneratedStructgreeting {
-///         marine: std::rc::Rc<std::cell::RefCell<fluence_test::internal::AppService>>,
+///         marine: std::rc::Rc<std::cell::RefCell<marine_rs_sdk_test::internal::AppService>>,
 ///     }
 ///
 ///     impl MGeneratedStructgreeting {
-///         pub fn new(marine: std::rc::Rc<std::cell::RefCell<fluence_test::internal::AppService>>) -> Self {
+///         pub fn new(marine: std::rc::Rc<std::cell::RefCell<marine_rs_sdk_test::internal::AppService>>) -> Self {
 ///             Self { marine }
 ///         }
 ///
 ///         pub fn greeting(&mut self, name: String) -> String {
 ///             use std::ops::DerefMut;
-///             let arguments = fluence_test::internal::serde_json::json!([name]);
+///             let arguments = marine_rs_sdk_test::internal::serde_json::json!([name]);
 ///             let result = self
 ///                 .marine
 ///                 .as_ref
 ///                 .borrow_mut()
 ///                 .call_with_module_name("greeting", "greeting", arguments, <_>::default())
 ///                 .expect("call to Marine failed");
-///             let result: String = fluence_test::internal::serde_json::from_value(result)
+///             let result: String = marine_rs_sdk_test::internal::serde_json::from_value(result)
 ///                 .expect("the default deserializer shouldn't fail");
 ///             result
 ///         }
@@ -87,11 +87,11 @@ fn generate_module_definition(module: &Module<'_>) -> TResult<TokenStream> {
                 #(#module_records)*
 
                 pub struct #struct_ident {
-                    marine: std::rc::Rc<std::cell::RefCell<fluence_test::internal::AppService>>,
+                    marine: std::rc::Rc<std::cell::RefCell<marine_rs_sdk_test::internal::AppService>>,
                 }
 
                 impl #struct_ident {
-                    pub fn new(marine: std::rc::Rc<std::cell::RefCell<fluence_test::internal::AppService>>) -> Self {
+                    pub fn new(marine: std::rc::Rc<std::cell::RefCell<marine_rs_sdk_test::internal::AppService>>) -> Self {
                         Self { marine }
                     }
                 }

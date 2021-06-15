@@ -29,7 +29,7 @@ pub(super) fn string_ser() -> proc_macro2::TokenStream {
 
         let result_ptr = result.as_ptr();
         let result_len = result.len() / 2;
-        fluence::internal::add_object_to_release(Box::new(result));
+        marine_rs_sdk::internal::add_object_to_release(Box::new(result));
 
         (result_ptr as _, result_len as _)
     }
@@ -54,7 +54,7 @@ pub(super) fn vector_ser(arg_name: &str, ty: &ParsedType) -> proc_macro2::TokenS
 
         let result_ptr = result.as_ptr();
         let result_len = result.len() / 2;
-        fluence::internal::add_object_to_release(Box::new(result));
+        marine_rs_sdk::internal::add_object_to_release(Box::new(result));
 
         (result_ptr as _, result_len as _)
     }
@@ -70,7 +70,7 @@ pub(super) fn record_ser() -> proc_macro2::TokenStream {
 
         let result_ptr = result.as_ptr();
         let result_len = result.len();
-        fluence::internal::add_object_to_release(Box::new(result));
+        marine_rs_sdk::internal::add_object_to_release(Box::new(result));
 
         (result_ptr as _, result_len as _)
     }

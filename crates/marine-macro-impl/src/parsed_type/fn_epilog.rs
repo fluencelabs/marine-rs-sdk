@@ -107,13 +107,13 @@ fn generate_epilog(ty: &Option<ParsedType>) -> proc_macro2::TokenStream {
         Some(ParsedType::Record(..)) => {
             quote! {
                 let result_ptr = result.__m_generated_serialize();
-                fluence::internal::set_result_ptr(result_ptr as _);
+                marine_rs_sdk::internal::set_result_ptr(result_ptr as _);
             }
         }
         Some(ParsedType::Utf8Str(_)) | Some(ParsedType::Utf8String(_)) => {
             quote! {
-                fluence::internal::set_result_ptr(result.as_ptr() as _);
-                fluence::internal::set_result_size(result.len() as _);
+                marine_rs_sdk::internal::set_result_ptr(result.as_ptr() as _);
+                marine_rs_sdk::internal::set_result_size(result.len() as _);
             }
         }
         Some(ParsedType::Vector(ty, _)) => {
@@ -126,8 +126,8 @@ fn generate_epilog(ty: &Option<ParsedType>) -> proc_macro2::TokenStream {
                 #vector_serializer
                 {
                     let (serialized_vec_ptr, serialized_vec_size) = #generated_serializer_ident(&result);
-                    fluence::internal::set_result_ptr(serialized_vec_ptr as _);
-                    fluence::internal::set_result_size(serialized_vec_size as _);
+                    marine_rs_sdk::internal::set_result_ptr(serialized_vec_ptr as _);
+                    marine_rs_sdk::internal::set_result_size(serialized_vec_size as _);
                 }
             }
         }
@@ -153,7 +153,7 @@ fn generate_objs_savings(ingredients: &FnEpilogIngredients<'_>) -> proc_macro2::
     match passing_style {
         // result will be deleted by IT side
         Some(PassingStyle::ByValue) => {
-            quote! { fluence::internal::add_object_to_release(Box::new(result)); }
+            quote! { marine_rs_sdk::internal::add_object_to_release(Box::new(result)); }
         }
         Some(PassingStyle::ByRef) | Some(PassingStyle::ByMutRef) => {
             generate_args_savings(ingredients.args, ingredients.converted_args)
@@ -175,7 +175,7 @@ fn generate_args_savings(
             // such values will be deleted inside an export function because they are being moved
             PassingStyle::ByValue => {}
             _ => res.extend(quote! {
-                fluence::internal::add_object_to_release(Box::new(#converted_arg));
+                marine_rs_sdk::internal::add_object_to_release(Box::new(#converted_arg));
             }),
         }
     }
