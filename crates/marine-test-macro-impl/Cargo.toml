@@ -1,6 +1,6 @@
 [package]
 name = "marine-test-macro-impl"
-version = "0.1.9"  # remember to update html_root_url
+version = "0.1.10"  # remember to update html_root_url
 edition = "2018"
 description = "Implementation of the `#[marine_test]` macro"
 documentation = "https://docs.rs/fluence/marine-test-macro-impl"

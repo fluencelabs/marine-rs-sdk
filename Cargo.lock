@@ -790,9 +790,9 @@ dependencies = [
 
 [[package]]
 name = "marine-macro"
-version = "0.6.9"
+version = "0.6.10"
 dependencies = [
- "marine-macro-impl 0.6.9",
+ "marine-macro-impl 0.6.10",
 ]
 
 [[package]]
@@ -811,7 +811,7 @@ dependencies = [
 
 [[package]]
 name = "marine-macro-impl"
-version = "0.6.9"
+version = "0.6.10"
 dependencies = [
  "pretty_assertions",
  "proc-macro2",
@@ -840,29 +840,29 @@ dependencies = [
 
 [[package]]
 name = "marine-rs-sdk"
-version = "0.6.9"
+version = "0.6.10"
 dependencies = [
- "marine-macro 0.6.9",
+ "marine-macro 0.6.10",
  "marine-rs-sdk-main",
- "marine-timestamp-macro 0.6.9",
+ "marine-timestamp-macro 0.6.10",
  "serde",
  "trybuild",
 ]
 
 [[package]]
 name = "marine-rs-sdk-main"
-version = "0.6.9"
+version = "0.6.10"
 dependencies = [
  "lazy_static",
  "log",
- "marine-macro 0.6.9",
+ "marine-macro 0.6.10",
  "serde",
  "simple_logger",
 ]
 
 [[package]]
 name = "marine-rs-sdk-test"
-version = "0.1.9"
+version = "0.1.10"
 dependencies = [
  "fluence-app-service",
  "marine-test-macro",
@@ -902,7 +902,7 @@ dependencies = [
 
 [[package]]
 name = "marine-test-macro"
-version = "0.1.9"
+version = "0.1.10"
 dependencies = [
  "marine-test-macro-impl",
  "proc-macro-error",
@@ -913,7 +913,7 @@ dependencies = [
 
 [[package]]
 name = "marine-test-macro-impl"
-version = "0.1.9"
+version = "0.1.10"
 dependencies = [
  "darling",
  "fluence-app-service",
@@ -937,7 +937,7 @@ dependencies = [
 
 [[package]]
 name = "marine-timestamp-macro"
-version = "0.6.9"
+version = "0.6.10"
 dependencies = [
  "chrono",
  "quote",
