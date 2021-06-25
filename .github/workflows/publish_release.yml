@@ -52,7 +52,7 @@ jobs:
         run: |
           set -x
           PKG_NAME=marine-rs-sdk
-          VERSION=$(cargo ws list -l | grep "$PKG_NAME"$ | head -n1 | awk '{ print $2 }')
+          VERSION=$(cargo ws list -l | grep "$PKG_NAME\s" | head -n1 | awk '{ print $2 }')
           echo "VERSION=$VERSION" | tee -a $GITHUB_ENV
           echo "PKG_NAME=$PKG_NAME" | tee -a $GITHUB_ENV
 
