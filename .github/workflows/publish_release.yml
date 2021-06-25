@@ -60,16 +60,16 @@ jobs:
       - name: Publish to crates.io
         run: cargo ws publish --no-git-commit --from-git --skip-published --yes
 
-      ### Create a pre-release
-      - name: Create Release
-        id: create_release
-        uses: actions/create-release@v1
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        with:
-          tag_name: ${{ env.VERSION }}
-          release_name: Marine Rust SDK ${{ env.VERSION }}
-          body: |
-            - [${{ env.VERSION }} @ crates.io](https://crates.io/crates/${{ env.PKG_NAME }}/${{ env.VERSION }})
-          draft: false
-          prerelease: false
+      ### Create a release
+      # - name: Create Release
+      #   id: create_release
+      #   uses: actions/create-release@v1
+      #   env:
+      #     GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      #   with:
+      #     tag_name: ${{ env.VERSION }}
+      #     release_name: Marine Rust SDK ${{ env.VERSION }}
+      #     body: |
+      #       - [${{ env.VERSION }} @ crates.io](https://crates.io/crates/${{ env.PKG_NAME }}/${{ env.VERSION }})
+      #     draft: false
+      #     prerelease: false
