@@ -4,6 +4,7 @@ on:
   push:
     branches:
       - "master"
+      - "fix_ci_version"
 
 jobs:
   npm-publish:
