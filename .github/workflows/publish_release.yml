@@ -52,14 +52,14 @@ jobs:
         run: |
           set -x
           PKG_NAME=marine-rs-sdk
-          VERSION=$(cargo ws list -l | grep "$PKG_NAME"$ | head -n1 | awk '{ print $2 }')
+          VERSION=$(cargo ws list -l | grep "$PKG_NAME\s" | head -n1 | awk '{ print $2 }')
           echo "VERSION=$VERSION" | tee -a $GITHUB_ENV
           echo "PKG_NAME=$PKG_NAME" | tee -a $GITHUB_ENV
 
       - name: Publish to crates.io
         run: cargo ws publish --no-git-commit --from-git --skip-published --yes
 
-      ### Create a pre-release
+      ### Create a release
       - name: Create Release
         id: create_release
         uses: actions/create-release@v1
