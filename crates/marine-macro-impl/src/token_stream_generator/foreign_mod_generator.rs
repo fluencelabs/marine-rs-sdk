@@ -34,8 +34,8 @@ impl quote::ToTokens for ast_types::AstExternMod {
         );
 
         let wasm_import_module_name = &self.namespace;
-        let original = &self.original;
         let generated_imports = generate_extern_section_items(&self);
+        let generated_imports_native = generate_extern_section_items_native(&self);
         let wrapper_functions = generate_wrapper_functions(&self);
 
         let glue_code = quote! {
@@ -46,7 +46,9 @@ impl quote::ToTokens for ast_types::AstExternMod {
             }
 
             #[cfg(not(target_arch = "wasm32"))]
-            #original
+            extern "C" {
+                #(#generated_imports_native)*
+            }
 
             #wrapper_functions
 
@@ -77,6 +79,40 @@ fn generate_extern_section_items(extern_item: &ast_types::AstExternMod) -> Vec<T
         let func = quote! {
             #[link_name = #link_name]
             fn #import_name(#(#raw_arg_names: #raw_arg_types),*) #fn_return_type;
+        };
+
+        section_items.push(func);
+    }
+
+    section_items
+}
+
+fn generate_extern_section_items_native(extern_item: &ast_types::AstExternMod) -> Vec<TokenStream> {
+    let mut section_items = Vec::with_capacity(extern_item.imports.len());
+
+    for import in &extern_item.imports {
+        let signature = &import.signature;
+        let fn_return_type = match &signature.output_type {
+            Some(ty) => quote! {-> #ty},
+            None => <_>::default(),
+        };
+
+        let link_name = import.link_name.as_ref().unwrap_or(&signature.name);
+        let import_name = generate_import_name(&signature.name);
+
+        let unchanged_args: Vec<proc_macro2::TokenStream> = signature
+            .arguments
+            .iter()
+            .map(|arg| {
+                let name = new_ident!(&arg.name);
+                let ty = &arg.ty;
+                quote! {#name : #ty,}
+            })
+            .collect();
+
+        let func = quote! {
+            #[link_name = #link_name]
+            fn #import_name(#(#unchanged_args),*) #fn_return_type;
         };
 
         section_items.push(func);
@@ -135,6 +171,17 @@ fn generate_wrapper_functions(extern_item: &ast_types::AstExternMod) -> TokenStr
 
                 }
             }
+
+            #[cfg(not(target_arch = "wasm32"))]
+            #[doc(hidden)]
+            #[allow(clippy::all)]
+            #visibility fn #func_name(#(#arg_names: #arg_types), *) #return_type {
+                unsafe {
+                // calling the original function with original args
+                #import_func_name(#(#arg_names), *)
+                }
+            }
+
         };
 
         token_stream.extend(wrapper_func);
