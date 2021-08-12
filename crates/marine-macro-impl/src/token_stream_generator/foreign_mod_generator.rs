@@ -106,7 +106,7 @@ fn generate_extern_section_items_native(extern_item: &ast_types::AstExternMod) -
             .map(|arg| {
                 let name = new_ident!(&arg.name);
                 let ty = &arg.ty;
-                quote! {#name : #ty,}
+                quote! {#name : #ty}
             })
             .collect();
 
