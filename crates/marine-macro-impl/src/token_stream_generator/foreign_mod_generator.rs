@@ -34,20 +34,22 @@ impl quote::ToTokens for ast_types::AstExternMod {
         );
 
         let wasm_import_module_name = &self.namespace;
-        let generated_imports = generate_extern_section_items(&self);
-        let generated_imports_native = generate_extern_section_items_native(&self);
+        let wasm_section_items = generate_extern_section_items(&self, wasm_extern_item_generator);
+        let not_wasm_section_items =
+            generate_extern_section_items(&self, not_wasm_extern_item_generator);
+
         let wrapper_functions = generate_wrapper_functions(&self);
 
         let glue_code = quote! {
             #[link(wasm_import_module = #wasm_import_module_name)]
             #[cfg(target_arch = "wasm32")]
             extern "C" {
-                #(#generated_imports)*
+                #(#wasm_section_items)*
             }
 
             #[cfg(not(target_arch = "wasm32"))]
             extern "C" {
-                #(#generated_imports_native)*
+                #(#not_wasm_section_items)*
             }
 
             #wrapper_functions
@@ -63,62 +65,60 @@ impl quote::ToTokens for ast_types::AstExternMod {
     }
 }
 
-fn generate_extern_section_items(extern_item: &ast_types::AstExternMod) -> Vec<TokenStream> {
+fn generate_extern_section_items(
+    extern_item: &ast_types::AstExternMod,
+    item_generator: fn(&ast_types::AstExternFn) -> TokenStream,
+) -> Vec<TokenStream> {
     let mut section_items = Vec::with_capacity(extern_item.imports.len());
 
     for import in &extern_item.imports {
-        let signature = &import.signature;
-        let fn_return_type = crate::parsed_type::generate_fn_return_type(&signature.output_type);
-        let link_name = import.link_name.as_ref().unwrap_or(&signature.name);
-        let import_name = generate_import_name(&signature.name);
-        let ExternDescriptor {
-            raw_arg_names,
-            raw_arg_types,
-        } = signature.arguments.generate_extern_prolog();
-
-        let func = quote! {
-            #[link_name = #link_name]
-            fn #import_name(#(#raw_arg_names: #raw_arg_types),*) #fn_return_type;
-        };
-
-        section_items.push(func);
+        section_items.push(item_generator(&import));
     }
 
     section_items
 }
 
-fn generate_extern_section_items_native(extern_item: &ast_types::AstExternMod) -> Vec<TokenStream> {
-    let mut section_items = Vec::with_capacity(extern_item.imports.len());
+fn wasm_extern_item_generator(import: &ast_types::AstExternFn) -> TokenStream {
+    let signature = &import.signature;
+    let fn_return_type = crate::parsed_type::generate_fn_return_type(&signature.output_type);
+    let link_name = import.link_name.as_ref().unwrap_or(&signature.name);
+    let import_name = generate_import_name(&signature.name);
+    let ExternDescriptor {
+        raw_arg_names,
+        raw_arg_types,
+    } = signature.arguments.generate_extern_prolog();
 
-    for import in &extern_item.imports {
-        let signature = &import.signature;
-        let fn_return_type = match &signature.output_type {
-            Some(ty) => quote! {-> #ty},
-            None => <_>::default(),
-        };
-
-        let link_name = import.link_name.as_ref().unwrap_or(&signature.name);
-        let import_name = generate_import_name(&signature.name);
-
-        let unchanged_args: Vec<proc_macro2::TokenStream> = signature
-            .arguments
-            .iter()
-            .map(|arg| {
-                let name = new_ident!(&arg.name);
-                let ty = &arg.ty;
-                quote! {#name : #ty}
-            })
-            .collect();
-
-        let func = quote! {
-            #[link_name = #link_name]
-            fn #import_name(#(#unchanged_args),*) #fn_return_type;
-        };
-
-        section_items.push(func);
+    quote! {
+        #[link_name = #link_name]
+        fn #import_name(#(#raw_arg_names: #raw_arg_types),*) #fn_return_type;
     }
+}
 
-    section_items
+fn not_wasm_extern_item_generator(import: &ast_types::AstExternFn) -> TokenStream {
+    let signature = &import.signature;
+    let original_return_type =
+        crate::parsed_type::generate_fn_original_return_type(&signature.output_type);
+    let link_name = import.link_name.as_ref().unwrap_or(&signature.name);
+    let import_name = generate_import_name(&signature.name);
+    let original_arguments = generate_original_arguments(&signature.arguments);
+
+    quote! {
+        #[link_name = #link_name]
+        fn #import_name(#(#original_arguments),*) #original_return_type;
+    }
+}
+
+fn generate_original_arguments(
+    arguments: &Vec<ast_types::AstFnArgument>,
+) -> Vec<proc_macro2::TokenStream> {
+    arguments
+        .iter()
+        .map(|arg| {
+            let name = crate::new_ident!(&arg.name);
+            let ty = &arg.ty;
+            quote! {#name : #ty}
+        })
+        .collect()
 }
 
 #[rustfmt::skip]
