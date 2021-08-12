@@ -16,8 +16,6 @@
 
 use marine_macro_impl::marine;
 
-use pretty_assertions::assert_eq;
-
 use std::io::Read;
 use std::path::Path;
 
@@ -33,8 +31,6 @@ where
 
     let expanded_item = items_from_file(expanded_path);
     let marine_item = to_syn_item(marine_token_streams);
-
-    assert_eq!(expanded_item, marine_item);
 
     marine_item == expanded_item
 }
