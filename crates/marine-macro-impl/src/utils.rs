@@ -18,7 +18,7 @@
 /// Crates new syn::Ident with the given string and new call span
 macro_rules! new_ident {
     ($string: expr) => {
-        syn::Ident::new(&$string, proc_macro2::Span::call_site());
+        syn::Ident::new(&$string, proc_macro2::Span::call_site())
     };
 }
 

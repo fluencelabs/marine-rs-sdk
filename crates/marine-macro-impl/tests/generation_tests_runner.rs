@@ -41,3 +41,19 @@ fn records_use_as_type() {
         "tests/generation_tests/records/use_as_type/expanded.rs",
     ));
 }
+
+#[test]
+fn imports_arrays() {
+    assert!(test_marine_token_streams(
+        "tests/generation_tests/imports/arrays/marine.rs",
+        "tests/generation_tests/imports/arrays/expanded.rs",
+    ));
+}
+
+#[test]
+fn imports_basic_types() {
+    assert!(test_marine_token_streams(
+        "tests/generation_tests/imports/basic_types/marine.rs",
+        "tests/generation_tests/imports/basic_types/expanded.rs",
+    ));
+}

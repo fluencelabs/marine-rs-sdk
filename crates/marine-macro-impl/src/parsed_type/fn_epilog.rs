@@ -92,6 +92,15 @@ pub(crate) fn generate_fn_return_type(ty: &Option<ParsedType>) -> proc_macro2::T
     }
 }
 
+pub(crate) fn generate_fn_original_return_type(
+    ty: &Option<ParsedType>,
+) -> proc_macro2::TokenStream {
+    match &ty {
+        Some(ty) => quote! {-> #ty},
+        None => <_>::default(),
+    }
+}
+
 pub(crate) fn generate_return_expression(ty: &Option<ParsedType>) -> proc_macro2::TokenStream {
     match ty {
         None => quote! {},
