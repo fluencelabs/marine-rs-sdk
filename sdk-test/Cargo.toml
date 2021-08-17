@@ -17,6 +17,9 @@ all-features = true
 path = "src/lib.rs"
 doctest = false
 
+[dev-dependencies]
+trybuild = "1.0"
+
 [dependencies]
 marine-test-macro = { path = "../crates/marine-test-macro", version = "=0.1.11" }
 fluence-app-service = { version = "0.9.0", features = ["raw-module-api"] }

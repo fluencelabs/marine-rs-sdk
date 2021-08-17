@@ -65,9 +65,9 @@ pub(super) fn generate_module_definitions<'i>(
 
 fn generate_module_definition(module: &Module<'_>) -> TResult<TokenStream> {
     let module_name = module.name;
-    let module_ident = utils::generate_module_ident(module_name)?;
-    let structs_module_ident = utils::generate_structs_module_ident(module_name)?;
-    let struct_ident = utils::generate_struct_name(module_name)?;
+    let module_ident = utils::new_ident(module_name)?;
+    //let structs_module_ident = utils::generate_structs_module_ident(module_name)?;
+    let struct_ident = utils::new_ident("Module")?;
 
     let module_interface = &module.interface;
     let module_records = record_type_generator::generate_records(&module_interface.record_types)?;
@@ -80,25 +80,25 @@ fn generate_module_definition(module: &Module<'_>) -> TResult<TokenStream> {
     let module_definition = quote! {
         // it's a sort of hack: this module structure allows user to import structs by
         // use module_name_structs::StructName;
-        pub mod #structs_module_ident {
-            pub use #module_ident::*;
+        pub mod #module_ident {
+            //pub use #module_ident::*;
 
-            pub mod #module_ident {
+            pub mod records {
                 #(#module_records)*
+            }
 
-                pub struct #struct_ident {
-                    marine: std::rc::Rc<std::cell::RefCell<marine_rs_sdk_test::internal::AppService>>,
-                }
+            pub struct #struct_ident {
+                marine: std::rc::Rc<std::cell::RefCell<marine_rs_sdk_test::internal::AppService>>,
+            }
 
-                impl #struct_ident {
-                    pub fn new(marine: std::rc::Rc<std::cell::RefCell<marine_rs_sdk_test::internal::AppService>>) -> Self {
-                        Self { marine }
-                    }
+            impl #struct_ident {
+                pub fn new(marine: std::rc::Rc<std::cell::RefCell<marine_rs_sdk_test::internal::AppService>>) -> Self {
+                    Self { marine }
                 }
+            }
 
-                impl #struct_ident {
-                    #(#module_functions)*
-                }
+            impl #struct_ident {
+                #(#module_functions)*
             }
         }
     };

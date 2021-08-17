@@ -50,6 +50,9 @@ pub enum TestGeneratorError {
 
     #[error("{0} is invalid UTF8 path")]
     InvalidUTF8Path(PathBuf),
+
+    #[error("self unexpected")]
+    UnexpectedSelf
 }
 
 #[derive(Debug, ThisError)]

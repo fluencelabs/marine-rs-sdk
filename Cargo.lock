@@ -901,6 +901,7 @@ dependencies = [
  "marine-test-macro",
  "serde",
  "serde_json",
+ "trybuild",
  "uuid",
 ]
 
