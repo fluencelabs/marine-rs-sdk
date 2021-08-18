@@ -17,13 +17,13 @@
 use super::methods_generator_utils::*;
 use crate::TResult;
 
-use marine_it_parser::interface::MRecordTypes;
-use marine_it_parser::interface::MFunctionSignature;
+use marine_it_parser::it_interface::IFunctionSignature;
+use marine_it_parser::it_interface::IRecordTypes;
 
 pub(super) fn generate_module_methods<'m, 'r>(
     module_name: &str,
-    mut method_signatures: impl ExactSizeIterator<Item = &'m MFunctionSignature>,
-    records: &'r MRecordTypes,
+    mut method_signatures: impl ExactSizeIterator<Item = &'m IFunctionSignature>,
+    records: &'r IRecordTypes,
 ) -> TResult<Vec<proc_macro2::TokenStream>> {
     use CallParametersSettings::*;
 

@@ -17,19 +17,19 @@
 use crate::TResult;
 
 use fluence_app_service::TomlAppServiceConfig;
-use marine_it_parser::module_raw_interface;
-use marine_it_parser::interface::MModuleInterface;
+use marine_it_parser::module_it_interface;
+use marine_it_parser::it_interface::IModuleInterface;
 
 use std::path::PathBuf;
 
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub(super) struct Module<'m> {
     pub name: &'m str,
-    pub interface: MModuleInterface,
+    pub interface: IModuleInterface,
 }
 
 impl<'m> Module<'m> {
-    fn new(name: &'m str, interface: MModuleInterface) -> Self {
+    fn new(name: &'m str, interface: IModuleInterface) -> Self {
         Self { name, interface }
     }
 }
@@ -44,7 +44,7 @@ pub(super) fn collect_modules(
     module_paths
         .into_iter()
         .map(|(name, path)| {
-            module_raw_interface(path).map(|interface| Module::new(name, interface))
+            module_it_interface(path).map(|interface| Module::new(name, interface))
         })
         .collect::<Result<Vec<_>, _>>()
         .map_err(Into::into)

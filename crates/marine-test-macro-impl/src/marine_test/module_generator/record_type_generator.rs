@@ -17,13 +17,13 @@
 use crate::marine_test::utils;
 use crate::TResult;
 
-use marine_it_parser::interface::it::IRecordFieldType;
-use marine_it_parser::interface::MRecordTypes;
+use marine_it_parser::it_interface::it::IRecordFieldType;
+use marine_it_parser::it_interface::IRecordTypes;
 
 use proc_macro2::TokenStream;
 use quote::quote;
 
-pub(super) fn generate_records(records: &MRecordTypes) -> TResult<Vec<TokenStream>> {
+pub(super) fn generate_records(records: &IRecordTypes) -> TResult<Vec<TokenStream>> {
     use std::ops::Deref;
 
     records.iter().map(|(_, record)| -> TResult<_> {
@@ -45,7 +45,7 @@ pub(super) fn generate_records(records: &MRecordTypes) -> TResult<Vec<TokenStrea
 
 fn prepare_field<'f>(
     fields: impl ExactSizeIterator<Item = &'f IRecordFieldType>,
-    records: &MRecordTypes,
+    records: &IRecordTypes,
 ) -> TResult<Vec<TokenStream>> {
     fields
         .map(|field| -> TResult<_> {

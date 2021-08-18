@@ -15,8 +15,8 @@
  */
 
 use crate::TResult;
-use marine_it_parser::interface::MRecordTypes;
-use marine_it_parser::interface::it::IType;
+use marine_it_parser::it_interface::IRecordTypes;
+use marine_it_parser::it_interface::it::IType;
 
 use proc_macro2::TokenStream;
 use quote::quote;
@@ -31,7 +31,7 @@ pub(super) fn new_ident(ident_str: &str) -> TResult<syn::Ident> {
     syn::parse_str::<syn::Ident>(&ident_str).map_err(Into::into)
 }
 
-pub(super) fn itype_to_tokens(itype: &IType, records: &MRecordTypes) -> TResult<TokenStream> {
+pub(super) fn itype_to_tokens(itype: &IType, records: &IRecordTypes) -> TResult<TokenStream> {
     let token_stream = match itype {
         IType::Record(record_id) => {
             let record = records

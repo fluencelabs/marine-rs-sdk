@@ -705,23 +705,13 @@ checksum = "e62f29b16bbdb0763a04f8561c954624ee9cd9f558af4e67b95eb00880da11ec"
 dependencies = [
  "cargo_toml",
  "it-lilo",
- "marine-it-parser 0.6.5",
+ "marine-it-parser",
  "marine-macro-impl 0.6.10",
  "once_cell",
  "serde",
  "serde_json",
  "thiserror",
  "walrus",
- "wasmer-interface-types-fl",
-]
-
-[[package]]
-name = "marine-it-interfaces"
-version = "0.3.0"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "97c533789e72808630cc35b5d14d286382236282525f82ddce8fb47eb9d659e8"
-dependencies = [
- "multimap",
  "wasmer-interface-types-fl",
 ]
 
@@ -737,30 +727,13 @@ dependencies = [
 
 [[package]]
 name = "marine-it-parser"
-version = "0.5.0"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "e59c7067a18b9e4aebe67bee033638fae97d6fe4fb00f70f9a509eb5d03d1c5d"
-dependencies = [
- "anyhow",
- "marine-it-interfaces 0.3.0",
- "nom",
- "semver 0.11.0",
- "serde",
- "thiserror",
- "walrus",
- "wasmer-interface-types-fl",
- "wasmer-runtime-core-fl",
-]
-
-[[package]]
-name = "marine-it-parser"
 version = "0.6.5"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "19a6606e472587b2e7b759b16d037a4ea951facc2a6650f668f22403978c2442"
 dependencies = [
  "anyhow",
  "itertools 0.10.1",
- "marine-it-interfaces 0.4.0",
+ "marine-it-interfaces",
  "marine-module-interface",
  "nom",
  "semver 0.11.0",
@@ -838,7 +811,7 @@ checksum = "d8a5936273bebb523ed169863282dbc19fc66bb983c7031c5b8b0556584f2401"
 dependencies = [
  "anyhow",
  "itertools 0.10.1",
- "marine-it-interfaces 0.4.0",
+ "marine-it-interfaces",
  "nom",
  "semver 0.11.0",
  "serde",
@@ -916,8 +889,8 @@ dependencies = [
  "it-lilo",
  "log",
  "marine-it-generator",
- "marine-it-interfaces 0.4.0",
- "marine-it-parser 0.6.5",
+ "marine-it-interfaces",
+ "marine-it-parser",
  "marine-module-info-parser",
  "marine-module-interface",
  "marine-utils",
@@ -952,7 +925,7 @@ version = "0.1.11"
 dependencies = [
  "darling",
  "fluence-app-service",
- "marine-it-parser 0.5.0",
+ "marine-it-parser",
  "proc-macro-error",
  "proc-macro2",
  "quote",
