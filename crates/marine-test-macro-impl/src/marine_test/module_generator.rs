@@ -66,7 +66,6 @@ pub(super) fn generate_module_definitions<'i>(
 fn generate_module_definition(module: &Module<'_>) -> TResult<TokenStream> {
     let module_name = module.name;
     let module_ident = utils::new_ident(module_name)?;
-    //let structs_module_ident = utils::generate_structs_module_ident(module_name)?;
     let struct_ident = utils::new_ident("ModuleInterface")?;
 
     let module_interface = &module.interface;
@@ -79,7 +78,7 @@ fn generate_module_definition(module: &Module<'_>) -> TResult<TokenStream> {
 
     let module_definition = quote! {
         // it's a sort of hack: this module structure allows user to import structs by
-        // use module_name_structs::StructName;
+        // using marine_env_test::module_name::StructName;
         pub mod #module_ident {
             pub use records::*;
             pub mod records {

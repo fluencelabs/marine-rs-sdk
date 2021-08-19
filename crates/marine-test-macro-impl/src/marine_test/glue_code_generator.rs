@@ -134,20 +134,13 @@ pub(super) fn generate_test_glue_code(
     let module_definitions =
         marine_test::module_generator::generate_module_definitions(module_interfaces.iter())?;
 
-    //let module_iter = module_interfaces.iter().map(|module| module.name);
-
 
     let original_block = func_item.block;
     let signature = func_item.sig;
     let name = &signature.ident;
     let inputs = &signature.inputs;
-    let arg_names: Vec<TokenStream> = inputs.iter().map(|x| {
-        match x {
-            FnArg::Receiver(_) => panic!("self not expected here"),
-            FnArg::Typed(x) => x.pat.to_token_stream()
-        }
-    }).collect();
-    let module_ctors = generate_module_ctors(signature.inputs.iter())?;
+    let arg_names = generate_arg_names(inputs.iter())?;
+    let module_ctors = generate_module_ctors(inputs.iter())?;
 
     let glue_code = quote! {
         #[test]
@@ -235,29 +228,10 @@ fn generate_app_service_ctor(config_path: &str, modules_dir: &Path) -> TResult<T
     Ok(service_ctor)
 }
 
-/*fn generate_module_ctors<'n>(
-    module_names: impl ExactSizeIterator<Item = &'n str>,
+fn generate_module_ctors<'inputs>(
+    inputs: impl Iterator<Item = &'inputs FnArg>
 ) -> TResult<Vec<TokenStream>> {
-    module_names
-        .map(|name| -> TResult<_> {
-            // TODO: optimize these two call because they are called twice for each module name
-            // and internally allocate memory in format call.
-            let module_name = marine_test::utils::new_ident(&name)?;
-            let struct_name = marine_test::utils::new_ident("Module")?;
-            let name_for_user = marine_test::utils::new_ident(&name)?;
-
-            let module_ctor =
-                quote! { let mut #name_for_user = marine_test_env::#module_name::#struct_name::new(marine.clone()); };
-
-            Ok(module_ctor)
-        })
-        .collect::<TResult<_>>()
-}
-*/
-fn generate_module_ctors<'name>(
-    module_names: impl Iterator<Item = &'name FnArg>
-) -> TResult<Vec<TokenStream>> {
-    module_names.map(|x| -> TResult<_> {
+    inputs.map(|x| -> TResult<_> {
         match x {
             FnArg::Receiver(_) => Err(TestGeneratorError::UnexpectedSelf),
             FnArg::Typed(x) => {
@@ -265,6 +239,17 @@ fn generate_module_ctors<'name>(
                 let ty = &x.ty;
                 Ok(quote! {let mut #pat = #ty::new(marine.clone());})
             }
+        }
+    }).collect::<TResult<_>>()
+}
+
+fn generate_arg_names<'inputs>(
+    inputs: impl Iterator<Item = &'inputs FnArg>
+) -> TResult<Vec<TokenStream>> {
+    inputs.map(|x| -> TResult<_> {
+        match x {
+            FnArg::Receiver(_) => Err(TestGeneratorError::UnexpectedSelf),
+            FnArg::Typed(x) => Ok(x.pat.to_token_stream())
         }
     }).collect::<TResult<_>>()
 }
