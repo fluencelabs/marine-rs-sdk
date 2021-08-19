@@ -31,17 +31,18 @@ pub(super) fn generate_module_methods<'m, 'r>(
 
     let methods_count = 2 * method_signatures.len();
     method_signatures
-        .sorted_by(|sig1, sig2| {sig1.name.cmp(&sig2.name)})
+        .sorted_by(|sig1, sig2| sig1.name.cmp(&sig2.name))
         .try_fold::<_, _, TResult<_>>(
-        Vec::with_capacity(methods_count),
-        |mut methods, signature| {
-            let default_cp = generate_module_method(module_name, &signature, Default, records)?;
-            let user_cp = generate_module_method(module_name, &signature, UserDefined, records)?;
+            Vec::with_capacity(methods_count),
+            |mut methods, signature| {
+                let default_cp = generate_module_method(module_name, &signature, Default, records)?;
+                let user_cp =
+                    generate_module_method(module_name, &signature, UserDefined, records)?;
 
-            methods.push(default_cp);
-            methods.push(user_cp);
+                methods.push(default_cp);
+                methods.push(user_cp);
 
-            Ok(methods)
-        },
-    )
+                Ok(methods)
+            },
+        )
 }

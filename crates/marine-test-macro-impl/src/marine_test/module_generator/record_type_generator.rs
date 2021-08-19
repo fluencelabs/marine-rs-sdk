@@ -32,20 +32,20 @@ pub(super) fn generate_records(records: &IRecordTypes) -> TResult<Vec<TokenStrea
         .iter()
         .sorted_by(|(_, a), (_,b)| {a.name.cmp(&b.name)})
         .map(|(_, record)| -> TResult<_> {
-        let record_name_ident = utils::generate_record_name(&record.name)?;
-        let fields = prepare_field(record.fields.deref().iter(), records)?;
+            let record_name_ident = utils::generate_record_name(&record.name)?;
+            let fields = prepare_field(record.fields.deref().iter(), records)?;
 
-        let generated_record = quote! {
-            #[derive(Clone, Debug, marine_rs_sdk_test::internal::serde::Serialize, marine_rs_sdk_test::internal::serde::Deserialize)]
-            #[serde(crate = "marine_rs_sdk_test::internal::serde")]
-            pub struct #record_name_ident {
-                #(pub #fields),*
-            }
-        };
+            let generated_record = quote! {
+                #[derive(Clone, Debug, marine_rs_sdk_test::internal::serde::Serialize, marine_rs_sdk_test::internal::serde::Deserialize)]
+                #[serde(crate = "marine_rs_sdk_test::internal::serde")]
+                pub struct #record_name_ident {
+                    #(pub #fields),*
+                }
+            };
 
-        Ok(generated_record)
-    }
-    ).collect::<TResult<Vec<_>>>()
+            Ok(generated_record)
+        })
+        .collect::<TResult<Vec<_>>>()
 }
 
 fn prepare_field<'f>(

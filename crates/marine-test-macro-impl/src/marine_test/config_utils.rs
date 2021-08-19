@@ -43,9 +43,7 @@ pub(super) fn collect_modules(
 
     module_paths
         .into_iter()
-        .map(|(name, path)| {
-            module_it_interface(path).map(|interface| Module::new(name, interface))
-        })
+        .map(|(name, path)| module_it_interface(path).map(|interface| Module::new(name, interface)))
         .collect::<Result<Vec<_>, _>>()
         .map_err(Into::into)
 }
