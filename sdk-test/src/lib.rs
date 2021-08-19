@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-#![doc(html_root_url = "https://docs.rs/sdk-test/0.1.11")]
+#![doc(html_root_url = "https://docs.rs/sdk-test/0.2.0")]
 #![deny(
     dead_code,
     nonstandard_style,

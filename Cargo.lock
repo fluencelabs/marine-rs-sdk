@@ -868,7 +868,7 @@ dependencies = [
 
 [[package]]
 name = "marine-rs-sdk-test"
-version = "0.1.11"
+version = "0.2.0"
 dependencies = [
  "fluence-app-service",
  "marine-test-macro",
@@ -910,7 +910,7 @@ dependencies = [
 
 [[package]]
 name = "marine-test-macro"
-version = "0.1.11"
+version = "0.2.0"
 dependencies = [
  "marine-test-macro-impl",
  "proc-macro-error",
@@ -921,10 +921,11 @@ dependencies = [
 
 [[package]]
 name = "marine-test-macro-impl"
-version = "0.1.11"
+version = "0.2.0"
 dependencies = [
  "darling",
  "fluence-app-service",
+ "itertools 0.10.1",
  "marine-it-parser",
  "proc-macro-error",
  "proc-macro2",
