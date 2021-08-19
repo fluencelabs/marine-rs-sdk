@@ -191,9 +191,7 @@ fn generate_app_service_ctor(config_path: &str, modules_dir: &Path) -> TResult<T
             }
 
             let (file_path_, remainder) = match file_path.next_back().and_then(|p| match p {
-                std::path::Component::Normal(_) | std::path::Component::CurDir | std::path::Component::ParentDir => {
-                    Some((file_path, p))
-                }
+                std::path::Component::Normal(_) | std::path::Component::CurDir | std::path::Component::ParentDir => Some((file_path, p)),
                 _ => None,
             }) {
                 Some(t) => t,

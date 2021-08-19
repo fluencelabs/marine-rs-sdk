@@ -85,11 +85,11 @@ fn generate_module_definition(module: &Module<'_>) -> TResult<TokenStream> {
                 #(#module_records)*
 
                 pub struct #struct_ident {
-                    marine: std::rc::Rc<std::cell::RefCell<marine_rs_sdk_test::internal::AppService>>,
+                    marine: std::rc::Rc<std::cell::RefCell<marine_rs_sdk_test::internal::AppService>, >,
                 }
 
                 impl #struct_ident {
-                    pub fn new(marine: std::rc::Rc<std::cell::RefCell<marine_rs_sdk_test::internal::AppService>>) -> Self {
+                    pub fn new(marine: std::rc::Rc<std::cell::RefCell<marine_rs_sdk_test::internal::AppService>, >) -> Self {
                         Self { marine }
                     }
                 }
