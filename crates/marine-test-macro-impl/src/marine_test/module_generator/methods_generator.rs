@@ -20,15 +20,19 @@ use crate::TResult;
 use marine_it_parser::it_interface::IFunctionSignature;
 use marine_it_parser::it_interface::IRecordTypes;
 
+use itertools::Itertools;
+
 pub(super) fn generate_module_methods<'m, 'r>(
     module_name: &str,
-    mut method_signatures: impl ExactSizeIterator<Item = &'m IFunctionSignature>,
+    method_signatures: impl ExactSizeIterator<Item = &'m IFunctionSignature>,
     records: &'r IRecordTypes,
 ) -> TResult<Vec<proc_macro2::TokenStream>> {
     use CallParametersSettings::*;
 
     let methods_count = 2 * method_signatures.len();
-    method_signatures.try_fold::<_, _, TResult<_>>(
+    method_signatures
+        .sorted_by(|sig1, sig2| {sig1.name.cmp(&sig2.name)})
+        .try_fold::<_, _, TResult<_>>(
         Vec::with_capacity(methods_count),
         |mut methods, signature| {
             let default_cp = generate_module_method(module_name, &signature, Default, records)?;

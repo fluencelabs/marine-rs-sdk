@@ -22,11 +22,16 @@ use marine_it_parser::it_interface::IRecordTypes;
 
 use proc_macro2::TokenStream;
 use quote::quote;
+use itertools::Itertools;
 
 pub(super) fn generate_records(records: &IRecordTypes) -> TResult<Vec<TokenStream>> {
     use std::ops::Deref;
-
-    records.iter().map(|(_, record)| -> TResult<_> {
+    records
+        .iter()
+        .collect::<Vec<_>>()
+        .iter()
+        .sorted_by(|(_, a), (_,b)| {a.name.cmp(&b.name)})
+        .map(|(_, record)| -> TResult<_> {
         let record_name_ident = utils::generate_record_name(&record.name)?;
         let fields = prepare_field(record.fields.deref().iter(), records)?;
 
