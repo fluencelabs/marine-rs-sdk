@@ -52,7 +52,7 @@ pub enum TestGeneratorError {
     InvalidUTF8Path(PathBuf),
 
     #[error("a \"self\" argument found and it is not supported in test function")]
-    UnexpectedSelf
+    UnexpectedSelf,
 }
 
 #[derive(Debug, ThisError)]
