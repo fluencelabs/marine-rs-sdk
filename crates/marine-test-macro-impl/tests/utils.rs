@@ -40,11 +40,6 @@ where
     )
     .unwrap_or_else(|e| panic!("failed to apply the marine macro due {}", e));
 
-    println!(
-        "got: {}\nexp: {}",
-        &marine_token_streams,
-        stream_from_file(&expanded_path)
-    );
     let expanded_item = items_from_file(&expanded_path);
     let marine_item = to_syn_item(marine_token_streams.clone());
 
