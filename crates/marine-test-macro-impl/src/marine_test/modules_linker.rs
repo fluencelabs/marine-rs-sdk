@@ -29,7 +29,7 @@ pub(super) fn link_modules<'modules>(modules: &'modules [Module<'_>]) -> LinkedM
     for module in modules {
         for (_, record_type) in &module.interface.record_types {
             let record_type_ex =
-                IRecordTypeClosed::new(record_type, &module.interface.record_types);
+                IRecordTypeClosed::new(record_type.clone(), &module.interface.record_types);
             if let Some(module_names) = all_record_types.get_mut(&record_type_ex) {
                 module_names.push(module.name);
             } else {
@@ -51,7 +51,7 @@ pub(super) fn link_modules<'modules>(modules: &'modules [Module<'_>]) -> LinkedM
                 .iter()
                 .map(|(_, record_type)| -> RecordEntry<'_> {
                     let record_type_ex =
-                        IRecordTypeClosed::new(record_type, &module.interface.record_types);
+                        IRecordTypeClosed::new(record_type.clone(), &module.interface.record_types);
                     let names = all_record_types.get(&record_type_ex).unwrap();
                     let owner_module = *names.first().unwrap();
                     if owner_module == module.name {
@@ -79,9 +79,9 @@ struct ITypeClosed<'r> {
 }
 
 impl<'r> ITypeClosed<'r> {
-    fn new(ty: &IType, records: &'r IRecordTypes) -> Self {
+    fn new(ty: IType, records: &'r IRecordTypes) -> Self {
         Self {
-            ty: ty.clone(),
+            ty,
             records,
         }
     }
@@ -107,13 +107,13 @@ impl PartialEq for ITypeClosed<'_> {
             | (I32, I32)
             | (I64, I64) => true,
             (Array(self_ty), Array(other_ty)) => {
-                ITypeClosed::new(self_ty, self.records) == ITypeClosed::new(other_ty, other.records)
+                ITypeClosed::new(*self_ty.clone(), self.records) == ITypeClosed::new(*other_ty.clone(), other.records)
             }
             (Record(self_record), Record(other_record)) => {
                 let self_record = self.records.get(self_record).unwrap();
                 let other_record = other.records.get(other_record).unwrap();
-                IRecordTypeClosed::new(self_record, self.records)
-                    == IRecordTypeClosed::new(other_record, other.records)
+                IRecordTypeClosed::new(self_record.clone(), self.records)
+                    == IRecordTypeClosed::new(other_record.clone(), other.records)
             }
             _ => false,
         }
@@ -128,9 +128,9 @@ pub struct IRecordTypeClosed<'r> {
 }
 
 impl<'r> IRecordTypeClosed<'r> {
-    fn new(record_type: &Rc<IRecordType>, records: &'r IRecordTypes) -> Self {
+    fn new(record_type: Rc<IRecordType>, records: &'r IRecordTypes) -> Self {
         Self {
-            record_type: record_type.clone(),
+            record_type,
             records,
         }
     }
@@ -146,8 +146,8 @@ impl PartialEq for IRecordTypeClosed<'_> {
             )
             .all(|(lhs, rhs)| -> bool {
                 lhs.name == rhs.name
-                    && ITypeClosed::new(&lhs.ty, self.records)
-                        == ITypeClosed::new(&rhs.ty, other.records)
+                    && ITypeClosed::new(lhs.ty.clone(), self.records)
+                        == ITypeClosed::new(rhs.ty.clone(), other.records)
             })
     }
 }
