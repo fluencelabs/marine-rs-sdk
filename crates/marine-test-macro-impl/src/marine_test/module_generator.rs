@@ -105,4 +105,3 @@ fn generate_module_definition(
 
     Ok(module_definition)
 }
-

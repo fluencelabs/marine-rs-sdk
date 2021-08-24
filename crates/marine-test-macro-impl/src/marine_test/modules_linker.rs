@@ -25,7 +25,9 @@ use std::cmp::Ordering;
 use std::hash::Hasher;
 use crate::{TResult, TestGeneratorError};
 
-pub(super) fn link_modules<'modules>(modules: &'modules [Module<'_>]) -> TResult<LinkedModules<'modules>> {
+pub(super) fn link_modules<'modules>(
+    modules: &'modules [Module<'_>],
+) -> TResult<LinkedModules<'modules>> {
     let mut all_record_types = HashMap::<IRecordTypeClosed<'_>, &str>::new();
     let mut linked_modules = HashMap::<&str, LinkedModule<'_>>::new();
 
@@ -36,24 +38,25 @@ pub(super) fn link_modules<'modules>(modules: &'modules [Module<'_>]) -> TResult
                 records: Vec::<_>::default(),
             },
         ) {
-            return Err(TestGeneratorError::DuplicateModuleName(module.name.to_string()));
+            return Err(TestGeneratorError::DuplicateModuleName(
+                module.name.to_string(),
+            ));
         }
 
         let linking_module = linked_modules.get_mut(module.name).unwrap();
 
         for (_, record_type) in &module.interface.record_types {
-            use RecordEntry::*;
             let record_type_ex =
                 IRecordTypeClosed::new(record_type.clone(), &module.interface.record_types);
 
             let entry = if let Some(owner_module) = all_record_types.get(&record_type_ex) {
-                Use(UseDescription {
+                RecordEntry::Use(UseDescription {
                     from: owner_module,
                     name: &record_type.name,
                 })
             } else {
                 all_record_types.insert(record_type_ex.clone(), module.name);
-                Declare(record_type_ex)
+                RecordEntry::Declare(record_type_ex)
             };
 
             linking_module.records.push(entry);
@@ -106,8 +109,6 @@ impl PartialEq for ITypeClosed<'_> {
         }
     }
 }
-
-impl Eq for ITypeClosed<'_> {}
 
 #[derive(Clone)]
 pub struct IRecordTypeClosed<'r> {
