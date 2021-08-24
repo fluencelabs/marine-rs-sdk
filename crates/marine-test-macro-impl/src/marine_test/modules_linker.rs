@@ -23,18 +23,22 @@ use marine_it_parser::it_interface::it::{IType, IRecordType};
 use itertools::zip;
 use std::cmp::Ordering;
 use std::hash::Hasher;
+use crate::{TResult, TestGeneratorError};
 
-pub(super) fn link_modules<'modules>(modules: &'modules [Module<'_>]) -> LinkedModules<'modules> {
+pub(super) fn link_modules<'modules>(modules: &'modules [Module<'_>]) -> TResult<LinkedModules<'modules>> {
     let mut all_record_types = HashMap::<IRecordTypeClosed<'_>, &str>::new();
     let mut linked_modules = HashMap::<&str, LinkedModule<'_>>::new();
 
     for module in modules {
-        linked_modules.insert(
+        if let Some(_) = linked_modules.insert(
             module.name,
             LinkedModule {
                 records: Vec::<_>::default(),
             },
-        );
+        ) {
+            return Err(TestGeneratorError::DuplicateModuleName(module.name.to_string()));
+        }
+
         let linking_module = linked_modules.get_mut(module.name).unwrap();
 
         for (_, record_type) in &module.interface.record_types {
@@ -56,7 +60,7 @@ pub(super) fn link_modules<'modules>(modules: &'modules [Module<'_>]) -> LinkedM
         }
     }
 
-    linked_modules
+    Ok(linked_modules)
 }
 
 struct ITypeClosed<'r> {

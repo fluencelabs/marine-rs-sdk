@@ -53,6 +53,9 @@ pub enum TestGeneratorError {
 
     #[error("a \"self\" argument found and it is not supported in test function")]
     UnexpectedSelf,
+
+    #[error("Duplicate module: {0}")]
+    DuplicateModuleName(String),
 }
 
 #[derive(Debug, ThisError)]
