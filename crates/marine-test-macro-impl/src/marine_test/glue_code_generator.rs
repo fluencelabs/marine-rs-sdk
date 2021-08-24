@@ -130,9 +130,12 @@ pub(super) fn generate_test_glue_code(
     let modules_dir = file_path.join(modules_dir);
     let module_interfaces =
         marine_test::config_utils::collect_modules(&marine_config, modules_dir)?;
+    let linked_modules = marine_test::modules_linker::link_modules(&module_interfaces);
 
-    let module_definitions =
-        marine_test::module_generator::generate_module_definitions(module_interfaces.iter())?;
+    let module_definitions = marine_test::module_generator::generate_module_definitions(
+        module_interfaces.iter(),
+        &linked_modules,
+    )?;
 
     let original_block = func_item.block;
     let signature = func_item.sig;
