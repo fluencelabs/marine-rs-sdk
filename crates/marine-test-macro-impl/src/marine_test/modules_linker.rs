@@ -25,65 +25,48 @@ use std::cmp::Ordering;
 use std::hash::Hasher;
 
 pub(super) fn link_modules<'modules>(modules: &'modules [Module<'_>]) -> LinkedModules<'modules> {
-    let mut all_record_types = HashMap::<IRecordTypeClosed<'_>, Vec<&str>>::new();
+    let mut all_record_types = HashMap::<IRecordTypeClosed<'_>, &str>::new();
+    let mut linked_modules = HashMap::<&str, LinkedModule<'_>>::new();
+
     for module in modules {
+        linked_modules.insert(
+            module.name,
+            LinkedModule {
+                records: Vec::<_>::default(),
+            },
+        );
+        let linking_module = linked_modules.get_mut(module.name).unwrap();
+
         for (_, record_type) in &module.interface.record_types {
+            use RecordEntry::*;
             let record_type_ex =
                 IRecordTypeClosed::new(record_type.clone(), &module.interface.record_types);
-            if let Some(module_names) = all_record_types.get_mut(&record_type_ex) {
-                module_names.push(module.name);
+
+            let entry = if let Some(owner_module) = all_record_types.get(&record_type_ex) {
+                Use(UseDescription {
+                    from: owner_module,
+                    name: &record_type.name,
+                })
             } else {
-                all_record_types.insert(record_type_ex, vec![module.name]);
-            }
+                all_record_types.insert(record_type_ex.clone(), module.name);
+                Declare(record_type_ex)
+            };
+
+            linking_module.records.push(entry);
         }
     }
 
-    for (_, names) in &mut all_record_types {
-        names.sort();
-    }
-
-    let records_in_modules = modules.iter().fold(
-        HashMap::<&str, LinkedModule<'_>>::new(),
-        |mut accumulator, module| {
-            let records = module
-                .interface
-                .record_types
-                .iter()
-                .map(|(_, record_type)| -> RecordEntry<'_> {
-                    let record_type_ex =
-                        IRecordTypeClosed::new(record_type.clone(), &module.interface.record_types);
-                    let names = all_record_types.get(&record_type_ex).unwrap();
-                    let owner_module = *names.first().unwrap();
-                    if owner_module == module.name {
-                        RecordEntry::Declare(record_type_ex)
-                    } else {
-                        RecordEntry::Use(UseDescription {
-                            from: owner_module,
-                            name: &record_type.name,
-                        })
-                    }
-                })
-                .collect::<Vec<_>>();
-
-            accumulator.insert(module.name, LinkedModule { records });
-            accumulator
-        },
-    );
-
-    records_in_modules
+    linked_modules
 }
 
 struct ITypeClosed<'r> {
-    ty: IType,
+    ty: &'r IType,
     records: &'r IRecordTypes,
 }
 
 impl<'r> ITypeClosed<'r> {
-    fn new(ty: IType, records: &'r IRecordTypes) -> Self {
-        Self {
-            ty,
-            records,
-        }
+    fn new(ty: &'r IType, records: &'r IRecordTypes) -> Self {
+        Self { ty, records }
     }
 }
 
@@ -107,7 +90,7 @@ impl PartialEq for ITypeClosed<'_> {
             | (I32, I32)
             | (I64, I64) => true,
             (Array(self_ty), Array(other_ty)) => {
-                ITypeClosed::new(*self_ty.clone(), self.records) == ITypeClosed::new(*other_ty.clone(), other.records)
+                ITypeClosed::new(self_ty, self.records) == ITypeClosed::new(other_ty, other.records)
             }
             (Record(self_record), Record(other_record)) => {
                 let self_record = self.records.get(self_record).unwrap();
@@ -122,6 +105,7 @@ impl PartialEq for ITypeClosed<'_> {
 
 impl Eq for ITypeClosed<'_> {}
 
+#[derive(Clone)]
 pub struct IRecordTypeClosed<'r> {
     pub record_type: Rc<IRecordType>,
     pub records: &'r IRecordTypes,
@@ -146,8 +130,8 @@ impl PartialEq for IRecordTypeClosed<'_> {
             )
             .all(|(lhs, rhs)| -> bool {
                 lhs.name == rhs.name
-                    && ITypeClosed::new(lhs.ty.clone(), self.records)
-                        == ITypeClosed::new(rhs.ty.clone(), other.records)
+                    && ITypeClosed::new(&lhs.ty, self.records)
+                        == ITypeClosed::new(&rhs.ty, other.records)
             })
     }
 }

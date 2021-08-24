@@ -2,8 +2,21 @@
 fn empty_string() {
     pub mod marine_test_env {
         pub mod greeting {
-            pub use super::call_parameters::CallParameters;
-            pub use super::call_parameters::SecurityTetraplet;
+            #[derive(
+                Clone,
+                Debug,
+                marine_rs_sdk_test :: internal :: serde :: Serialize,
+                marine_rs_sdk_test :: internal :: serde :: Deserialize
+            )]
+            #[serde(crate = "marine_rs_sdk_test::internal::serde")]
+            pub struct CallParameters {
+                pub init_peer_id: String,
+                pub service_id: String,
+                pub service_creator_peer_id: String,
+                pub host_id: String,
+                pub particle_id: String,
+                pub tetraplets: Vec<Vec<SecurityTetraplet>>
+            }
             #[derive(
                 Clone,
                 Debug,
@@ -29,6 +42,19 @@ fn empty_string() {
                 pub error: String,
                 pub stdout: String,
                 pub stderr: String
+            }
+            #[derive(
+                Clone,
+                Debug,
+                marine_rs_sdk_test :: internal :: serde :: Serialize,
+                marine_rs_sdk_test :: internal :: serde :: Deserialize
+            )]
+            #[serde(crate = "marine_rs_sdk_test::internal::serde")]
+            pub struct SecurityTetraplet {
+                pub peer_pk: String,
+                pub service_id: String,
+                pub function_name: String,
+                pub json_path: String
             }
             pub struct ModuleInterface {
                 marine: std::rc::Rc<std::cell::RefCell<marine_rs_sdk_test::internal::AppService>, >,
@@ -78,34 +104,8 @@ fn empty_string() {
             }
         }
         pub mod call_parameters {
-            #[derive(
-                Clone,
-                Debug,
-                marine_rs_sdk_test :: internal :: serde :: Serialize,
-                marine_rs_sdk_test :: internal :: serde :: Deserialize
-            )]
-            #[serde(crate = "marine_rs_sdk_test::internal::serde")]
-            pub struct CallParameters {
-                pub init_peer_id: String,
-                pub service_id: String,
-                pub service_creator_peer_id: String,
-                pub host_id: String,
-                pub particle_id: String,
-                pub tetraplets: Vec<Vec<SecurityTetraplet>>
-            }
-            #[derive(
-                Clone,
-                Debug,
-                marine_rs_sdk_test :: internal :: serde :: Serialize,
-                marine_rs_sdk_test :: internal :: serde :: Deserialize
-            )]
-            #[serde(crate = "marine_rs_sdk_test::internal::serde")]
-            pub struct SecurityTetraplet {
-                pub peer_pk: String,
-                pub service_id: String,
-                pub function_name: String,
-                pub json_path: String
-            }
+            pub use super::greeting::CallParameters;
+            pub use super::greeting::SecurityTetraplet;
             pub struct ModuleInterface {
                 marine: std::rc::Rc<std::cell::RefCell<marine_rs_sdk_test::internal::AppService>, >,
             }
