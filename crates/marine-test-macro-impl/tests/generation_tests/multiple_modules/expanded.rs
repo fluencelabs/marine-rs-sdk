@@ -2,264 +2,230 @@
 fn empty_string() {
     pub mod marine_test_env {
         pub mod greeting {
-            pub use records::*;
-            pub mod records {
-                #[derive(
-                    Clone,
-                    Debug,
-                    marine_rs_sdk_test :: internal :: serde :: Serialize,
-                    marine_rs_sdk_test :: internal :: serde :: Deserialize
-                )]
-                #[serde(crate = "marine_rs_sdk_test::internal::serde")]
-                pub struct CallParameters {
-                    pub init_peer_id: String,
-                    pub service_id: String,
-                    pub service_creator_peer_id: String,
-                    pub host_id: String,
-                    pub particle_id: String,
-                    pub tetraplets: Vec<Vec<SecurityTetraplet>>
+            pub use super::call_parameters::CallParameters;
+            pub use super::call_parameters::SecurityTetraplet;
+            #[derive(
+                Clone,
+                Debug,
+                marine_rs_sdk_test :: internal :: serde :: Serialize,
+                marine_rs_sdk_test :: internal :: serde :: Deserialize
+            )]
+            #[serde(crate = "marine_rs_sdk_test::internal::serde")]
+            pub struct MountedBinaryResult {
+                pub ret_code: i32,
+                pub error: String,
+                pub stdout: Vec<u8>,
+                pub stderr: Vec<u8>
+            }
+            #[derive(
+                Clone,
+                Debug,
+                marine_rs_sdk_test :: internal :: serde :: Serialize,
+                marine_rs_sdk_test :: internal :: serde :: Deserialize
+            )]
+            #[serde(crate = "marine_rs_sdk_test::internal::serde")]
+            pub struct MountedBinaryStringResult {
+                pub ret_code: i32,
+                pub error: String,
+                pub stdout: String,
+                pub stderr: String
+            }
+            pub struct ModuleInterface {
+                marine: std::rc::Rc<std::cell::RefCell<marine_rs_sdk_test::internal::AppService>, >,
+            }
+            impl ModuleInterface {
+                pub fn new(
+                    marine: std::rc::Rc<
+                        std::cell::RefCell<marine_rs_sdk_test::internal::AppService>,
+                    >
+                ) -> Self {
+                    Self { marine }
                 }
-                #[derive(
-                    Clone,
-                    Debug,
-                    marine_rs_sdk_test :: internal :: serde :: Serialize,
-                    marine_rs_sdk_test :: internal :: serde :: Deserialize
-                )]
-                #[serde(crate = "marine_rs_sdk_test::internal::serde")]
-                pub struct MountedBinaryResult {
-                    pub ret_code: i32,
-                    pub error: String,
-                    pub stdout: Vec<u8>,
-                    pub stderr: Vec<u8>
+            }
+            impl ModuleInterface {
+                pub fn greeting(&mut self, name: String) -> String {
+                    use std::ops::DerefMut;
+                    let arguments = marine_rs_sdk_test::internal::serde_json::json!([name]);
+                    let result = self
+                        .marine
+                        .as_ref()
+                        .borrow_mut()
+                        .call_module("greeting", "greeting", arguments, <_>::default())
+                        .expect("call to Marine failed");
+                    let result: String =
+                        marine_rs_sdk_test::internal::serde_json::from_value(result)
+                            .expect("the default deserializer shouldn't fail");
+                    result
                 }
-                #[derive(
-                    Clone,
-                    Debug,
-                    marine_rs_sdk_test :: internal :: serde :: Serialize,
-                    marine_rs_sdk_test :: internal :: serde :: Deserialize
-                )]
-                #[serde(crate = "marine_rs_sdk_test::internal::serde")]
-                pub struct MountedBinaryStringResult {
-                    pub ret_code: i32,
-                    pub error: String,
-                    pub stdout: String,
-                    pub stderr: String
-                }
-                #[derive(
-                    Clone,
-                    Debug,
-                    marine_rs_sdk_test :: internal :: serde :: Serialize,
-                    marine_rs_sdk_test :: internal :: serde :: Deserialize
-                )]
-                #[serde(crate = "marine_rs_sdk_test::internal::serde")]
-                pub struct SecurityTetraplet {
-                    pub peer_pk: String,
-                    pub service_id: String,
-                    pub function_name: String,
-                    pub json_path: String
-                }
-                pub struct ModuleInterface {
-                    marine:
-                        std::rc::Rc<std::cell::RefCell<marine_rs_sdk_test::internal::AppService>, >,
-                }
-                impl ModuleInterface {
-                    pub fn new(
-                        marine: std::rc::Rc<
-                            std::cell::RefCell<marine_rs_sdk_test::internal::AppService>,
-                        >
-                    ) -> Self {
-                        Self { marine }
-                    }
-                }
-                impl ModuleInterface {
-                    pub fn greeting(&mut self, name: String) -> String {
-                        use std::ops::DerefMut;
-                        let arguments = marine_rs_sdk_test::internal::serde_json::json!([name]);
-                        let result = self
-                            .marine
-                            .as_ref()
-                            .borrow_mut()
-                            .call_module("greeting", "greeting", arguments, <_>::default())
-                            .expect("call to Marine failed");
-                        let result: String =
-                            marine_rs_sdk_test::internal::serde_json::from_value(result)
-                                .expect("the default deserializer shouldn't fail");
-                        result
-                    }
-                    pub fn greeting_cp(
-                        &mut self,
-                        name: String,
-                        cp: marine_rs_sdk_test::CallParameters
-                    ) -> String {
-                        use std::ops::DerefMut;
-                        let arguments = marine_rs_sdk_test::internal::serde_json::json!([name]);
-                        let result = self
-                            .marine
-                            .as_ref()
-                            .borrow_mut()
-                            .call_module("greeting", "greeting", arguments, cp)
-                            .expect("call to Marine failed");
-                        let result: String =
-                            marine_rs_sdk_test::internal::serde_json::from_value(result)
-                                .expect("the default deserializer shouldn't fail");
-                        result
-                    }
+                pub fn greeting_cp(
+                    &mut self,
+                    name: String,
+                    cp: marine_rs_sdk_test::CallParameters
+                ) -> String {
+                    use std::ops::DerefMut;
+                    let arguments = marine_rs_sdk_test::internal::serde_json::json!([name]);
+                    let result = self
+                        .marine
+                        .as_ref()
+                        .borrow_mut()
+                        .call_module("greeting", "greeting", arguments, cp)
+                        .expect("call to Marine failed");
+                    let result: String =
+                        marine_rs_sdk_test::internal::serde_json::from_value(result)
+                            .expect("the default deserializer shouldn't fail");
+                    result
                 }
             }
         }
         pub mod call_parameters {
-            pub use records::*;
-            pub mod records {
-                #[derive(
-                    Clone,
-                    Debug,
-                    marine_rs_sdk_test :: internal :: serde :: Serialize,
-                    marine_rs_sdk_test :: internal :: serde :: Deserialize
-                )]
-                #[serde(crate = "marine_rs_sdk_test::internal::serde")]
-                pub struct CallParameters {
-                    pub init_peer_id: String,
-                    pub service_id: String,
-                    pub service_creator_peer_id: String,
-                    pub host_id: String,
-                    pub particle_id: String,
-                    pub tetraplets: Vec<Vec<SecurityTetraplet>>
+            #[derive(
+                Clone,
+                Debug,
+                marine_rs_sdk_test :: internal :: serde :: Serialize,
+                marine_rs_sdk_test :: internal :: serde :: Deserialize
+            )]
+            #[serde(crate = "marine_rs_sdk_test::internal::serde")]
+            pub struct CallParameters {
+                pub init_peer_id: String,
+                pub service_id: String,
+                pub service_creator_peer_id: String,
+                pub host_id: String,
+                pub particle_id: String,
+                pub tetraplets: Vec<Vec<SecurityTetraplet>>
+            }
+            #[derive(
+                Clone,
+                Debug,
+                marine_rs_sdk_test :: internal :: serde :: Serialize,
+                marine_rs_sdk_test :: internal :: serde :: Deserialize
+            )]
+            #[serde(crate = "marine_rs_sdk_test::internal::serde")]
+            pub struct SecurityTetraplet {
+                pub peer_pk: String,
+                pub service_id: String,
+                pub function_name: String,
+                pub json_path: String
+            }
+            pub struct ModuleInterface {
+                marine: std::rc::Rc<std::cell::RefCell<marine_rs_sdk_test::internal::AppService>, >,
+            }
+            impl ModuleInterface {
+                pub fn new(
+                    marine: std::rc::Rc<
+                        std::cell::RefCell<marine_rs_sdk_test::internal::AppService>,
+                    >
+                ) -> Self {
+                    Self { marine }
                 }
-                #[derive(
-                    Clone,
-                    Debug,
-                    marine_rs_sdk_test :: internal :: serde :: Serialize,
-                    marine_rs_sdk_test :: internal :: serde :: Deserialize
-                )]
-                #[serde(crate = "marine_rs_sdk_test::internal::serde")]
-                pub struct SecurityTetraplet {
-                    pub peer_pk: String,
-                    pub service_id: String,
-                    pub function_name: String,
-                    pub json_path: String
+            }
+            impl ModuleInterface {
+                pub fn call_parameters(&mut self, ) -> String {
+                    use std::ops::DerefMut;
+                    let arguments = marine_rs_sdk_test::internal::serde_json::json!([]);
+                    let result = self
+                        .marine
+                        .as_ref()
+                        .borrow_mut()
+                        .call_module(
+                            "call_parameters",
+                            "call_parameters",
+                            arguments,
+                            <_>::default()
+                        )
+                        .expect("call to Marine failed");
+                    let result: String =
+                        marine_rs_sdk_test::internal::serde_json::from_value(result)
+                            .expect("the default deserializer shouldn't fail");
+                    result
                 }
-                pub struct ModuleInterface {
-                    marine:
-                        std::rc::Rc<std::cell::RefCell<marine_rs_sdk_test::internal::AppService>, >,
+                pub fn call_parameters_cp(
+                    &mut self,
+                    cp: marine_rs_sdk_test::CallParameters
+                ) -> String {
+                    use std::ops::DerefMut;
+                    let arguments = marine_rs_sdk_test::internal::serde_json::json!([]);
+                    let result = self
+                        .marine
+                        .as_ref()
+                        .borrow_mut()
+                        .call_module("call_parameters", "call_parameters", arguments, cp)
+                        .expect("call to Marine failed");
+                    let result: String =
+                        marine_rs_sdk_test::internal::serde_json::from_value(result)
+                            .expect("the default deserializer shouldn't fail");
+                    result
                 }
-                impl ModuleInterface {
-                    pub fn new(
-                        marine: std::rc::Rc<
-                            std::cell::RefCell<marine_rs_sdk_test::internal::AppService>,
-                        >
-                    ) -> Self {
-                        Self { marine }
-                    }
+                pub fn return_string(&mut self,) -> String {
+                    use std::ops::DerefMut;
+                    let arguments = marine_rs_sdk_test::internal::serde_json::json!([]);
+                    let result = self
+                        .marine
+                        .as_ref()
+                        .borrow_mut()
+                        .call_module(
+                            "call_parameters",
+                            "return_string",
+                            arguments,
+                            <_>::default()
+                        )
+                        .expect("call to Marine failed");
+                    let result: String =
+                        marine_rs_sdk_test::internal::serde_json::from_value(result)
+                            .expect("the default deserializer shouldn't fail");
+                    result
                 }
-                impl ModuleInterface {
-                    pub fn call_parameters(&mut self, ) -> String {
-                        use std::ops::DerefMut;
-                        let arguments = marine_rs_sdk_test::internal::serde_json::json!([]);
-                        let result = self
-                            .marine
-                            .as_ref()
-                            .borrow_mut()
-                            .call_module(
-                                "call_parameters",
-                                "call_parameters",
-                                arguments,
-                                <_>::default()
-                            )
-                            .expect("call to Marine failed");
-                        let result: String =
-                            marine_rs_sdk_test::internal::serde_json::from_value(result)
-                                .expect("the default deserializer shouldn't fail");
-                        result
-                    }
-                    pub fn call_parameters_cp(
-                        &mut self,
-                        cp: marine_rs_sdk_test::CallParameters
-                    ) -> String {
-                        use std::ops::DerefMut;
-                        let arguments = marine_rs_sdk_test::internal::serde_json::json!([]);
-                        let result = self
-                            .marine
-                            .as_ref()
-                            .borrow_mut()
-                            .call_module("call_parameters", "call_parameters", arguments, cp)
-                            .expect("call to Marine failed");
-                        let result: String =
-                            marine_rs_sdk_test::internal::serde_json::from_value(result)
-                                .expect("the default deserializer shouldn't fail");
-                        result
-                    }
-                    pub fn return_string(&mut self,) -> String {
-                        use std::ops::DerefMut;
-                        let arguments = marine_rs_sdk_test::internal::serde_json::json!([]);
-                        let result = self
-                            .marine
-                            .as_ref()
-                            .borrow_mut()
-                            .call_module(
-                                "call_parameters",
-                                "return_string",
-                                arguments,
-                                <_>::default()
-                            )
-                            .expect("call to Marine failed");
-                        let result: String =
-                            marine_rs_sdk_test::internal::serde_json::from_value(result)
-                                .expect("the default deserializer shouldn't fail");
-                        result
-                    }
-                    pub fn return_string_cp(
-                        &mut self,
-                        cp: marine_rs_sdk_test::CallParameters
-                    ) -> String {
-                        use std::ops::DerefMut;
-                        let arguments = marine_rs_sdk_test::internal::serde_json::json!([]);
-                        let result = self
-                            .marine
-                            .as_ref()
-                            .borrow_mut()
-                            .call_module("call_parameters", "return_string", arguments, cp)
-                            .expect("call to Marine failed");
-                        let result: String =
-                            marine_rs_sdk_test::internal::serde_json::from_value(result)
-                                .expect("the default deserializer shouldn't fail");
-                        result
-                    }
-                    pub fn test_array_refs(&mut self,) -> Vec<String> {
-                        use std::ops::DerefMut;
-                        let arguments = marine_rs_sdk_test::internal::serde_json::json!([]);
-                        let result = self
-                            .marine
-                            .as_ref()
-                            .borrow_mut()
-                            .call_module(
-                                "call_parameters",
-                                "test_array_refs",
-                                arguments,
-                                <_>::default()
-                            )
-                            .expect("call to Marine failed");
-                        let result: Vec<String> =
-                            marine_rs_sdk_test::internal::serde_json::from_value(result)
-                                .expect("the default deserializer shouldn't fail");
-                        result
-                    }
-                    pub fn test_array_refs_cp(
-                        &mut self,
-                        cp: marine_rs_sdk_test::CallParameters
-                    ) -> Vec<String> {
-                        use std::ops::DerefMut;
-                        let arguments = marine_rs_sdk_test::internal::serde_json::json!([]);
-                        let result = self
-                            .marine
-                            .as_ref()
-                            .borrow_mut()
-                            .call_module("call_parameters", "test_array_refs", arguments, cp)
-                            .expect("call to Marine failed");
-                        let result: Vec<String> =
-                            marine_rs_sdk_test::internal::serde_json::from_value(result)
-                                .expect("the default deserializer shouldn't fail");
-                        result
-                    }
+                pub fn return_string_cp(
+                    &mut self,
+                    cp: marine_rs_sdk_test::CallParameters
+                ) -> String {
+                    use std::ops::DerefMut;
+                    let arguments = marine_rs_sdk_test::internal::serde_json::json!([]);
+                    let result = self
+                        .marine
+                        .as_ref()
+                        .borrow_mut()
+                        .call_module("call_parameters", "return_string", arguments, cp)
+                        .expect("call to Marine failed");
+                    let result: String =
+                        marine_rs_sdk_test::internal::serde_json::from_value(result)
+                            .expect("the default deserializer shouldn't fail");
+                    result
+                }
+                pub fn test_array_refs(&mut self, ) -> Vec<String> {
+                    use std::ops::DerefMut;
+                    let arguments = marine_rs_sdk_test::internal::serde_json::json!([]);
+                    let result = self
+                        .marine
+                        .as_ref()
+                        .borrow_mut()
+                        .call_module(
+                            "call_parameters",
+                            "test_array_refs",
+                            arguments,
+                            <_>::default()
+                        )
+                        .expect("call to Marine failed");
+                    let result: Vec<String> =
+                        marine_rs_sdk_test::internal::serde_json::from_value(result)
+                            .expect("the default deserializer shouldn't fail");
+                    result
+                }
+                pub fn test_array_refs_cp(
+                    &mut self,
+                    cp: marine_rs_sdk_test::CallParameters
+                ) -> Vec<String> {
+                    use std::ops::DerefMut;
+                    let arguments = marine_rs_sdk_test::internal::serde_json::json!([]);
+                    let result = self
+                        .marine
+                        .as_ref()
+                        .borrow_mut()
+                        .call_module("call_parameters", "test_array_refs", arguments, cp)
+                        .expect("call to Marine failed");
+                    let result: Vec<String> =
+                        marine_rs_sdk_test::internal::serde_json::from_value(result)
+                            .expect("the default deserializer shouldn't fail");
+                    result
                 }
             }
         }
