@@ -35,7 +35,7 @@ pub(super) fn link_modules<'modules>(
         if let Some(_) = linked_modules.insert(
             module.name,
             LinkedModule {
-                records: Vec::<_>::default(),
+                records: Vec::default(),
             },
         ) {
             return Err(TestGeneratorError::DuplicateModuleName(
