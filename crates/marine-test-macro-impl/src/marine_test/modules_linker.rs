@@ -15,15 +15,16 @@
  */
 
 use crate::marine_test::config_utils::Module;
+use crate::{TResult, TestGeneratorError};
 
-use std::collections::HashMap;
-use std::rc::Rc;
 use marine_it_parser::it_interface::IRecordTypes;
 use marine_it_parser::it_interface::it::{IType, IRecordType};
+
 use itertools::zip;
 use std::cmp::Ordering;
+use std::collections::HashMap;
 use std::hash::Hasher;
-use crate::{TResult, TestGeneratorError};
+use std::rc::Rc;
 
 pub(super) fn link_modules<'modules>(
     modules: &'modules [Module<'_>],
