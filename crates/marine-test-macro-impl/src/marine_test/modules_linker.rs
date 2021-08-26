@@ -33,34 +33,31 @@ pub(super) fn link_modules<'modules>(
     let mut linked_modules = HashMap::<&str, LinkedModule<'_>>::new();
 
     for module in modules {
-        if let Some(_) = linked_modules.insert(
-            module.name,
-            LinkedModule {
-                records: Vec::default(),
-            },
-        ) {
-            return Err(TestGeneratorError::DuplicateModuleName(
-                module.name.to_string(),
-            ));
-        }
-
-        let linking_module = linked_modules.get_mut(module.name).unwrap();
-
+        let mut linking_module = LinkedModule::default();
         for (_, record_type) in &module.interface.record_types {
             let record_type_ex =
                 IRecordTypeClosed::new(record_type.clone(), &module.interface.record_types);
 
-            let entry = if let Some(owner_module) = all_record_types.get(&record_type_ex) {
-                RecordEntry::Use(UseDescription {
-                    from: owner_module,
-                    name: &record_type.name,
-                })
-            } else {
-                all_record_types.insert(record_type_ex.clone(), module.name);
-                RecordEntry::Declare(record_type_ex)
+            let entry = match all_record_types.get(&record_type_ex) {
+                Some(owner_module) => {
+                    RecordEntry::Use(UseDescription {
+                        from: owner_module,
+                        name: &record_type.name,
+                    })
+                },
+                None => {
+                    all_record_types.insert(record_type_ex.clone(), module.name);
+                    RecordEntry::Declare(record_type_ex)
+                },
             };
 
             linking_module.records.push(entry);
+        }
+
+        if let Some(_) = linked_modules.insert(module.name, linking_module) {
+            return Err(TestGeneratorError::DuplicateModuleName(
+                module.name.to_string(),
+            ));
         }
     }
 
@@ -194,6 +191,7 @@ impl Ord for RecordEntry<'_> {
     }
 }
 
+#[derive(Default)]
 pub struct LinkedModule<'all> {
     pub records: Vec<RecordEntry<'all>>,
 }
