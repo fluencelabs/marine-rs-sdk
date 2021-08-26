@@ -29,8 +29,6 @@ use itertools::Itertools;
 pub(super) fn generate_records(linked_module: &LinkedModule<'_>) -> TResult<Vec<TokenStream>> {
     linked_module.records
         .iter()
-        .collect::<Vec<_>>()
-        .iter()
         .sorted()
         .map(|record| -> TResult<_> {
             use RecordEntry::*;
