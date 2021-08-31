@@ -16,7 +16,8 @@
 
 use marine_macro_impl::marine;
 
-use std::io::Read;
+use marine_macro_testing_utils::{items_from_file, stream_from_file, to_syn_item};
+
 use std::path::Path;
 
 pub fn test_marine_token_streams<FP, EP>(marine_path: FP, expanded_path: EP) -> bool
@@ -33,30 +34,4 @@ where
     let marine_item = to_syn_item(marine_token_streams);
 
     marine_item == expanded_item
-}
-
-fn stream_from_file<P>(path: P) -> proc_macro2::TokenStream
-where
-    P: AsRef<Path>,
-{
-    let items = items_from_file(path);
-    quote::quote! { #(#items)* }
-}
-
-fn items_from_file<P>(path: P) -> Vec<syn::Item>
-where
-    P: AsRef<Path>,
-{
-    let mut file = std::fs::File::open(path).expect("Unable to open file");
-
-    let mut src = String::new();
-    file.read_to_string(&mut src).expect("Unable to read file");
-
-    let token_file = syn::parse_file(&src).expect("Unable to parse file");
-    token_file.items
-}
-
-fn to_syn_item(token_stream: proc_macro2::TokenStream) -> Vec<syn::Item> {
-    let file: syn::File = syn::parse2(token_stream).expect("token stream should be parsed");
-    file.items
 }

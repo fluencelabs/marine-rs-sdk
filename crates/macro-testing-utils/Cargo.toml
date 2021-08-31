@@ -1,0 +1,21 @@
+[package]
+name = "marine-macro-testing-utils"
+version = "0.1.0"
+edition = "2018"
+description = "Some functions for testing procedural macros"
+documentation = "https://docs.rs/fluence/marine-macro-testing-utils"
+repository = "https://github.com/fluencelabs/marine-rs-sdk/tree/master/crates/marine-macro-testing-utils"
+authors = ["Fluence Labs"]
+keywords = ["fluence", "marine", "sdk", "webassembly"]
+categories = ["development-tools::testing"]
+license = "Apache-2.0"
+
+[lib]
+path = "src/lib.rs"
+crate-type = ["rlib"]
+doctest = false
+
+[dependencies]
+quote = "1.0.9"
+proc-macro2 = "1.0.26"
+syn = { version = '1.0.64', features = ['full'] }

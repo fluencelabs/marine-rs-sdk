@@ -23,3 +23,6 @@ proc-macro2 = "1.0.26"
 proc-macro-error = { version = "1.0.4", default-features = false }
 syn = { version = '1.0.64', features = ['full'] }
 thiserror = "1.0.24"
+
+[dev-dependencies]
+marine-macro-testing-utils = {path = "../macro-testing-utils"}
