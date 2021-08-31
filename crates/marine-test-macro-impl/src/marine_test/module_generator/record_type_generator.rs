@@ -34,12 +34,12 @@ pub(super) fn generate_records(linked_module: &LinkedModule<'_>) -> TResult<Vec<
             use RecordEntry::*;
             match record {
                 Use(use_info) => {
-                    let from_module_ident = utils::generate_record_name(use_info.from)?;
-                    let record_name_ident = utils::generate_record_name(use_info.name)?;
+                    let from_module_ident = utils::new_ident(use_info.from)?;
+                    let record_name_ident = utils::new_ident(use_info.name)?;
                     Ok(quote! {pub use super::#from_module_ident::#record_name_ident;})
                 },
                 Declare(record) => {
-                    let record_name_ident = utils::generate_record_name(&record.record_type.name)?;
+                    let record_name_ident = utils::new_ident(&record.record_type.name)?;
                     let fields = prepare_field(record.record_type.fields.iter(), record.records)?;
 
                     Ok(quote! {

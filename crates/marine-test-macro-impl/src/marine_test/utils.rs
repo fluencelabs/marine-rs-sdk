@@ -21,11 +21,6 @@ use marine_it_parser::it_interface::it::IType;
 use proc_macro2::TokenStream;
 use quote::quote;
 
-pub(super) fn generate_record_name(record_name: &str) -> TResult<syn::Ident> {
-    let extended_record_name = record_name.to_string();
-    new_ident(&extended_record_name)
-}
-
 pub(super) fn new_ident(ident_str: &str) -> TResult<syn::Ident> {
     let ident_str = ident_str.replace('-', "_");
     syn::parse_str::<syn::Ident>(&ident_str).map_err(Into::into)
