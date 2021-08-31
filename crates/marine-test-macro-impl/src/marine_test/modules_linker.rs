@@ -25,6 +25,7 @@ use std::cmp::Ordering;
 use std::collections::HashMap;
 use std::hash::Hasher;
 use std::rc::Rc;
+use static_assertions::const_assert;
 
 pub(super) fn link_modules<'modules>(
     modules: &'modules [Module<'_>],
@@ -39,16 +40,14 @@ pub(super) fn link_modules<'modules>(
                 IRecordTypeClosed::new(record_type.clone(), &module.interface.record_types);
 
             let entry = match all_record_types.get(&record_type_ex) {
-                Some(owner_module) => {
-                    RecordEntry::Use(UseDescription {
-                        from: owner_module,
-                        name: &record_type.name,
-                    })
-                },
+                Some(owner_module) => RecordEntry::Use(UseDescription {
+                    from: owner_module,
+                    name: &record_type.name,
+                }),
                 None => {
                     all_record_types.insert(record_type_ex.clone(), module.name);
                     RecordEntry::Declare(record_type_ex)
-                },
+                }
             };
 
             linking_module.records.push(entry);
@@ -78,31 +77,28 @@ impl<'r> ITypeClosed<'r> {
 impl PartialEq for ITypeClosed<'_> {
     fn eq(&self, other: &Self) -> bool {
         use IType::*;
+        // check if new variants require special handling in the match below
+        const_assert!(IType::VARIANT_COUNT == 17);
+
         match (&self.ty, &other.ty) {
-            (Boolean, Boolean)
-            | (S8, S8)
-            | (S16, S16)
-            | (S32, S32)
-            | (S64, S64)
-            | (U8, U8)
-            | (U16, U16)
-            | (U32, U32)
-            | (U64, U64)
-            | (F32, F32)
-            | (F64, F64)
-            | (String, String)
-            | (ByteArray, ByteArray)
-            | (I32, I32)
-            | (I64, I64) => true,
             (Array(self_ty), Array(other_ty)) => {
                 ITypeClosed::new(self_ty, self.records) == ITypeClosed::new(other_ty, other.records)
             }
             (Record(self_record), Record(other_record)) => {
-                let self_record = self.records.get(self_record).unwrap();
-                let other_record = other.records.get(other_record).unwrap();
-                IRecordTypeClosed::new(self_record.clone(), self.records)
-                    == IRecordTypeClosed::new(other_record.clone(), other.records)
+                let self_record = self.records.get(self_record);
+                let other_record = other.records.get(other_record);
+
+                // ID from Record(ID) potentially may not be in .records, if in happens comparision is always FALSE
+                match (self_record, other_record) {
+                    (None, _) => false,
+                    (_, None) => false,
+                    (Some(self_record), Some(other_record)) => {
+                        IRecordTypeClosed::new(self_record.clone(), self.records)
+                            == IRecordTypeClosed::new(other_record.clone(), other.records)
+                    }
+                }
             }
+            (lhs, rhs) if lhs == rhs => true,
             _ => false,
         }
     }
@@ -125,18 +121,21 @@ impl<'r> IRecordTypeClosed<'r> {
 
 impl PartialEq for IRecordTypeClosed<'_> {
     fn eq(&self, other: &Self) -> bool {
-        self.record_type.name == other.record_type.name
-            && self.record_type.fields.len() == other.record_type.fields.len()
-            && zip(
-                self.record_type.fields.iter(),
-                other.record_type.fields.iter(),
-            )
-            .all(|(lhs, rhs)| -> bool {
-                lhs.name == rhs.name
-                    && ITypeClosed::new(&lhs.ty, self.records)
-                        == ITypeClosed::new(&rhs.ty, other.records)
-            })
+        let names_are_equal = self.record_type.name == other.record_type.name;
+        names_are_equal && fields_are_equal(self, other)
     }
+}
+
+fn fields_are_equal(lhs: &IRecordTypeClosed<'_>, rhs: &IRecordTypeClosed<'_>) -> bool {
+    let same_number_of_fields = lhs.record_type.fields.len() == rhs.record_type.fields.len();
+    same_number_of_fields
+        && zip(lhs.record_type.fields.iter(), rhs.record_type.fields.iter()).all(
+            |(lhs_field, rhs_field)| -> bool {
+                lhs_field.name == rhs_field.name
+                    && ITypeClosed::new(&lhs_field.ty, lhs.records)
+                        == ITypeClosed::new(&rhs_field.ty, rhs.records)
+            },
+        )
 }
 
 impl PartialOrd for IRecordTypeClosed<'_> {
