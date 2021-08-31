@@ -18,16 +18,16 @@ use std::io::Read;
 use std::path::Path;
 
 pub fn stream_from_file<P>(path: P) -> proc_macro2::TokenStream
-    where
-        P: AsRef<Path>,
+where
+    P: AsRef<Path>,
 {
     let items = items_from_file(path);
     quote::quote! { #(#items)* }
 }
 
 pub fn items_from_file<P>(path: P) -> Vec<syn::Item>
-    where
-        P: AsRef<Path>,
+where
+    P: AsRef<Path>,
 {
     let mut file = std::fs::File::open(path).expect("Unable to open file");
 
