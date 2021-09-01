@@ -15,38 +15,18 @@
  */
 
 use crate::TResult;
-use marine_it_parser::interface::MRecordTypes;
-use marine_it_parser::interface::it::IType;
+use marine_it_parser::it_interface::IRecordTypes;
+use marine_it_parser::it_interface::it::IType;
 
 use proc_macro2::TokenStream;
 use quote::quote;
-
-pub(super) fn generate_module_ident(module_name: &str) -> TResult<syn::Ident> {
-    let generated_module_name = format!("__m_generated_{}", module_name);
-    new_ident(&generated_module_name)
-}
-
-pub(super) fn generate_structs_module_ident(module_name: &str) -> TResult<syn::Ident> {
-    let generated_module_name = format!("{}_structs", module_name);
-    new_ident(&generated_module_name)
-}
-
-pub(super) fn generate_record_name(record_name: &str) -> TResult<syn::Ident> {
-    let extended_record_name = record_name.to_string();
-    new_ident(&extended_record_name)
-}
-
-pub(super) fn generate_struct_name(struct_name: &str) -> TResult<syn::Ident> {
-    let extended_struct_name = format!("MGeneratedStruct{}", struct_name);
-    new_ident(&extended_struct_name)
-}
 
 pub(super) fn new_ident(ident_str: &str) -> TResult<syn::Ident> {
     let ident_str = ident_str.replace('-', "_");
     syn::parse_str::<syn::Ident>(&ident_str).map_err(Into::into)
 }
 
-pub(super) fn itype_to_tokens(itype: &IType, records: &MRecordTypes) -> TResult<TokenStream> {
+pub(super) fn itype_to_tokens(itype: &IType, records: &IRecordTypes) -> TResult<TokenStream> {
     let token_stream = match itype {
         IType::Record(record_id) => {
             let record = records

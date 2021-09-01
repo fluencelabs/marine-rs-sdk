@@ -21,6 +21,7 @@ mod record_type_generator;
 use crate::marine_test::utils;
 use crate::marine_test::config_utils::Module;
 use crate::TResult;
+use crate::marine_test::modules_linker::{LinkedModules, LinkedModule};
 
 use proc_macro2::TokenStream;
 use quote::quote;
@@ -56,21 +57,24 @@ use quote::quote;
 ///```
 pub(super) fn generate_module_definitions<'i>(
     modules: impl ExactSizeIterator<Item = &'i Module<'i>>,
+    linked_modules: &'i LinkedModules<'_>,
 ) -> TResult<Vec<TokenStream>> {
     modules
         .into_iter()
-        .map(generate_module_definition)
+        .map(|value| generate_module_definition(value, linked_modules.get(&value.name).unwrap())) // linked_modules are built from modules
         .collect::<TResult<Vec<_>>>()
 }
 
-fn generate_module_definition(module: &Module<'_>) -> TResult<TokenStream> {
+fn generate_module_definition(
+    module: &Module<'_>,
+    linked_module: &'_ LinkedModule<'_>,
+) -> TResult<TokenStream> {
     let module_name = module.name;
-    let module_ident = utils::generate_module_ident(module_name)?;
-    let structs_module_ident = utils::generate_structs_module_ident(module_name)?;
-    let struct_ident = utils::generate_struct_name(module_name)?;
+    let module_ident = utils::new_ident(module_name)?;
+    let struct_ident = utils::new_ident("ModuleInterface")?;
 
     let module_interface = &module.interface;
-    let module_records = record_type_generator::generate_records(&module_interface.record_types)?;
+    let module_records = record_type_generator::generate_records(linked_module)?;
     let module_functions = methods_generator::generate_module_methods(
         module_name,
         module_interface.function_signatures.iter(),
@@ -79,26 +83,22 @@ fn generate_module_definition(module: &Module<'_>) -> TResult<TokenStream> {
 
     let module_definition = quote! {
         // it's a sort of hack: this module structure allows user to import structs by
-        // use module_name_structs::StructName;
-        pub mod #structs_module_ident {
-            pub use #module_ident::*;
+        // using marine_env_test::module_name::StructName;
+        pub mod #module_ident {
+            #(#module_records)*
 
-            pub mod #module_ident {
-                #(#module_records)*
+            pub struct #struct_ident {
+                marine: std::rc::Rc<std::cell::RefCell<marine_rs_sdk_test::internal::AppService>, >,
+            }
 
-                pub struct #struct_ident {
-                    marine: std::rc::Rc<std::cell::RefCell<marine_rs_sdk_test::internal::AppService>>,
+            impl #struct_ident {
+                pub fn new(marine: std::rc::Rc<std::cell::RefCell<marine_rs_sdk_test::internal::AppService>, >) -> Self {
+                    Self { marine }
                 }
+            }
 
-                impl #struct_ident {
-                    pub fn new(marine: std::rc::Rc<std::cell::RefCell<marine_rs_sdk_test::internal::AppService>>) -> Self {
-                        Self { marine }
-                    }
-                }
-
-                impl #struct_ident {
-                    #(#module_functions)*
-                }
+            impl #struct_ident {
+                #(#module_functions)*
             }
         }
     };

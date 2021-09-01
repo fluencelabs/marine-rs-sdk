@@ -18,10 +18,10 @@ use crate::marine_test::utils::new_ident;
 use crate::marine_test::utils::itype_to_tokens;
 use crate::TResult;
 
-use marine_it_parser::interface::it::IType;
-use marine_it_parser::interface::it::IFunctionArg;
-use marine_it_parser::interface::MRecordTypes;
-use marine_it_parser::interface::MFunctionSignature;
+use marine_it_parser::it_interface::it::IType;
+use marine_it_parser::it_interface::it::IFunctionArg;
+use marine_it_parser::it_interface::IRecordTypes;
+use marine_it_parser::it_interface::IFunctionSignature;
 
 use proc_macro2::TokenStream;
 use quote::quote;
@@ -34,9 +34,9 @@ pub(super) enum CallParametersSettings {
 
 pub(super) fn generate_module_method(
     module_name: &str,
-    signature: &MFunctionSignature,
+    signature: &IFunctionSignature,
     cp_setting: CallParametersSettings,
-    records: &MRecordTypes,
+    records: &IRecordTypes,
 ) -> TResult<TokenStream> {
     let arguments = generate_arguments(signature.arguments.iter(), records)?;
     let output_type = generate_output_type(&signature.outputs, records)?;
@@ -73,8 +73,8 @@ pub(super) fn generate_module_method(
 fn generate_marine_call(
     module_name: &str,
     cp_settings: CallParametersSettings,
-    method_signature: &MFunctionSignature,
-    records: &MRecordTypes,
+    method_signature: &IFunctionSignature,
+    records: &IRecordTypes,
 ) -> TResult<TokenStream> {
     let args = method_signature.arguments.iter().map(|a| a.name.as_str());
     let convert_arguments = generate_arguments_converter(args)?;
@@ -133,7 +133,7 @@ fn generate_set_result(output_type: &Option<&IType>) -> TokenStream {
 
 fn generate_convert_to_output(
     output_type: &Option<&IType>,
-    records: &MRecordTypes,
+    records: &IRecordTypes,
 ) -> TResult<TokenStream> {
     let result_stream = match output_type {
         Some(ty) => {
@@ -157,7 +157,7 @@ fn generate_ret(output_type: &Option<&IType>) -> TokenStream {
 
 fn generate_arguments<'a, 'r>(
     arguments: impl ExactSizeIterator<Item = &'a IFunctionArg>,
-    records: &'r MRecordTypes,
+    records: &'r IRecordTypes,
 ) -> TResult<Vec<TokenStream>> {
     arguments
         .map(|argument| -> TResult<_> {
@@ -170,7 +170,7 @@ fn generate_arguments<'a, 'r>(
         .collect::<TResult<Vec<_>>>()
 }
 
-fn generate_output_type(output_types: &[IType], records: &MRecordTypes) -> TResult<TokenStream> {
+fn generate_output_type(output_types: &[IType], records: &IRecordTypes) -> TResult<TokenStream> {
     let output_type = get_output_type(output_types)?;
     match output_type {
         None => Ok(TokenStream::new()),

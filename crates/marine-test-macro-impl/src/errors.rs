@@ -50,6 +50,12 @@ pub enum TestGeneratorError {
 
     #[error("{0} is invalid UTF8 path")]
     InvalidUTF8Path(PathBuf),
+
+    #[error(r#"a "self" argument found and it is not supported in test function"#)]
+    UnexpectedSelf,
+
+    #[error("Duplicate module: {0}")]
+    DuplicateModuleName(String),
 }
 
 #[derive(Debug, ThisError)]

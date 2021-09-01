@@ -17,35 +17,47 @@
 use crate::marine_test::utils;
 use crate::TResult;
 
-use marine_it_parser::interface::it::IRecordFieldType;
-use marine_it_parser::interface::MRecordTypes;
+use marine_it_parser::it_interface::it::IRecordFieldType;
+use marine_it_parser::it_interface::IRecordTypes;
 
 use proc_macro2::TokenStream;
 use quote::quote;
 
-pub(super) fn generate_records(records: &MRecordTypes) -> TResult<Vec<TokenStream>> {
-    use std::ops::Deref;
+use crate::marine_test::modules_linker::{LinkedModule, RecordEntry};
+use itertools::Itertools;
 
-    records.iter().map(|(_, record)| -> TResult<_> {
-        let record_name_ident = utils::generate_record_name(&record.name)?;
-        let fields = prepare_field(record.fields.deref().iter(), records)?;
+pub(super) fn generate_records(linked_module: &LinkedModule<'_>) -> TResult<Vec<TokenStream>> {
+    linked_module.records
+        .iter()
+        .sorted()
+        .map(|record| -> TResult<_> {
+            use RecordEntry::*;
+            match record {
+                Use(use_info) => {
+                    let from_module_ident = utils::new_ident(use_info.from)?;
+                    let record_name_ident = utils::new_ident(use_info.name)?;
+                    Ok(quote! {pub use super::#from_module_ident::#record_name_ident;})
+                },
+                Declare(record) => {
+                    let record_name_ident = utils::new_ident(&record.record_type.name)?;
+                    let fields = prepare_field(record.record_type.fields.iter(), record.records)?;
 
-        let generated_record = quote! {
-            #[derive(Clone, Debug, marine_rs_sdk_test::internal::serde::Serialize, marine_rs_sdk_test::internal::serde::Deserialize)]
-            #[serde(crate = "marine_rs_sdk_test::internal::serde")]
-            pub struct #record_name_ident {
-                #(pub #fields),*
+                    Ok(quote! {
+                        #[derive(Clone, Debug, marine_rs_sdk_test::internal::serde::Serialize, marine_rs_sdk_test::internal::serde::Deserialize)]
+                        #[serde(crate = "marine_rs_sdk_test::internal::serde")]
+                        pub struct #record_name_ident {
+                            #(pub #fields),*
+                        }
+                    })
+                }
             }
-        };
-
-        Ok(generated_record)
-    }
-    ).collect::<TResult<Vec<_>>>()
+        })
+        .collect::<TResult<Vec<_>>>()
 }
 
 fn prepare_field<'f>(
     fields: impl ExactSizeIterator<Item = &'f IRecordFieldType>,
-    records: &MRecordTypes,
+    records: &IRecordTypes,
 ) -> TResult<Vec<TokenStream>> {
     fields
         .map(|field| -> TResult<_> {

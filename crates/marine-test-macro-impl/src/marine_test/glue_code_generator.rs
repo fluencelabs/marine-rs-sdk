@@ -23,9 +23,11 @@ use crate::marine_test::config_utils;
 use fluence_app_service::TomlAppServiceConfig;
 use proc_macro2::TokenStream;
 use quote::quote;
+use quote::ToTokens;
 
 use std::path::Path;
 use std::path::PathBuf;
+use syn::FnArg;
 
 /// Generates glue code for tests.
 /// F.e. for this test for the greeting service
@@ -128,30 +130,40 @@ pub(super) fn generate_test_glue_code(
     let modules_dir = file_path.join(modules_dir);
     let module_interfaces =
         marine_test::config_utils::collect_modules(&marine_config, modules_dir)?;
+    let linked_modules = marine_test::modules_linker::link_modules(&module_interfaces)?;
 
-    let module_definitions =
-        marine_test::module_generator::generate_module_definitions(module_interfaces.iter())?;
-
-    let module_iter = module_interfaces.iter().map(|module| module.name);
-    let module_ctors = generate_module_ctors(module_iter)?;
+    let module_definitions = marine_test::module_generator::generate_module_definitions(
+        module_interfaces.iter(),
+        &linked_modules,
+    )?;
 
     let original_block = func_item.block;
     let signature = func_item.sig;
+    let name = &signature.ident;
+    let inputs = &signature.inputs;
+    let arg_names = generate_arg_names(inputs.iter())?;
+    let module_ctors = generate_module_ctors(inputs.iter())?;
 
     let glue_code = quote! {
         #[test]
-        #signature {
+        fn #name() {
             // definitions for wasm modules specified in config
-            #(#module_definitions)*
-
+            pub mod marine_test_env {
+              #(#module_definitions)*
+            }
             // AppService constructor and instantiation to implicit `marine` variable
             #app_service_ctor
 
             // constructors of all modules of the tested service
             #(#module_ctors)*
 
-            // original test function as is
-            #original_block
+            fn test_func(#inputs) {
+               #(let mut #arg_names = #arg_names;)*
+               // original test function as is
+               #original_block
+            }
+
+            test_func(#(#arg_names,)*)
         }
     };
 
@@ -181,9 +193,7 @@ fn generate_app_service_ctor(config_path: &str, modules_dir: &Path) -> TResult<T
             }
 
             let (file_path_, remainder) = match file_path.next_back().and_then(|p| match p {
-                std::path::Component::Normal(_) | std::path::Component::CurDir | std::path::Component::ParentDir => {
-                    Some((file_path, p))
-                }
+                std::path::Component::Normal(_) | std::path::Component::CurDir | std::path::Component::ParentDir => Some((file_path, p)),
                 _ => None,
             }) {
                 Some(t) => t,
@@ -218,21 +228,32 @@ fn generate_app_service_ctor(config_path: &str, modules_dir: &Path) -> TResult<T
     Ok(service_ctor)
 }
 
-fn generate_module_ctors<'n>(
-    module_names: impl ExactSizeIterator<Item = &'n str>,
+fn generate_module_ctors<'inputs>(
+    inputs: impl Iterator<Item = &'inputs FnArg>,
 ) -> TResult<Vec<TokenStream>> {
-    module_names
-        .map(|name| -> TResult<_> {
-            // TODO: optimize these two call because they are called twice for each module name
-            // and internally allocate memory in format call.
-            let module_name = marine_test::utils::generate_structs_module_ident(&name)?;
-            let struct_name = marine_test::utils::generate_struct_name(&name)?;
-            let name_for_user = marine_test::utils::new_ident(&name)?;
+    inputs
+        .map(|x| -> TResult<_> {
+            match x {
+                FnArg::Receiver(_) => Err(TestGeneratorError::UnexpectedSelf),
+                FnArg::Typed(x) => {
+                    let pat = &x.pat;
+                    let ty = &x.ty;
+                    Ok(quote! {let mut #pat = #ty::new(marine.clone());})
+                }
+            }
+        })
+        .collect::<TResult<_>>()
+}
 
-            let module_ctor =
-                quote! { let mut #name_for_user = #module_name::#struct_name::new(marine.clone()); };
-
-            Ok(module_ctor)
+fn generate_arg_names<'inputs>(
+    inputs: impl Iterator<Item = &'inputs FnArg>,
+) -> TResult<Vec<TokenStream>> {
+    inputs
+        .map(|x| -> TResult<_> {
+            match x {
+                FnArg::Receiver(_) => Err(TestGeneratorError::UnexpectedSelf),
+                FnArg::Typed(x) => Ok(x.pat.to_token_stream()),
+            }
         })
         .collect::<TResult<_>>()
 }

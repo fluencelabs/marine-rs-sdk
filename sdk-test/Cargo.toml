@@ -1,6 +1,6 @@
 [package]
 name = "marine-rs-sdk-test"
-version = "0.1.11"  # remember to update html_root_url
+version = "0.2.0"  # remember to update html_root_url
 description = "Backend SDK that allows testing modules for the Marine runtime"
 documentation = "https://docs.rs/marine-rs-sdk-test"
 repository = "https://github.com/fluencelabs/marine-rs-sdk/tree/master/fluence-test"
@@ -17,8 +17,11 @@ all-features = true
 path = "src/lib.rs"
 doctest = false
 
+[dev-dependencies]
+trybuild = "1.0"
+
 [dependencies]
-marine-test-macro = { path = "../crates/marine-test-macro", version = "=0.1.11" }
+marine-test-macro = { path = "../crates/marine-test-macro", version = "=0.2.0" }
 fluence-app-service = { version = "0.9.0", features = ["raw-module-api"] }
 
 serde = { version = "1.0.118", features = ["derive"] }

@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-#![doc(html_root_url = "https://docs.rs/sdk-test-macro/0.1.11")]
+#![doc(html_root_url = "https://docs.rs/sdk-test-macro/0.2.0")]
 #![deny(
     dead_code,
     nonstandard_style,
@@ -36,7 +36,7 @@ use syn::spanned::Spanned;
 /// This macro allows user to write tests for services in the following form:
 ///```rust
 /// #[marine_test(config = "/path/to/Config.toml", modules_dir = "path/to/service/modules")]
-/// fn test() {
+/// fn test(greeting: marine_test_env::greeting::ModuleInterface) {
 ///     let service_result = greeting.greeting("John".to_string());
 ///     assert_eq!(&service_result, "Hi, name!");
 /// }

@@ -17,27 +17,32 @@
 use super::methods_generator_utils::*;
 use crate::TResult;
 
-use marine_it_parser::interface::MRecordTypes;
-use marine_it_parser::interface::MFunctionSignature;
+use marine_it_parser::it_interface::IFunctionSignature;
+use marine_it_parser::it_interface::IRecordTypes;
+
+use itertools::Itertools;
 
 pub(super) fn generate_module_methods<'m, 'r>(
     module_name: &str,
-    mut method_signatures: impl ExactSizeIterator<Item = &'m MFunctionSignature>,
-    records: &'r MRecordTypes,
+    method_signatures: impl ExactSizeIterator<Item = &'m IFunctionSignature>,
+    records: &'r IRecordTypes,
 ) -> TResult<Vec<proc_macro2::TokenStream>> {
     use CallParametersSettings::*;
 
     let methods_count = 2 * method_signatures.len();
-    method_signatures.try_fold::<_, _, TResult<_>>(
-        Vec::with_capacity(methods_count),
-        |mut methods, signature| {
-            let default_cp = generate_module_method(module_name, &signature, Default, records)?;
-            let user_cp = generate_module_method(module_name, &signature, UserDefined, records)?;
+    method_signatures
+        .sorted_by(|lhs, rhs| lhs.name.cmp(&rhs.name))
+        .try_fold::<_, _, TResult<_>>(
+            Vec::with_capacity(methods_count),
+            |mut methods, signature| {
+                let default_cp = generate_module_method(module_name, &signature, Default, records)?;
+                let user_cp =
+                    generate_module_method(module_name, &signature, UserDefined, records)?;
 
-            methods.push(default_cp);
-            methods.push(user_cp);
+                methods.push(default_cp);
+                methods.push(user_cp);
 
-            Ok(methods)
-        },
-    )
+                Ok(methods)
+            },
+        )
 }
