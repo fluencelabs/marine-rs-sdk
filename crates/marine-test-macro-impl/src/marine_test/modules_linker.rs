@@ -53,7 +53,7 @@ pub(super) fn link_modules<'modules>(
             linking_module.records.push(entry);
         }
 
-        if let Some(_) = linked_modules.insert(module.name, linking_module) {
+        if linked_modules.insert(module.name, linking_module).is_some() {
             return Err(TestGeneratorError::DuplicateModuleName(
                 module.name.to_string(),
             ));
@@ -78,7 +78,9 @@ impl PartialEq for ITypeClosed<'_> {
     fn eq(&self, other: &Self) -> bool {
         use IType::*;
         // check if new variants require special handling in the match below
-        const_assert!(IType::VARIANT_COUNT == 17);
+        #[allow(unused)]
+        const LAST_VERIFIED_ITYPE_SIZE : usize = 17;
+        const_assert!(IType::VARIANT_COUNT == LAST_VERIFIED_ITYPE_SIZE);
 
         match (&self.ty, &other.ty) {
             (Array(self_ty), Array(other_ty)) => {
@@ -88,7 +90,7 @@ impl PartialEq for ITypeClosed<'_> {
                 let self_record = self.records.get(self_record);
                 let other_record = other.records.get(other_record);
 
-                // ID from Record(ID) potentially may not be in .records, if in happens comparision is always FALSE
+                // ID from Record(ID) potentially may not be in .records, if it happens comparision is always FALSE
                 match (self_record, other_record) {
                     (None, _) => false,
                     (_, None) => false,
@@ -127,8 +129,8 @@ impl PartialEq for IRecordTypeClosed<'_> {
 }
 
 fn fields_are_equal(lhs: &IRecordTypeClosed<'_>, rhs: &IRecordTypeClosed<'_>) -> bool {
-    let same_number_of_fields = lhs.record_type.fields.len() == rhs.record_type.fields.len();
-    same_number_of_fields
+    let same_fields_count = lhs.record_type.fields.len() == rhs.record_type.fields.len();
+    same_fields_count
         && zip(lhs.record_type.fields.iter(), rhs.record_type.fields.iter()).all(
             |(lhs_field, rhs_field)| -> bool {
                 lhs_field.name == rhs_field.name
