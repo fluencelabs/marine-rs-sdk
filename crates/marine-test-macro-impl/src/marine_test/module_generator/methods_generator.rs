@@ -31,7 +31,7 @@ pub(super) fn generate_module_methods<'m, 'r>(
 
     let methods_count = 2 * method_signatures.len();
     method_signatures
-        .sorted_by(|sig1, sig2| sig1.name.cmp(&sig2.name))
+        .sorted_by(|lhs, rhs| lhs.name.cmp(&rhs.name))
         .try_fold::<_, _, TResult<_>>(
             Vec::with_capacity(methods_count),
             |mut methods, signature| {
