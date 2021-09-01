@@ -79,7 +79,7 @@ impl PartialEq for ITypeClosed<'_> {
         use IType::*;
         // check if new variants require special handling in the match below
         #[allow(unused)]
-        const LAST_VERIFIED_ITYPE_SIZE : usize = 17;
+        const LAST_VERIFIED_ITYPE_SIZE: usize = 17;
         const_assert!(IType::VARIANT_COUNT == LAST_VERIFIED_ITYPE_SIZE);
 
         match (&self.ty, &other.ty) {
