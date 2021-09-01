@@ -61,7 +61,7 @@ pub(super) fn generate_module_definitions<'i>(
 ) -> TResult<Vec<TokenStream>> {
     modules
         .into_iter()
-        .map(|value| generate_module_definition(value, linked_modules.get(&value.name).unwrap()))
+        .map(|value| generate_module_definition(value, linked_modules.get(&value.name).unwrap()))// linked_modules are built from modules
         .collect::<TResult<Vec<_>>>()
 }
 
