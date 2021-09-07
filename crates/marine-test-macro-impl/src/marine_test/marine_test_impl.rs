@@ -17,6 +17,7 @@
 use crate::attributes::MTestAttributes;
 use crate::TResult;
 use crate::marine_test::glue_code_generator::generate_test_glue_code;
+use crate::marine_test::glue_code_generator::generate_test_glue_code2;
 
 use proc_macro2::TokenStream;
 use darling::FromMeta;
@@ -37,4 +38,16 @@ pub fn marine_test_impl(
     let func_item = syn::parse2::<syn::ItemFn>(input)?;
 
     generate_test_glue_code(func_item, attrs, file_path)
+}
+
+pub fn marine_test_impl2(
+    attrs: TokenStream,
+) -> TResult<TokenStream> {
+    // from https://github.com/dtolnay/syn/issues/788
+    let parser = syn::punctuated::Punctuated::<syn::NestedMeta, syn::Token![,]>::parse_terminated;
+    let attrs = parser.parse2(attrs)?;
+    let attrs: Vec<syn::NestedMeta> = attrs.into_iter().collect();
+    let attrs = MTestAttributes::from_list(&attrs)?;
+
+    generate_test_glue_code2(attrs)
 }

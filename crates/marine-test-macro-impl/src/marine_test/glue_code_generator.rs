@@ -127,7 +127,7 @@ pub(super) fn generate_test_glue_code(
     };
 
     let app_service_ctor = generate_app_service_ctor(&attrs.config_path, &modules_dir)?;
-    let modules_dir = file_path.join(modules_dir);
+    /*let modules_dir = file_path.join(modules_dir);
     let module_interfaces =
         marine_test::config_utils::collect_modules(&marine_config, modules_dir)?;
     let linked_modules = marine_test::modules_linker::link_modules(&module_interfaces)?;
@@ -135,7 +135,7 @@ pub(super) fn generate_test_glue_code(
     let module_definitions = marine_test::module_generator::generate_module_definitions(
         module_interfaces.iter(),
         &linked_modules,
-    )?;
+    )?;*/
 
     let original_block = func_item.block;
     let signature = func_item.sig;
@@ -148,9 +148,7 @@ pub(super) fn generate_test_glue_code(
         #[test]
         fn #name() {
             // definitions for wasm modules specified in config
-            pub mod marine_test_env {
-              #(#module_definitions)*
-            }
+
             // AppService constructor and instantiation to implicit `marine` variable
             #app_service_ctor
 
@@ -164,6 +162,42 @@ pub(super) fn generate_test_glue_code(
             }
 
             test_func(#(#arg_names,)*)
+        }
+    };
+
+    Ok(glue_code)
+}
+
+pub(super) fn generate_test_glue_code2(
+    attrs: MTestAttributes,
+) -> TResult<TokenStream> {
+    let file_path = PathBuf::from(".");
+    let config_path = file_path.join(&attrs.config_path);
+
+    let marine_config = TomlAppServiceConfig::load(&config_path)?;
+    let modules_dir = match config_utils::resolve_modules_dir(&marine_config, attrs.modules_dir) {
+        Some(modules_dir) => modules_dir,
+        None => return Err(TestGeneratorError::ModulesDirUnspecified),
+    };
+
+    let modules_dir = file_path.join(modules_dir);
+    let module_interfaces =
+        marine_test::config_utils::collect_modules(&marine_config, modules_dir)?;
+    let linked_modules = marine_test::modules_linker::link_modules(&module_interfaces)?;
+
+    let module_definitions = marine_test::module_generator::generate_module_definitions(
+        module_interfaces.iter(),
+        &linked_modules,
+    )?;
+
+    let glue_code = quote! {
+        use marine_rs_sdk_test;
+        pub mod marine_test_env {
+            #(#module_definitions)*
+        }
+
+        pub fn message() -> String {
+            "hello".to_string()
         }
     };
 

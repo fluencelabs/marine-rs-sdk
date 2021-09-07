@@ -22,3 +22,4 @@ mod utils;
 mod modules_linker;
 
 pub use marine_test_impl::marine_test_impl;
+pub use marine_test_impl::marine_test_impl2;
