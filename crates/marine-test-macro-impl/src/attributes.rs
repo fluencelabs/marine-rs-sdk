@@ -44,6 +44,9 @@ pub(crate) struct ServiceDescription {
     /// Path to compiled modules of a service.
     #[darling(default)]
     pub(crate) modules_dir: Option<String>,
+
+    #[darling(default)]
+    pub(crate) name: Option<String>,
 }
 
 impl FromMeta for Services {

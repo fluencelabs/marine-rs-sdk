@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-use crate::attributes::MTestAttributes;
+use crate::attributes::{MTestAttributes, Services, ServiceDescription};
 use crate::TResult;
 use crate::TestGeneratorError;
 use crate::marine_test;
@@ -28,6 +28,8 @@ use quote::ToTokens;
 use std::path::Path;
 use std::path::PathBuf;
 use syn::FnArg;
+use crate::marine_test::config_utils::Module;
+use crate::marine_test::utils::new_ident;
 
 /// Generates glue code for tests.
 /// F.e. for this test for the greeting service
@@ -118,19 +120,181 @@ pub(super) fn generate_test_glue_code(
     attrs: MTestAttributes,
     file_path: PathBuf,
 ) -> TResult<TokenStream> {
-    let config_path = file_path.join(&attrs.config_path);
+    match attrs.services {
+        Some(services) => generate_test_glue_code_services(func_item, services, file_path),
+        None => generate_test_glue_code_modules(
+            func_item,
+            attrs.modules_dir,
+            attrs.config_path,
+            file_path,
+        ),
+    }
+}
 
-    let marine_config = TomlAppServiceConfig::load(&config_path)?;
-    let modules_dir = match config_utils::resolve_modules_dir(&marine_config, attrs.modules_dir) {
+fn load_config(
+    config_path: &str,
+    modules_dir: Option<String>,
+    file_path: &PathBuf,
+) -> TResult<ConfigWrapper> {
+    let config_path_buf = file_path.join(&config_path);
+
+    let marine_config = TomlAppServiceConfig::load(&config_path_buf)?;
+    let modules_dir = match config_utils::resolve_modules_dir(&marine_config, modules_dir) {
         Some(modules_dir) => modules_dir,
         None => return Err(TestGeneratorError::ModulesDirUnspecified),
     };
 
-    let app_service_ctor = generate_app_service_ctor(&attrs.config_path, &modules_dir)?;
     let modules_dir = file_path.join(modules_dir);
-    let module_interfaces =
-        marine_test::config_utils::collect_modules(&marine_config, modules_dir)?;
+    Ok(ConfigWrapper {
+        config: marine_config,
+        modules_dir,
+    })
+}
+
+struct ConfigWrapper {
+    config: TomlAppServiceConfig,
+    modules_dir: PathBuf,
+}
+
+impl ConfigWrapper {
+    fn collect_modules(&self) -> TResult<Vec<Module<'_>>> {
+        marine_test::config_utils::collect_modules(&self.config, &self.modules_dir)
+    }
+}
+
+fn generate_services_definitions(
+    services: &[ServiceDescription],
+    file_path: &PathBuf,
+) -> TResult<Vec<TokenStream>> {
+    services
+        .iter()
+        .map(|service| -> TResult<TokenStream> {
+            //let service_mod = new_ident(service.name.as_ref().unwrap())?;
+            let service_mod = new_ident("test")?;
+            let service_definition = generate_service_definition(service, file_path)?;
+            let glue_code = quote! {
+                pub mod #service_mod {
+                    #service_definition
+                }
+            };
+
+            Ok(glue_code)
+        })
+        .collect::<TResult<Vec<TokenStream>>>()
+}
+
+fn generate_service_definition(
+    service: &ServiceDescription,
+    file_path: &PathBuf,
+) -> TResult<TokenStream> {
+    let config_wrapper = load_config(
+        &service.config_path,
+        service.modules_dir.clone(),
+        &file_path,
+    )?;
+    let module_interfaces = config_wrapper.collect_modules()?;
     let linked_modules = marine_test::modules_linker::link_modules(&module_interfaces)?;
+    let modules_dir = match config_utils::resolve_modules_dir(
+        &config_wrapper.config,
+        service.modules_dir.clone(),
+    ) {
+        Some(modules_dir) => modules_dir,
+        None => return Err(TestGeneratorError::ModulesDirUnspecified),
+    };
+
+    let module_definitions = marine_test::module_generator::generate_module_definitions(
+        module_interfaces.iter(),
+        &linked_modules,
+    )?;
+
+    let facade = match module_interfaces.last() {
+        Some(module) => module,
+        None => return Err(TestGeneratorError::ModulesDirUnspecified),
+    };
+
+    let facade_interface = marine_test::module_generator::generate_facade_methods(
+        facade.name,
+        facade.interface.function_signatures.iter(),
+        &facade.interface.record_types,
+    )?;
+    let app_service_ctor = generate_app_service_ctor(&service.config_path, &modules_dir)?;
+    let modules_type = generate_modules_type(&module_interfaces)?;
+    let service_definition = quote! {
+        pub mod modules {
+            #(#module_definitions)*
+        }
+
+        #modules_type
+
+        pub struct ServiceInterface {
+            pub modules: __GeneratedModules,
+            marine: std::rc::Rc<std::cell::RefCell<marine_rs_sdk_test::internal::AppService>, >
+        }
+
+        impl ServiceInterface {
+            pub fn new() -> Self {
+                #app_service_ctor
+                let modules = __GeneratedModules::new(marine.clone());
+                Self {
+                    marine,
+                    modules
+                }
+            }
+
+            #(#facade_interface)*
+        }
+    };
+
+    Ok(service_definition)
+}
+
+fn generate_modules_type(module_interfaces: &[Module<'_>]) -> TResult<TokenStream> {
+    let fields = module_interfaces
+        .iter()
+        .map(|module| -> TResult<TokenStream> {
+            let name = new_ident(module.name)?;
+            Ok(quote! {pub #name: modules::#name::ModuleInterface})
+        })
+        .collect::<TResult<Vec<TokenStream>>>()?;
+
+    let ctors = module_interfaces
+        .iter()
+        .map(|module| -> TResult<TokenStream> {
+            let name = new_ident(module.name)?;
+            Ok(quote! {#name: modules::#name::ModuleInterface::new(marine.clone())})
+        })
+        .collect::<TResult<Vec<TokenStream>>>()?;
+
+    let ty = quote! {
+        pub struct __GeneratedModules {
+            #(#fields,)*
+        }
+
+        impl __GeneratedModules {
+            fn new(marine: std::rc::Rc<std::cell::RefCell<marine_rs_sdk_test::internal::AppService>, >) -> Self {
+                Self {
+                    #(#ctors,)*
+                }
+            }
+        }
+    };
+
+    Ok(ty)
+}
+
+fn generate_test_glue_code_modules(
+    func_item: syn::ItemFn,
+    module_dir: Option<String>,
+    config_path: String,
+    file_path: PathBuf,
+) -> TResult<TokenStream> {
+    let config_wrapper = load_config(&config_path, module_dir.clone(), &file_path)?;
+    let module_interfaces = config_wrapper.collect_modules()?;
+    let linked_modules = marine_test::modules_linker::link_modules(&module_interfaces)?;
+    let modules_dir = match config_utils::resolve_modules_dir(&config_wrapper.config, module_dir) {
+        Some(modules_dir) => modules_dir,
+        None => return Err(TestGeneratorError::ModulesDirUnspecified),
+    };
 
     let module_definitions = marine_test::module_generator::generate_module_definitions(
         module_interfaces.iter(),
@@ -143,7 +307,7 @@ pub(super) fn generate_test_glue_code(
     let inputs = &signature.inputs;
     let arg_names = generate_arg_names(inputs.iter())?;
     let module_ctors = generate_module_ctors(inputs.iter())?;
-
+    let app_service_ctor = generate_app_service_ctor(&config_path, &modules_dir)?;
     let glue_code = quote! {
         #[test]
         fn #name() {
@@ -164,6 +328,35 @@ pub(super) fn generate_test_glue_code(
             }
 
             test_func(#(#arg_names,)*)
+        }
+    };
+
+    Ok(glue_code)
+}
+
+fn generate_test_glue_code_services(
+    func_item: syn::ItemFn,
+    services: Services,
+    file_path: PathBuf,
+) -> TResult<TokenStream> {
+    let service_definitions = generate_services_definitions(&services.services, &file_path)?;
+
+    let original_block = func_item.block;
+    let signature = func_item.sig;
+    let name = &signature.ident;
+    let glue_code = quote! {
+        #[test]
+        fn #name() {
+            // definitions for wasm modules specified in config
+            pub mod marine_test_env {
+              #(#service_definitions)*
+            }
+
+            fn test_func() {
+               #original_block
+            }
+
+            test_func()
         }
     };
 

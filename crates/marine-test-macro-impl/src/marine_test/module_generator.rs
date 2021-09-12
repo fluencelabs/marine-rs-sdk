@@ -65,6 +65,8 @@ pub(super) fn generate_module_definitions<'i>(
         .collect::<TResult<Vec<_>>>()
 }
 
+pub(super) use methods_generator::generate_facade_methods;
+
 fn generate_module_definition(
     module: &Module<'_>,
     linked_module: &'_ LinkedModule<'_>,

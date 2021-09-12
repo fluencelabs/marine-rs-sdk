@@ -35,11 +35,11 @@ impl<'m> Module<'m> {
 }
 
 /// Returns all modules the provided config consists of.
-pub(super) fn collect_modules(
-    config: &TomlAppServiceConfig,
-    modules_dir: PathBuf,
-) -> TResult<Vec<Module<'_>>> {
-    let module_paths = collect_module_paths(config, modules_dir);
+pub(super) fn collect_modules<'config>(
+    config: &'config TomlAppServiceConfig,
+    modules_dir: &PathBuf,
+) -> TResult<Vec<Module<'config>>> {
+    let module_paths = collect_module_paths(config, &modules_dir);
 
     module_paths
         .into_iter()
@@ -48,10 +48,10 @@ pub(super) fn collect_modules(
         .map_err(Into::into)
 }
 
-fn collect_module_paths(
-    config: &TomlAppServiceConfig,
-    modules_dir: PathBuf,
-) -> Vec<(&str, PathBuf)> {
+fn collect_module_paths<'config>(
+    config: &'config TomlAppServiceConfig,
+    modules_dir: &PathBuf,
+) -> Vec<(&'config str, PathBuf)> {
     config
         .toml_faas_config
         .module

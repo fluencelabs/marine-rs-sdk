@@ -70,6 +70,44 @@ pub(super) fn generate_module_method(
     Ok(module_method)
 }
 
+pub(super) fn generate_module_method_forward(
+    module_name: &str,
+    signature: &IFunctionSignature,
+    cp_setting: CallParametersSettings,
+    records: &IRecordTypes,
+) -> TResult<TokenStream> {
+    let arguments = generate_arguments(signature.arguments.iter(), records)?;
+    let output_type = generate_output_type(&signature.outputs, records)?;
+    let mcall = generate_forward_call(module_name, cp_setting, &signature)?;
+
+    let (cp, func_name) = match cp_setting {
+        CallParametersSettings::Default => {
+            let func_name = new_ident(&signature.name)?;
+            (TokenStream::new(), func_name)
+        }
+        CallParametersSettings::UserDefined => {
+            let maybe_comma = if signature.arguments.is_empty() {
+                TokenStream::new()
+            } else {
+                quote! { , }
+            };
+
+            let cp = quote! { #maybe_comma cp: marine_rs_sdk_test::CallParameters };
+            let func_name = format!("{}_cp", signature.name);
+            let func_name = new_ident(&func_name)?;
+            (cp, func_name)
+        }
+    };
+
+    let module_method = quote! {
+        pub fn #func_name(&mut self, #(#arguments),* #cp) #output_type {
+            #mcall
+        }
+    };
+
+    Ok(module_method)
+}
+
 fn generate_marine_call(
     module_name: &str,
     cp_settings: CallParametersSettings,
@@ -95,6 +133,34 @@ fn generate_marine_call(
         #convert_result_to_output_type
 
         #ret
+    };
+
+    Ok(function_call)
+}
+
+fn generate_forward_call(
+    module_name: &str,
+    cp_settings: CallParametersSettings,
+    method_signature: &IFunctionSignature,
+) -> TResult<TokenStream> {
+    let mut args = method_signature
+        .arguments
+        .iter()
+        .map(|a| new_ident(a.name.as_str()))
+        .collect::<TResult<Vec<syn::Ident>>>()?;
+
+
+    let method_name = if let CallParametersSettings::UserDefined = cp_settings {
+        args.push(new_ident("cp")?);
+        new_ident(format!("{}_cp", method_signature.name.as_str()).as_str())?
+    } else {
+        new_ident(method_signature.name.as_str())?
+    };
+
+    let module_name = new_ident(module_name)?;
+
+    let function_call = quote! {
+        self.modules.#module_name.#method_name(#(#args,)*)
     };
 
     Ok(function_call)
