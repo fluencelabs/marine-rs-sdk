@@ -33,7 +33,20 @@ where
     let marine_item = stream_from_file(&marine_path);
     let test_token_stream = quote::quote! { #marine_item };
     let buf = marine_path.as_ref().to_path_buf();
-    let attrs = quote::quote! {config_path = #config_path, modules_dir = #modules_dir};
+    let attrs = quote::quote! {
+        config_path = #config_path,
+        modules_dir = #modules_dir,
+        services(
+            service1(
+                config_path = #config_path,
+                modules_dir = #modules_dir,
+            ),
+            service2(
+                config_path = #config_path,
+                modules_dir = #modules_dir,
+            )
+        ),
+    };
     let marine_token_streams = marine_test_impl(
         attrs,
         test_token_stream,
