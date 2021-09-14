@@ -22,7 +22,7 @@ doctest = false
 marine-macro = { path = "../marine-macro", version = "=0.6.11" }
 
 log = { version = "0.4.8", features = ["std"] }
-serde = "=1.0.118"
+serde = "1.0.118"
 
 [dev-dependencies]
 simple_logger = "1.6.0" # used in doc test
