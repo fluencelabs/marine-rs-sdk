@@ -1,6 +1,6 @@
 [package]
 name = "marine-macro"
-version = "0.6.11"  # remember to update html_root_url
+version = "0.6.12"  # remember to update html_root_url
 edition = "2018"
 description = "Definition of the `#[marine]` macro"
 documentation = "https://docs.rs/fluence/marine-macro"
@@ -18,4 +18,4 @@ proc-macro = true
 doctest = false
 
 [dependencies]
-marine-macro-impl = { path = "../marine-macro-impl", version = "=0.6.11" }
+marine-macro-impl = { path = "../marine-macro-impl", version = "=0.6.12" }
