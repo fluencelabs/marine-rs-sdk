@@ -1,6 +1,6 @@
 [package]
 name = "marine-rs-sdk-main"
-version = "0.6.11"  # remember to update html_root_url
+version = "0.6.12"  # remember to update html_root_url
 edition = "2018"
 description = "Contains logger, allocators and several other modules for marine-rs-sdk"
 documentation = "https://docs.rs/marine-rs-sdk-main"
@@ -19,10 +19,10 @@ crate-type = ["rlib"]
 doctest = false
 
 [dependencies]
-marine-macro = { path = "../marine-macro", version = "=0.6.11" }
+marine-macro = { path = "../marine-macro", version = "=0.6.12" }
 
 log = { version = "0.4.8", features = ["std"] }
-serde = "=1.0.118"
+serde = "1.0.118"
 
 [dev-dependencies]
 simple_logger = "1.6.0" # used in doc test

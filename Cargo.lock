@@ -407,7 +407,7 @@ dependencies = [
  "itertools 0.9.0",
  "log",
  "marine-module-interface",
- "marine-rs-sdk 0.6.11 (registry+https://github.com/rust-lang/crates.io-index)",
+ "marine-rs-sdk 0.6.11",
  "marine-rs-sdk-main 0.6.10",
  "marine-runtime",
  "marine-utils",
@@ -756,9 +756,9 @@ dependencies = [
 
 [[package]]
 name = "marine-macro"
-version = "0.6.11"
+version = "0.6.12"
 dependencies = [
- "marine-macro-impl 0.6.11",
+ "marine-macro-impl 0.6.12",
 ]
 
 [[package]]
@@ -777,7 +777,7 @@ dependencies = [
 
 [[package]]
 name = "marine-macro-impl"
-version = "0.6.11"
+version = "0.6.12"
 dependencies = [
  "marine-macro-testing-utils",
  "pretty_assertions",
@@ -835,17 +835,6 @@ dependencies = [
 [[package]]
 name = "marine-rs-sdk"
 version = "0.6.11"
-dependencies = [
- "marine-macro 0.6.11",
- "marine-rs-sdk-main 0.6.11",
- "marine-timestamp-macro 0.6.11",
- "serde",
- "trybuild",
-]
-
-[[package]]
-name = "marine-rs-sdk"
-version = "0.6.11"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "9157bae63a4bbdd7a29984f6ded08f8ed72991b83ca3bdd59d2f889fa8b8ea02"
 dependencies = [
@@ -853,6 +842,17 @@ dependencies = [
  "marine-rs-sdk-main 0.6.10",
  "marine-timestamp-macro 0.6.10",
  "serde",
+]
+
+[[package]]
+name = "marine-rs-sdk"
+version = "0.6.12"
+dependencies = [
+ "marine-macro 0.6.12",
+ "marine-rs-sdk-main 0.6.12",
+ "marine-timestamp-macro 0.6.12",
+ "serde",
+ "trybuild",
 ]
 
 [[package]]
@@ -868,11 +868,11 @@ dependencies = [
 
 [[package]]
 name = "marine-rs-sdk-main"
-version = "0.6.11"
+version = "0.6.12"
 dependencies = [
  "lazy_static",
  "log",
- "marine-macro 0.6.11",
+ "marine-macro 0.6.12",
  "serde",
  "simple_logger",
 ]
@@ -959,7 +959,7 @@ dependencies = [
 
 [[package]]
 name = "marine-timestamp-macro"
-version = "0.6.11"
+version = "0.6.12"
 dependencies = [
  "chrono",
  "quote",
