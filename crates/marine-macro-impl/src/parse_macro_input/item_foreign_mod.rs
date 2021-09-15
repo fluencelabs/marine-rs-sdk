@@ -39,7 +39,6 @@ impl ParseMacroInput for syn::ItemForeignMod {
         let extern_mod_item = ast_types::AstExternMod {
             namespace,
             imports,
-            original: self,
         };
         Ok(MarineAst::ExternMod(extern_mod_item))
     }

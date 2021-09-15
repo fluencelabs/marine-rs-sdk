@@ -68,10 +68,9 @@ pub(crate) struct AstExternFn {
 
 #[derive(Clone)]
 pub(crate) struct AstExternMod {
-    pub namespace: String,
+    pub(crate) namespace: String,
     // only imports are possible here
-    pub imports: Vec<AstExternFn>,
-    pub original: syn::ItemForeignMod,
+    pub(crate) imports: Vec<AstExternFn>,
 }
 
 #[derive(Clone)]
