@@ -18,25 +18,25 @@ use crate::parsed_type::ParsedType;
 
 #[derive(Clone)]
 pub(crate) struct AstFnArgument {
-    pub name: String,
-    pub ty: ParsedType,
+    pub(crate) name: String,
+    pub(crate) ty: ParsedType,
 }
 
 #[derive(Clone)]
 pub(crate) struct AstFnSignature {
-    pub visibility: syn::Visibility,
-    pub name: String,
-    pub arguments: Vec<AstFnArgument>,
+    pub(crate) visibility: syn::Visibility,
+    pub(crate) name: String,
+    pub(crate) arguments: Vec<AstFnArgument>,
     // only one or zero return values are supported now,
     // waiting for adding multi-value support in Wasmer
-    pub output_type: Option<ParsedType>,
+    pub(crate) output_type: Option<ParsedType>,
 }
 
 #[derive(Clone)]
 pub(crate) struct AstRecord {
-    pub name: String,
-    pub fields: AstRecordFields,
-    pub original: syn::ItemStruct,
+    pub(crate) name: String,
+    pub(crate) fields: AstRecordFields,
+    pub(crate) original: syn::ItemStruct,
 }
 
 #[derive(Debug, Clone, PartialEq)]
@@ -55,15 +55,15 @@ pub(crate) enum AstRecordFields {
 #[derive(Debug, Clone, PartialEq)]
 pub(crate) struct AstRecordField {
     /// Name of the field. Can be `None` for tuples.
-    pub name: Option<String>,
-    pub ty: ParsedType,
+    pub(crate) name: Option<String>,
+    pub(crate) ty: ParsedType,
 }
 
 #[derive(Clone)]
 pub(crate) struct AstExternFn {
-    pub link_name: Option<String>,
+    pub(crate) link_name: Option<String>,
     // only imports are possible here
-    pub signature: AstFnSignature,
+    pub(crate) signature: AstFnSignature,
 }
 
 #[derive(Clone)]
@@ -75,8 +75,8 @@ pub(crate) struct AstExternMod {
 
 #[derive(Clone)]
 pub(crate) struct AstFn {
-    pub signature: AstFnSignature,
-    pub original: syn::ItemFn,
+    pub(crate) signature: AstFnSignature,
+    pub(crate) original: syn::ItemFn,
 }
 
 #[derive(Clone)]
