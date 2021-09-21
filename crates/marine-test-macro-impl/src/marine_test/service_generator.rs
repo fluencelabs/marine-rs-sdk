@@ -35,8 +35,7 @@ pub(crate) fn generate_services_definitions(
     services
         .iter()
         .map(|service| -> TResult<TokenStream> {
-            //let service_mod = new_ident(service.name.as_ref().unwrap())?;
-            let service_mod = new_ident("test")?;
+            let service_mod = new_ident(&service.name)?;
             let service_definition = generate_service_definition(service, file_path)?;
             let glue_code = quote! {
                 pub mod #service_mod {

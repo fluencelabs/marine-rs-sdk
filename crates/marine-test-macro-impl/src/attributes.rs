@@ -15,7 +15,7 @@
  */
 
 use darling::FromMeta;
-use syn::NestedMeta;
+use std::collections::HashMap;
 
 /// Describes attributes of `marine_test` macro.
 #[derive(Debug, Default, Clone, FromMeta)]
@@ -27,13 +27,27 @@ pub(crate) struct MTestAttributes {
     #[darling(default)]
     pub(crate) modules_dir: Option<String>,
 
-    #[darling(default)]
-    pub(crate) services: Option<Services>,
+    #[darling(map = "process_services", default)]
+    pub(crate) services: Option<Vec<ServiceDescription>>,
 }
 
-#[derive(Debug, Default, Clone)]
-pub(crate) struct Services {
-    pub(crate) services: Vec<ServiceDescription>,
+fn process_services(
+    services: Option<HashMap<syn::Path, ServiceDescription>>,
+) -> Option<Vec<ServiceDescription>> {
+    services.map(|services| {
+        services
+            .into_iter()
+            .map(|(path, service_desc)| {
+                //TODO check if unwrap is safe
+                let name = path.segments.last().unwrap().ident.to_string();
+                ServiceDescription {
+                    modules_dir: service_desc.modules_dir,
+                    config_path: service_desc.config_path,
+                    name,
+                }
+            })
+            .collect()
+    })
 }
 
 #[derive(Debug, Default, Clone, FromMeta)]
@@ -45,20 +59,6 @@ pub(crate) struct ServiceDescription {
     #[darling(default)]
     pub(crate) modules_dir: Option<String>,
 
-    #[darling(default)]
-    pub(crate) name: Option<String>,
-}
-
-impl FromMeta for Services {
-    fn from_list(items: &[NestedMeta]) -> darling::Result<Self> {
-        let services = items
-            .iter()
-            .map(|item| match item {
-                NestedMeta::Meta(meta) => ServiceDescription::from_meta(meta),
-                _ => Err(darling::Error::custom("Expected array dfgh").with_span(item)),
-            })
-            .collect::<darling::Result<Vec<ServiceDescription>>>()?;
-
-        Ok(Services { services })
-    }
+    #[darling(skip)]
+    pub(crate) name: String,
 }

@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-use crate::attributes::{MTestAttributes, Services};
+use crate::attributes::{MTestAttributes, ServiceDescription};
 use crate::TResult;
 use crate::TestGeneratorError;
 use crate::marine_test;
@@ -117,7 +117,9 @@ pub(super) fn generate_test_glue_code(
     file_path: PathBuf,
 ) -> TResult<TokenStream> {
     match attrs.services {
-        Some(services) => generate_test_glue_code_services(func_item, services, file_path),
+        Some(services) => {
+            generate_test_glue_code_services(func_item, services, file_path)
+        },
         None => generate_test_glue_code_modules(
             func_item,
             attrs.modules_dir,
@@ -181,10 +183,10 @@ fn generate_test_glue_code_modules(
 
 fn generate_test_glue_code_services(
     func_item: syn::ItemFn,
-    services: Services,
+    services: Vec<ServiceDescription>,
     file_path: PathBuf,
 ) -> TResult<TokenStream> {
-    let service_definitions = marine_test::service_generator::generate_services_definitions(&services.services, &file_path)?;
+    let service_definitions = marine_test::service_generator::generate_services_definitions(&services, &file_path)?;
 
     let original_block = func_item.block;
     let signature = func_item.sig;
