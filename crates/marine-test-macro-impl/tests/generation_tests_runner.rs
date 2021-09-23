@@ -17,6 +17,8 @@
 mod utils;
 
 use utils::test_marine_test_token_streams;
+use utils::TestServiceDescription;
+use utils::test_marine_test_token_streams_multiservice;
 
 #[test]
 fn test_empty_func() {
@@ -47,3 +49,42 @@ fn test_multiple_modules() {
         "artifacts"
     ));
 }
+
+#[test]
+fn test_multiservice_single() {
+    let descriptions = vec![
+        TestServiceDescription {
+            modules_dir: "empty_func/artifacts",
+            config_path: "empty_func/Config.toml",
+            name: "empty_func",
+        }
+    ];
+    assert!(test_marine_test_token_streams_multiservice(
+        "tests/generation_tests/multi-service-single/marine_test.rs",
+        "tests/generation_tests/multi-service-single/expanded.rs",
+        descriptions
+    ));
+}
+
+#[test]
+fn test_multiservice_multiple() {
+    let descriptions = vec![
+        TestServiceDescription {
+            modules_dir: "empty_func/artifacts",
+            config_path: "empty_func/Config.toml",
+            name: "empty_func",
+        },
+
+        TestServiceDescription {
+            modules_dir: "mounted_binary/artifacts",
+            config_path: "mounted_binary/Config.toml",
+            name: "mounted_binary",
+        }
+    ];
+    assert!(test_marine_test_token_streams_multiservice(
+        "tests/generation_tests/multi-service-multiple/marine_test.rs",
+        "tests/generation_tests/multi-service-multiple/expanded.rs",
+        descriptions
+    ));
+}
+

@@ -25,6 +25,7 @@ use quote::quote;
 
 use std::path::Path;
 use std::path::PathBuf;
+use itertools::Itertools;
 
 pub(crate) fn generate_services_definitions(
     services: Vec<ServiceDescription>,
@@ -32,6 +33,7 @@ pub(crate) fn generate_services_definitions(
 ) -> TResult<Vec<TokenStream>> {
     services
         .into_iter()
+        .sorted_by(|lhs, rhs| lhs.name.cmp(&rhs.name))
         .map(|service| -> TResult<TokenStream> {
             let service = ProcessedService::new(service, file_path)?;
             let service_mod = new_ident(&service.name)?;
@@ -114,6 +116,7 @@ fn generate_facade_structs(
         .interface
         .record_types
         .iter()
+        .sorted_by_key(|(_, record)| {&record.name})
         .map(|(_, record)| -> TResult<TokenStream> {
             let record_name = new_ident(&record.name)?;
             let result = quote! {pub use modules::#module_name::#record_name;};
