@@ -15,17 +15,17 @@
  */
 
 use crate::attributes::{MTestAttributes, ServiceDescription};
-use crate::TResult;
-use crate::TestGeneratorError;
 use crate::marine_test;
+use crate::marine_test::{config_utils, token_stream_generator};
+use crate::TestGeneratorError;
+use crate::TResult;
+
+use std::path::PathBuf;
 
 use proc_macro2::TokenStream;
 use quote::quote;
 use quote::ToTokens;
-
-use std::path::PathBuf;
 use syn::FnArg;
-use crate::marine_test::config_utils;
 
 /// Generates glue code for tests.
 /// F.e. for this test for the greeting service
@@ -137,7 +137,7 @@ fn generate_test_glue_code_modules(
     let module_interfaces = config_wrapper.collect_modules(&file_path)?;
     let linked_modules = marine_test::modules_linker::link_modules(&module_interfaces)?;
 
-    let module_definitions = marine_test::module_generator::generate_module_definitions(
+    let module_definitions = token_stream_generator::generate_module_definitions(
         module_interfaces.iter(),
         &linked_modules,
     )?;
@@ -148,7 +148,7 @@ fn generate_test_glue_code_modules(
     let inputs = &signature.inputs;
     let arg_names = generate_arg_names(inputs.iter())?;
     let module_ctors = generate_module_ctors(inputs.iter())?;
-    let app_service_ctor = marine_test::service_generator::generate_app_service_ctor(
+    let app_service_ctor = token_stream_generator::service_generator::generate_app_service_ctor(
         &config_path,
         &config_wrapper.modules_dir,
     )?;
@@ -184,7 +184,7 @@ fn generate_test_glue_code_services(
     file_path: PathBuf,
 ) -> TResult<TokenStream> {
     let service_definitions =
-        marine_test::service_generator::generate_services_definitions(services, &file_path)?;
+        token_stream_generator::service_generator::generate_services_definitions(services, &file_path)?;
 
     let original_block = func_item.block;
     let signature = func_item.sig;

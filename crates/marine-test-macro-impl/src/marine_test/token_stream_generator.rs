@@ -17,11 +17,12 @@
 mod methods_generator;
 mod methods_generator_utils;
 mod record_type_generator;
+pub mod service_generator;
 
-use crate::marine_test::utils;
 use crate::marine_test::config_utils::Module;
+use crate::marine_test::modules_linker::{LinkedModule, LinkedModules};
+use crate::marine_test::utils;
 use crate::TResult;
-use crate::marine_test::modules_linker::{LinkedModules, LinkedModule};
 
 use proc_macro2::TokenStream;
 use quote::quote;
@@ -64,8 +65,6 @@ pub(super) fn generate_module_definitions<'i>(
         .map(|value| generate_module_definition(value, linked_modules.get(&value.name).unwrap())) // linked_modules are built from modules
         .collect::<TResult<Vec<_>>>()
 }
-
-pub(super) use methods_generator::generate_facade_methods;
 
 fn generate_module_definition(
     module: &Module<'_>,

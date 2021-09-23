@@ -14,12 +14,11 @@
  * limitations under the License.
  */
 
+pub use marine_test_impl::marine_test_impl;
+
 mod config_utils;
 mod marine_test_impl;
 mod glue_code_generator;
-mod module_generator;
+mod token_stream_generator;
 mod utils;
 mod modules_linker;
-mod service_generator;
-
-pub use marine_test_impl::marine_test_impl;

@@ -21,6 +21,7 @@ use marine_it_parser::module_it_interface;
 use marine_it_parser::it_interface::IModuleInterface;
 
 use std::path::PathBuf;
+use crate::attributes::ServiceDescription;
 
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub(super) struct Module<'m> {
@@ -43,6 +44,25 @@ impl ConfigWrapper {
     pub(super) fn collect_modules(&self, file_path: &PathBuf) -> TResult<Vec<Module<'_>>> {
         let modules_dir = file_path.join(&self.modules_dir);
         collect_modules(&self.config, &modules_dir)
+    }
+}
+
+pub(crate) struct ProcessedService {
+    pub(crate) config: ConfigWrapper,
+    pub(crate) config_path: String,
+    pub(crate) name: String,
+}
+
+impl ProcessedService {
+    pub(crate) fn new(service: ServiceDescription, file_path: &PathBuf) -> TResult<Self> {
+        let config_wrapper =
+            load_config(&service.config_path, service.modules_dir, &file_path)?;
+
+        Ok(Self {
+            config: config_wrapper,
+            config_path: service.config_path,
+            name: service.name,
+        })
     }
 }
 

@@ -16,59 +16,34 @@
 use crate::attributes::{ServiceDescription};
 use crate::TResult;
 use crate::TestGeneratorError;
-use crate::marine_test;
-use crate::marine_test::config_utils;
+use crate::marine_test::config_utils::{Module, ProcessedService};
+use crate::marine_test::utils::new_ident;
+use crate::marine_test::modules_linker;
 
 use proc_macro2::TokenStream;
 use quote::quote;
 
 use std::path::Path;
 use std::path::PathBuf;
-use crate::marine_test::config_utils::{Module, ConfigWrapper};
-use crate::marine_test::utils::new_ident;
 
 pub(crate) fn generate_services_definitions(
     services: Vec<ServiceDescription>,
     file_path: &PathBuf,
 ) -> TResult<Vec<TokenStream>> {
-    let processed_services = services
+    services
         .into_iter()
-        .map(|service| -> TResult<ProcessedService> { ProcessedService::new(service, file_path) })
-        .collect::<TResult<Vec<ProcessedService>>>()?;
-
-    processed_services
-        .iter()
         .map(|service| -> TResult<TokenStream> {
+            let service = ProcessedService::new(service, file_path)?;
             let service_mod = new_ident(&service.name)?;
-            let service_definition = generate_service_definition(service, file_path)?;
+            let service_definition = generate_service_definition(&service, file_path)?;
             let glue_code = quote! {
                 pub mod #service_mod {
                     #service_definition
                 }
             };
-
             Ok(glue_code)
         })
         .collect::<TResult<Vec<TokenStream>>>()
-}
-
-struct ProcessedService {
-    config: ConfigWrapper,
-    config_path: String,
-    name: String,
-}
-
-impl ProcessedService {
-    pub fn new(service: ServiceDescription, file_path: &PathBuf) -> TResult<Self> {
-        let config_wrapper =
-            config_utils::load_config(&service.config_path, service.modules_dir, &file_path)?;
-
-        Ok(Self {
-            config: config_wrapper,
-            config_path: service.config_path,
-            name: service.name,
-        })
-    }
 }
 
 fn generate_service_definition(
@@ -76,9 +51,9 @@ fn generate_service_definition(
     file_path: &PathBuf,
 ) -> TResult<TokenStream> {
     let modules = service.config.collect_modules(file_path)?;
-    let linked_modules = marine_test::modules_linker::link_modules(&modules)?;
+    let linked_modules = modules_linker::link_modules(&modules)?;
 
-    let module_definitions = marine_test::module_generator::generate_module_definitions(
+    let module_definitions = super::generate_module_definitions(
         modules.iter(),
         &linked_modules,
     )?;
@@ -89,7 +64,7 @@ fn generate_service_definition(
     };
 
     let facade_name = new_ident(&facade.name)?;
-    let facade_interface = marine_test::module_generator::generate_facade_methods(
+    let facade_interface = super::methods_generator::generate_facade_methods(
         &facade.name,
         facade.interface.function_signatures.iter(),
         &facade.interface.record_types,
