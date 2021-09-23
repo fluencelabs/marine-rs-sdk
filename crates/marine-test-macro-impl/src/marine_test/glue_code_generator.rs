@@ -25,6 +25,7 @@ use quote::ToTokens;
 
 use std::path::PathBuf;
 use syn::FnArg;
+use crate::marine_test::config_utils;
 
 /// Generates glue code for tests.
 /// F.e. for this test for the greeting service
@@ -132,8 +133,7 @@ fn generate_test_glue_code_modules(
     config_path: String,
     file_path: PathBuf,
 ) -> TResult<TokenStream> {
-    let config_wrapper =
-        marine_test::service_generator::load_config(&config_path, module_dir, &file_path)?;
+    let config_wrapper = config_utils::load_config(&config_path, module_dir, &file_path)?;
     let module_interfaces = config_wrapper.collect_modules(&file_path)?;
     let linked_modules = marine_test::modules_linker::link_modules(&module_interfaces)?;
 

@@ -19,13 +19,12 @@ use crate::TestGeneratorError;
 use crate::marine_test;
 use crate::marine_test::config_utils;
 
-use fluence_app_service::TomlAppServiceConfig;
 use proc_macro2::TokenStream;
 use quote::quote;
 
 use std::path::Path;
 use std::path::PathBuf;
-use crate::marine_test::config_utils::Module;
+use crate::marine_test::config_utils::{Module, ConfigWrapper};
 use crate::marine_test::utils::new_ident;
 
 pub(crate) fn generate_services_definitions(
@@ -41,7 +40,7 @@ pub(crate) fn generate_services_definitions(
         .iter()
         .map(|service| -> TResult<TokenStream> {
             let service_mod = new_ident(&service.name)?;
-            let service_definition = service.generate_definition(file_path)?;
+            let service_definition = generate_service_definition(service, file_path)?;
             let glue_code = quote! {
                 pub mod #service_mod {
                     #service_definition
@@ -61,7 +60,8 @@ struct ProcessedService {
 
 impl ProcessedService {
     pub fn new(service: ServiceDescription, file_path: &PathBuf) -> TResult<Self> {
-        let config_wrapper = load_config(&service.config_path, service.modules_dir, &file_path)?;
+        let config_wrapper =
+            config_utils::load_config(&service.config_path, service.modules_dir, &file_path)?;
 
         Ok(Self {
             config: config_wrapper,
@@ -69,63 +69,66 @@ impl ProcessedService {
             name: service.name,
         })
     }
+}
 
-    pub fn generate_definition(&self, file_path: &PathBuf) -> TResult<TokenStream> {
-        let modules = self.config.collect_modules(file_path)?;
-        let linked_modules = marine_test::modules_linker::link_modules(&modules)?;
+fn generate_service_definition(
+    service: &ProcessedService,
+    file_path: &PathBuf,
+) -> TResult<TokenStream> {
+    let modules = service.config.collect_modules(file_path)?;
+    let linked_modules = marine_test::modules_linker::link_modules(&modules)?;
 
-        let module_definitions = marine_test::module_generator::generate_module_definitions(
-            modules.iter(),
-            &linked_modules,
-        )?;
+    let module_definitions = marine_test::module_generator::generate_module_definitions(
+        modules.iter(),
+        &linked_modules,
+    )?;
 
-        let facade = match modules.last() {
-            Some(module) => module,
-            None => return Err(TestGeneratorError::ZeroModules),
-        };
+    let facade = match modules.last() {
+        Some(module) => module,
+        None => return Err(TestGeneratorError::ZeroModules),
+    };
 
-        let facade_name = new_ident(&facade.name)?;
-        let facade_interface = marine_test::module_generator::generate_facade_methods(
-            &facade.name,
-            facade.interface.function_signatures.iter(),
-            &facade.interface.record_types,
-        )?;
-        let facade_structs = generate_facade_structs(facade, &facade_name)?;
+    let facade_name = new_ident(&facade.name)?;
+    let facade_interface = marine_test::module_generator::generate_facade_methods(
+        &facade.name,
+        facade.interface.function_signatures.iter(),
+        &facade.interface.record_types,
+    )?;
+    let facade_structs = generate_facade_structs(facade, &facade_name)?;
 
-        let app_service_ctor =
-            generate_app_service_ctor(&self.config_path, &self.config.modules_dir)?;
-        let modules_type = generate_modules_type(&modules)?;
+    let app_service_ctor =
+        generate_app_service_ctor(&service.config_path, &service.config.modules_dir)?;
+    let modules_type = generate_modules_type(&modules)?;
 
-        let service_definition = quote! {
-            pub mod modules {
-                #(#module_definitions)*
-            }
+    let service_definition = quote! {
+        pub mod modules {
+            #(#module_definitions)*
+        }
 
-            #(#facade_structs)*
+        #(#facade_structs)*
 
-            #modules_type
+        #modules_type
 
-            pub struct ServiceInterface {
-                pub modules: __GeneratedModules,
-                marine: std::rc::Rc<std::cell::RefCell<marine_rs_sdk_test::internal::AppService>, >
-            }
+        pub struct ServiceInterface {
+            pub modules: __GeneratedModules,
+            marine: std::rc::Rc<std::cell::RefCell<marine_rs_sdk_test::internal::AppService>, >
+        }
 
-            impl ServiceInterface {
-                pub fn new() -> Self {
-                    #app_service_ctor
-                    let modules = __GeneratedModules::new(marine.clone());
-                    Self {
-                        marine,
-                        modules
-                    }
+        impl ServiceInterface {
+            pub fn new() -> Self {
+                #app_service_ctor
+                let modules = __GeneratedModules::new(marine.clone());
+                Self {
+                    marine,
+                    modules
                 }
-
-                #(#facade_interface)*
             }
-        };
 
-        Ok(service_definition)
-    }
+            #(#facade_interface)*
+        }
+    };
+
+    Ok(service_definition)
 }
 
 fn generate_facade_structs(
@@ -237,35 +240,4 @@ fn generate_modules_type(module_interfaces: &[Module<'_>]) -> TResult<TokenStrea
     };
 
     Ok(ty)
-}
-
-pub(crate) fn load_config(
-    config_path: &str,
-    modules_dir: Option<String>,
-    file_path: &PathBuf,
-) -> TResult<ConfigWrapper> {
-    let config_path_buf = file_path.join(&config_path);
-
-    let marine_config = TomlAppServiceConfig::load(&config_path_buf)?;
-    let modules_dir = match config_utils::resolve_modules_dir(&marine_config, modules_dir) {
-        Some(modules_dir) => modules_dir,
-        None => return Err(TestGeneratorError::ModulesDirUnspecified),
-    };
-
-    Ok(ConfigWrapper {
-        config: marine_config,
-        modules_dir,
-    })
-}
-
-pub(crate) struct ConfigWrapper {
-    pub config: TomlAppServiceConfig,
-    pub modules_dir: PathBuf,
-}
-
-impl ConfigWrapper {
-    pub(super) fn collect_modules(&self, file_path: &PathBuf) -> TResult<Vec<Module<'_>>> {
-        let modules_dir = file_path.join(&self.modules_dir);
-        marine_test::config_utils::collect_modules(&self.config, &modules_dir)
-    }
 }

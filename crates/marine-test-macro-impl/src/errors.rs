@@ -58,7 +58,7 @@ pub enum TestGeneratorError {
     DuplicateModuleName(String),
 
     #[error("No modules loaded")]
-    ZeroModules
+    ZeroModules,
 }
 
 #[derive(Debug, ThisError)]

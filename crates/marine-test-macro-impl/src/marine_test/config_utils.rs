@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-use crate::TResult;
+use crate::{TResult, TestGeneratorError};
 
 use fluence_app_service::TomlAppServiceConfig;
 use marine_it_parser::module_it_interface;
@@ -32,6 +32,37 @@ impl<'m> Module<'m> {
     fn new(name: &'m str, interface: IModuleInterface) -> Self {
         Self { name, interface }
     }
+}
+
+pub(crate) struct ConfigWrapper {
+    pub config: TomlAppServiceConfig,
+    pub modules_dir: PathBuf,
+}
+
+impl ConfigWrapper {
+    pub(super) fn collect_modules(&self, file_path: &PathBuf) -> TResult<Vec<Module<'_>>> {
+        let modules_dir = file_path.join(&self.modules_dir);
+        collect_modules(&self.config, &modules_dir)
+    }
+}
+
+pub(crate) fn load_config(
+    config_path: &str,
+    modules_dir: Option<String>,
+    file_path: &PathBuf,
+) -> TResult<ConfigWrapper> {
+    let config_path_buf = file_path.join(&config_path);
+
+    let marine_config = TomlAppServiceConfig::load(&config_path_buf)?;
+    let modules_dir = match resolve_modules_dir(&marine_config, modules_dir) {
+        Some(modules_dir) => modules_dir,
+        None => return Err(TestGeneratorError::ModulesDirUnspecified),
+    };
+
+    Ok(ConfigWrapper {
+        config: marine_config,
+        modules_dir,
+    })
 }
 
 /// Returns all modules the provided config consists of.
