@@ -149,7 +149,6 @@ fn generate_forward_call(
         .map(|a| new_ident(a.name.as_str()))
         .collect::<TResult<Vec<syn::Ident>>>()?;
 
-
     let method_name = if let CallParametersSettings::UserDefined = cp_settings {
         args.push(new_ident("cp")?);
         new_ident(format!("{}_cp", method_signature.name.as_str()).as_str())?

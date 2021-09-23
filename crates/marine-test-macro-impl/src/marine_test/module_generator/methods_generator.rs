@@ -60,7 +60,8 @@ pub fn generate_facade_methods<'m, 'r>(
         .try_fold::<_, _, TResult<_>>(
             Vec::with_capacity(methods_count),
             |mut methods, signature| {
-                let default_cp = generate_module_method_forward(module_name, &signature, Default, records)?;
+                let default_cp =
+                    generate_module_method_forward(module_name, &signature, Default, records)?;
                 let user_cp =
                     generate_module_method_forward(module_name, &signature, UserDefined, records)?;
 

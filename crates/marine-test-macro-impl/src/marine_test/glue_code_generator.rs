@@ -18,7 +18,6 @@ use crate::attributes::{MTestAttributes, ServiceDescription};
 use crate::TResult;
 use crate::TestGeneratorError;
 use crate::marine_test;
-use crate::marine_test::config_utils;
 
 use proc_macro2::TokenStream;
 use quote::quote;
@@ -117,9 +116,7 @@ pub(super) fn generate_test_glue_code(
     file_path: PathBuf,
 ) -> TResult<TokenStream> {
     match attrs.services {
-        Some(services) => {
-            generate_test_glue_code_services(func_item, services, file_path)
-        },
+        Some(services) => generate_test_glue_code_services(func_item, services, file_path),
         None => generate_test_glue_code_modules(
             func_item,
             attrs.modules_dir,
@@ -135,13 +132,10 @@ fn generate_test_glue_code_modules(
     config_path: String,
     file_path: PathBuf,
 ) -> TResult<TokenStream> {
-    let config_wrapper = marine_test::service_generator::load_config(&config_path, module_dir.clone(), &file_path)?;
-    let module_interfaces = config_wrapper.collect_modules()?;
+    let config_wrapper =
+        marine_test::service_generator::load_config(&config_path, module_dir, &file_path)?;
+    let module_interfaces = config_wrapper.collect_modules(&file_path)?;
     let linked_modules = marine_test::modules_linker::link_modules(&module_interfaces)?;
-    let modules_dir = match config_utils::resolve_modules_dir(&config_wrapper.config, module_dir) {
-        Some(modules_dir) => modules_dir,
-        None => return Err(TestGeneratorError::ModulesDirUnspecified),
-    };
 
     let module_definitions = marine_test::module_generator::generate_module_definitions(
         module_interfaces.iter(),
@@ -154,7 +148,10 @@ fn generate_test_glue_code_modules(
     let inputs = &signature.inputs;
     let arg_names = generate_arg_names(inputs.iter())?;
     let module_ctors = generate_module_ctors(inputs.iter())?;
-    let app_service_ctor = marine_test::service_generator::generate_app_service_ctor(&config_path, &modules_dir)?;
+    let app_service_ctor = marine_test::service_generator::generate_app_service_ctor(
+        &config_path,
+        &config_wrapper.modules_dir,
+    )?;
     let glue_code = quote! {
         #[test]
         fn #name() {
@@ -186,7 +183,8 @@ fn generate_test_glue_code_services(
     services: Vec<ServiceDescription>,
     file_path: PathBuf,
 ) -> TResult<TokenStream> {
-    let service_definitions = marine_test::service_generator::generate_services_definitions(&services, &file_path)?;
+    let service_definitions =
+        marine_test::service_generator::generate_services_definitions(services, &file_path)?;
 
     let original_block = func_item.block;
     let signature = func_item.sig;
