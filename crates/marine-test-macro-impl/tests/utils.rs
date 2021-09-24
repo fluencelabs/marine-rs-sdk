@@ -78,10 +78,7 @@ pub fn test_marine_test_token_streams_multiservice<FP, EP>(
     }).collect::<Result<Vec<_>, syn::Error>>().unwrap_or_else(|e| panic!("failed to parse test arguments due to {}", e));
 
     let attrs = quote::quote! {
-        config_path = "UNUSED",
-        services(
             #(#service_declarations,)*
-        ),
     };
 
     let marine_token_streams = marine_test_impl(

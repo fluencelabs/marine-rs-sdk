@@ -116,9 +116,11 @@ pub(super) fn generate_test_glue_code(
     attrs: MTestAttributes,
     file_path: PathBuf,
 ) -> TResult<TokenStream> {
-    match attrs.services {
-        Some(services) => generate_test_glue_code_services(func_item, services, file_path),
-        None => generate_test_glue_code_modules(
+    match attrs {
+        MTestAttributes::Services(services) => {
+            generate_test_glue_code_services(func_item, services, file_path)
+        }
+        MTestAttributes::Modules(attrs) => generate_test_glue_code_modules(
             func_item,
             attrs.modules_dir,
             attrs.config_path,
