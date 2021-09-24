@@ -52,13 +52,11 @@ fn test_multiple_modules() {
 
 #[test]
 fn test_multiservice_single() {
-    let descriptions = vec![
-        TestServiceDescription {
-            modules_dir: "empty_func/artifacts",
-            config_path: "empty_func/Config.toml",
-            name: "empty_func",
-        }
-    ];
+    let descriptions = vec![TestServiceDescription {
+        modules_dir: "empty_func/artifacts",
+        config_path: "empty_func/Config.toml",
+        name: "empty_func",
+    }];
     assert!(test_marine_test_token_streams_multiservice(
         "tests/generation_tests/multi-service-single/marine_test.rs",
         "tests/generation_tests/multi-service-single/expanded.rs",
@@ -74,12 +72,11 @@ fn test_multiservice_multiple() {
             config_path: "empty_func/Config.toml",
             name: "empty_func",
         },
-
         TestServiceDescription {
             modules_dir: "mounted_binary/artifacts",
             config_path: "mounted_binary/Config.toml",
             name: "mounted_binary",
-        }
+        },
     ];
     assert!(test_marine_test_token_streams_multiservice(
         "tests/generation_tests/multi-service-multiple/marine_test.rs",
@@ -87,4 +84,3 @@ fn test_multiservice_multiple() {
         descriptions
     ));
 }
-

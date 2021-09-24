@@ -53,17 +53,17 @@ where
 pub struct TestServiceDescription {
     pub config_path: &'static str,
     pub modules_dir: &'static str,
-    pub name: &'static str
+    pub name: &'static str,
 }
 
 pub fn test_marine_test_token_streams_multiservice<FP, EP>(
     marine_path: FP,
     expanded_path: EP,
-    services: Vec<TestServiceDescription>
+    services: Vec<TestServiceDescription>,
 ) -> bool
-    where
-        FP: AsRef<Path>,
-        EP: AsRef<Path>,
+where
+    FP: AsRef<Path>,
+    EP: AsRef<Path>,
 {
     let marine_item = stream_from_file(&marine_path);
     let test_token_stream = quote::quote! { #marine_item };
@@ -74,8 +74,10 @@ pub fn test_marine_test_token_streams_multiservice<FP, EP>(
             let config_path = desc.config_path;
             let modules_dir = desc.modules_dir;
             let name = syn::parse_str::<syn::Ident>(desc.name)?;
-            Ok(quote::quote!{#name(config_path = #config_path, modules_dir = #modules_dir)})
-    }).collect::<Result<Vec<_>, syn::Error>>().unwrap_or_else(|e| panic!("failed to parse test arguments due to {}", e));
+            Ok(quote::quote! {#name(config_path = #config_path, modules_dir = #modules_dir)})
+        })
+        .collect::<Result<Vec<_>, syn::Error>>()
+        .unwrap_or_else(|e| panic!("failed to parse test arguments due to {}", e));
 
     let attrs = quote::quote! {
             #(#service_declarations,)*
@@ -86,7 +88,7 @@ pub fn test_marine_test_token_streams_multiservice<FP, EP>(
         test_token_stream,
         buf.parent().unwrap().to_path_buf(),
     )
-        .unwrap_or_else(|e| panic!("failed to apply the marine macro due {}", e));
+    .unwrap_or_else(|e| panic!("failed to apply the marine macro due {}", e));
 
     let expanded_item = items_from_file(&expanded_path);
     let marine_item = to_syn_item(marine_token_streams.clone());

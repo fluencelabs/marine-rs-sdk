@@ -186,7 +186,9 @@ fn generate_test_glue_code_services(
     file_path: PathBuf,
 ) -> TResult<TokenStream> {
     let service_definitions =
-        token_stream_generator::service_generator::generate_services_definitions(services, &file_path)?;
+        token_stream_generator::service_generator::generate_services_definitions(
+            services, &file_path,
+        )?;
 
     let original_block = func_item.block;
     let signature = func_item.sig;

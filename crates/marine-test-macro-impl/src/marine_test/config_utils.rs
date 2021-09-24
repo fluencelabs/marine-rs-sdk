@@ -55,8 +55,7 @@ pub(crate) struct ProcessedService {
 
 impl ProcessedService {
     pub(crate) fn new(service: ServiceDescription, file_path: &PathBuf) -> TResult<Self> {
-        let config_wrapper =
-            load_config(&service.config_path, service.modules_dir, &file_path)?;
+        let config_wrapper = load_config(&service.config_path, service.modules_dir, &file_path)?;
 
         Ok(Self {
             config: config_wrapper,

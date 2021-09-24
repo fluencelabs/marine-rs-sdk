@@ -55,10 +55,7 @@ fn generate_service_definition(
     let modules = service.config.collect_modules(file_path)?;
     let linked_modules = modules_linker::link_modules(&modules)?;
 
-    let module_definitions = super::generate_module_definitions(
-        modules.iter(),
-        &linked_modules,
-    )?;
+    let module_definitions = super::generate_module_definitions(modules.iter(), &linked_modules)?;
 
     let facade = match modules.last() {
         Some(module) => module,
@@ -116,7 +113,7 @@ fn generate_facade_structs(
         .interface
         .record_types
         .iter()
-        .sorted_by_key(|(_, record)| {&record.name})
+        .sorted_by_key(|(_, record)| &record.name)
         .map(|(_, record)| -> TResult<TokenStream> {
             let record_name = new_ident(&record.name)?;
             let result = quote! {pub use modules::#module_name::#record_name;};
