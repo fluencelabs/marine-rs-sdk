@@ -55,9 +55,9 @@ impl FromMeta for MTestAttributes {
             (Ok(modules), Err(_)) => Ok(Self::Modules(modules)),
             (Err(_), Ok(services)) => Ok(Self::Services(process_services(services))),
             (Err(e1), Err(e2)) => Err(darling::error::Error::multiple(vec![e1, e2])),
-            (Ok(_), Ok(_)) => {
-                darling::Error::custom("internal sdk error: marine_test arguments are ambiguous")
-            }
+            (Ok(_), Ok(_)) => Err(darling::Error::custom(
+                "internal sdk error: marine_test arguments are ambiguous",
+            )),
         }
     }
 }
