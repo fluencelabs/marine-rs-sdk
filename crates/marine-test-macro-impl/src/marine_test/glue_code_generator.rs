@@ -114,17 +114,17 @@ use syn::FnArg;
 pub(super) fn generate_test_glue_code(
     func_item: syn::ItemFn,
     attrs: MTestAttributes,
-    file_path: PathBuf,
+    test_file_path: PathBuf,
 ) -> TResult<TokenStream> {
     match attrs {
         MTestAttributes::Services(services) => {
-            generate_test_glue_code_services(func_item, services, file_path)
+            generate_test_glue_code_services(func_item, services, test_file_path)
         }
         MTestAttributes::Modules(attrs) => generate_test_glue_code_modules(
             func_item,
             attrs.modules_dir,
             attrs.config_path,
-            file_path,
+            test_file_path,
         ),
     }
 }
@@ -133,10 +133,10 @@ fn generate_test_glue_code_modules(
     func_item: syn::ItemFn,
     module_dir: Option<String>,
     config_path: String,
-    file_path: PathBuf,
+    test_file_path: PathBuf,
 ) -> TResult<TokenStream> {
-    let config_wrapper = config_utils::load_config(&config_path, module_dir, &file_path)?;
-    let module_interfaces = config_wrapper.collect_modules(&file_path)?;
+    let config_wrapper = config_utils::load_config(&config_path, module_dir, &test_file_path)?;
+    let module_interfaces = config_wrapper.collect_modules(&test_file_path)?;
     let linked_modules = marine_test::modules_linker::link_modules(&module_interfaces)?;
 
     let module_definitions = token_stream_generator::generate_module_definitions(
@@ -183,11 +183,12 @@ fn generate_test_glue_code_modules(
 fn generate_test_glue_code_services(
     func_item: syn::ItemFn,
     services: Vec<ServiceDescription>,
-    file_path: PathBuf,
+    test_file_path: PathBuf,
 ) -> TResult<TokenStream> {
     let service_definitions =
-        token_stream_generator::service_generator::generate_services_definitions(
-            services, &file_path,
+        token_stream_generator::service_generator::generate_service_definitions(
+            services,
+            &test_file_path,
         )?;
 
     let original_block = func_item.block;
@@ -196,7 +197,7 @@ fn generate_test_glue_code_services(
     let glue_code = quote! {
         #[test]
         fn #name() {
-            // definitions for wasm modules specified in config
+            // definitions for services specified in attributes
             pub mod marine_test_env {
               #(#service_definitions)*
             }

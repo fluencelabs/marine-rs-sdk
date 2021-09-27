@@ -41,9 +41,9 @@ pub(crate) struct ConfigWrapper {
 }
 
 impl ConfigWrapper {
-    pub(super) fn collect_modules(&self, file_path: &PathBuf) -> TResult<Vec<Module<'_>>> {
-        let modules_dir = file_path.join(&self.modules_dir);
-        collect_modules(&self.config, &modules_dir)
+    pub(super) fn collect_modules(&self, test_file_path: &PathBuf) -> TResult<Vec<Module<'_>>> {
+        let modules_dir_test_relative = test_file_path.join(&self.modules_dir);
+        collect_modules(&self.config, &modules_dir_test_relative)
     }
 }
 

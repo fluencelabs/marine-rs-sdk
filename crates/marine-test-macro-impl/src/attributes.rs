@@ -54,9 +54,14 @@ impl FromMeta for MTestAttributes {
         match (modules, services) {
             (Ok(modules), Err(_)) => Ok(Self::Modules(modules)),
             (Err(_), Ok(services)) => Ok(Self::Services(process_services(services))),
-            (Err(e1), Err(e2)) => Err(darling::error::Error::multiple(vec![e1, e2])),
+            (Err(error_modules), Err(error_services)) => {
+                Err(darling::error::Error::multiple(vec![
+                    error_modules,
+                    error_services,
+                ]))
+            }
             (Ok(_), Ok(_)) => Err(darling::Error::custom(
-                "internal sdk error: marine_test arguments are ambiguous",
+                "internal sdk error: marine_test attributes are ambiguous",
             )),
         }
     }
@@ -65,12 +70,10 @@ impl FromMeta for MTestAttributes {
 fn process_services(services: HashMap<String, ServiceDescription>) -> Vec<ServiceDescription> {
     services
         .into_iter()
-        .map(|(name, service_desc)| {
-            ServiceDescription {
-                modules_dir: service_desc.modules_dir,
-                config_path: service_desc.config_path,
-                name,
-            }
+        .map(|(name, service_desc)| ServiceDescription {
+            modules_dir: service_desc.modules_dir,
+            config_path: service_desc.config_path,
+            name,
         })
         .collect()
 }

@@ -13,6 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
 use crate::attributes::{ServiceDescription};
 use crate::TResult;
 use crate::TestGeneratorError;
@@ -27,7 +28,7 @@ use std::path::Path;
 use std::path::PathBuf;
 use itertools::Itertools;
 
-pub(crate) fn generate_services_definitions(
+pub(crate) fn generate_service_definitions(
     services: Vec<ServiceDescription>,
     file_path: &PathBuf,
 ) -> TResult<Vec<TokenStream>> {
@@ -59,7 +60,7 @@ fn generate_service_definition(
 
     let facade = match modules.last() {
         Some(module) => module,
-        None => return Err(TestGeneratorError::ZeroModules),
+        None => return Err(TestGeneratorError::NoModulesInService),
     };
 
     let facade_name = new_ident(&facade.name)?;
