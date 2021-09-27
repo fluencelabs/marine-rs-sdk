@@ -50,7 +50,7 @@ pub(crate) struct ServiceDescription {
 impl FromMeta for MTestAttributes {
     fn from_list(items: &[syn::NestedMeta]) -> darling::Result<Self> {
         let modules = ModulesAttributes::from_list(items);
-        let services = HashMap::<syn::Path, ServiceDescription>::from_list(items);
+        let services = HashMap::<String, ServiceDescription>::from_list(items);
         match (modules, services) {
             (Ok(modules), Err(_)) => Ok(Self::Modules(modules)),
             (Err(_), Ok(services)) => Ok(Self::Services(process_services(services))),
@@ -62,12 +62,10 @@ impl FromMeta for MTestAttributes {
     }
 }
 
-fn process_services(services: HashMap<syn::Path, ServiceDescription>) -> Vec<ServiceDescription> {
+fn process_services(services: HashMap<String, ServiceDescription>) -> Vec<ServiceDescription> {
     services
         .into_iter()
-        .map(|(path, service_desc)| {
-            //TODO check if unwrap is safe
-            let name = path.segments.last().unwrap().ident.to_string();
+        .map(|(name, service_desc)| {
             ServiceDescription {
                 modules_dir: service_desc.modules_dir,
                 config_path: service_desc.config_path,
