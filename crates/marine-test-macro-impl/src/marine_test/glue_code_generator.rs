@@ -136,7 +136,9 @@ fn generate_test_glue_code_modules(
     test_file_path: PathBuf,
 ) -> TResult<TokenStream> {
     let config_wrapper = config_utils::load_config(&config_path, module_dir, &test_file_path)?;
-    let module_interfaces = config_wrapper.collect_modules(&test_file_path)?;
+    let modules_dir_test_relative = test_file_path.join(&config_wrapper.resolved_modules_dir);
+    let module_interfaces =
+        config_utils::collect_modules(&config_wrapper.config, &modules_dir_test_relative)?;
     let linked_modules = marine_test::modules_linker::link_modules(&module_interfaces)?;
 
     let module_definitions = token_stream_generator::generate_module_definitions(
@@ -152,7 +154,7 @@ fn generate_test_glue_code_modules(
     let module_ctors = generate_module_ctors(inputs.iter())?;
     let app_service_ctor = token_stream_generator::service_generator::generate_app_service_ctor(
         &config_path,
-        &config_wrapper.modules_dir,
+        &config_wrapper.resolved_modules_dir,
     )?;
     let glue_code = quote! {
         #[test]

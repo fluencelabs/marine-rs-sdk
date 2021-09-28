@@ -19,7 +19,7 @@ use crate::TResult;
 use crate::TestGeneratorError;
 use crate::marine_test::config_utils::{Module, ProcessedService};
 use crate::marine_test::utils::new_ident;
-use crate::marine_test::modules_linker;
+use crate::marine_test::{modules_linker, config_utils};
 
 use proc_macro2::TokenStream;
 use quote::quote;
@@ -51,9 +51,11 @@ pub(crate) fn generate_service_definitions(
 
 fn generate_service_definition(
     service: &ProcessedService,
-    file_path: &PathBuf,
+    test_file_path: &PathBuf,
 ) -> TResult<TokenStream> {
-    let modules = service.config.collect_modules(file_path)?;
+    let modules_dir_test_relative = test_file_path.join(&service.config.resolved_modules_dir);
+    let modules =
+        config_utils::collect_modules(&service.config.config, &modules_dir_test_relative)?;
     let linked_modules = modules_linker::link_modules(&modules)?;
 
     let module_definitions = super::generate_module_definitions(modules.iter(), &linked_modules)?;
@@ -72,7 +74,7 @@ fn generate_service_definition(
     let facade_structs = generate_facade_structs(facade, &facade_name)?;
 
     let app_service_ctor =
-        generate_app_service_ctor(&service.config_path, &service.config.modules_dir)?;
+        generate_app_service_ctor(&service.config_path, &service.config.resolved_modules_dir)?;
     let modules_type = generate_modules_type(&modules)?;
 
     let service_definition = quote! {
