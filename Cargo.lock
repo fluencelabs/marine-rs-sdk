@@ -756,9 +756,9 @@ dependencies = [
 
 [[package]]
 name = "marine-macro"
-version = "0.6.12"
+version = "0.6.13"
 dependencies = [
- "marine-macro-impl 0.6.12",
+ "marine-macro-impl 0.6.13",
 ]
 
 [[package]]
@@ -777,7 +777,7 @@ dependencies = [
 
 [[package]]
 name = "marine-macro-impl"
-version = "0.6.12"
+version = "0.6.13"
 dependencies = [
  "marine-macro-testing-utils",
  "pretty_assertions",
@@ -846,11 +846,11 @@ dependencies = [
 
 [[package]]
 name = "marine-rs-sdk"
-version = "0.6.12"
+version = "0.6.13"
 dependencies = [
- "marine-macro 0.6.12",
- "marine-rs-sdk-main 0.6.12",
- "marine-timestamp-macro 0.6.12",
+ "marine-macro 0.6.13",
+ "marine-rs-sdk-main 0.6.13",
+ "marine-timestamp-macro 0.6.13",
  "serde",
  "trybuild",
 ]
@@ -868,11 +868,11 @@ dependencies = [
 
 [[package]]
 name = "marine-rs-sdk-main"
-version = "0.6.12"
+version = "0.6.13"
 dependencies = [
  "lazy_static",
  "log",
- "marine-macro 0.6.12",
+ "marine-macro 0.6.13",
  "serde",
  "simple_logger",
 ]
@@ -959,7 +959,7 @@ dependencies = [
 
 [[package]]
 name = "marine-timestamp-macro"
-version = "0.6.12"
+version = "0.6.13"
 dependencies = [
  "chrono",
  "quote",
