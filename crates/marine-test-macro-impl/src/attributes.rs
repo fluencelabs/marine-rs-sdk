@@ -40,7 +40,10 @@ impl FromMeta for MTestAttributes {
         let multiple_services = HashMap::<String, ServiceDescription>::from_list(items);
         match (single_service, multiple_services) {
             (Ok(modules), Err(_)) => Ok(Self::SingleService(modules)),
-            (Err(_), Ok(services)) => Ok(Self::MultipleServices(services)),
+            (Err(_), Ok(services)) if !services.is_empty() => Ok(Self::MultipleServices(services)),
+            (Err(_), Ok(_)) => Err(darling::Error::custom(
+                r#"Need to specify "config_path" and "modules_dir" or several named services with these fields "#,
+            )),
             (Err(error_single), Err(error_multiple)) => Err(darling::error::Error::multiple(vec![
                 error_single,
                 error_multiple,
