@@ -26,6 +26,7 @@ use proc_macro2::TokenStream;
 use quote::quote;
 use quote::ToTokens;
 use syn::FnArg;
+use std::collections::HashMap;
 
 /// Generates glue code for tests.
 /// F.e. for this test for the greeting service
@@ -117,25 +118,22 @@ pub(super) fn generate_test_glue_code(
     test_file_path: PathBuf,
 ) -> TResult<TokenStream> {
     match attrs {
-        MTestAttributes::Services(services) => {
-            generate_test_glue_code_services(func_item, services, test_file_path)
+        MTestAttributes::MultipleServices(services) => {
+            generate_test_glue_code_multiple_eservices(func_item, services, test_file_path)
         }
-        MTestAttributes::Modules(attrs) => generate_test_glue_code_modules(
-            func_item,
-            attrs.modules_dir,
-            attrs.config_path,
-            test_file_path,
-        ),
+        MTestAttributes::SingleService(service) => {
+            generate_test_glue_code_single_service(func_item, service, test_file_path)
+        }
     }
 }
 
-fn generate_test_glue_code_modules(
+fn generate_test_glue_code_single_service(
     func_item: syn::ItemFn,
-    module_dir: Option<String>,
-    config_path: String,
+    service: ServiceDescription,
     test_file_path: PathBuf,
 ) -> TResult<TokenStream> {
-    let config_wrapper = config_utils::load_config(&config_path, module_dir, &test_file_path)?;
+    let config_wrapper =
+        config_utils::load_config(&service.config_path, service.modules_dir, &test_file_path)?;
     let modules_dir_test_relative = test_file_path.join(&config_wrapper.resolved_modules_dir);
     let module_interfaces =
         config_utils::collect_modules(&config_wrapper.config, &modules_dir_test_relative)?;
@@ -153,7 +151,7 @@ fn generate_test_glue_code_modules(
     let arg_names = generate_arg_names(inputs.iter())?;
     let module_ctors = generate_module_ctors(inputs.iter())?;
     let app_service_ctor = token_stream_generator::service_generator::generate_app_service_ctor(
-        &config_path,
+        &service.config_path,
         &config_wrapper.resolved_modules_dir,
     )?;
     let glue_code = quote! {
@@ -182,9 +180,9 @@ fn generate_test_glue_code_modules(
     Ok(glue_code)
 }
 
-fn generate_test_glue_code_services(
+fn generate_test_glue_code_multiple_eservices(
     func_item: syn::ItemFn,
-    services: Vec<ServiceDescription>,
+    services: HashMap<String, ServiceDescription>,
     test_file_path: PathBuf,
 ) -> TResult<TokenStream> {
     let service_definitions =

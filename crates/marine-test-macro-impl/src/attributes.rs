@@ -20,18 +20,8 @@ use std::collections::HashMap;
 /// Describes attributes of `marine_test` macro.
 #[derive(Debug, Clone)]
 pub(crate) enum MTestAttributes {
-    Modules(ModulesAttributes),
-    Services(Vec<ServiceDescription>),
-}
-
-#[derive(Debug, Default, Clone, FromMeta)]
-pub(crate) struct ModulesAttributes {
-    /// Path to a config file of a tested service.
-    pub(crate) config_path: String,
-
-    /// Path to compiled modules of a service.
-    #[darling(default)]
-    pub(crate) modules_dir: Option<String>,
+    SingleService(ServiceDescription),
+    MultipleServices(HashMap<String, ServiceDescription>),
 }
 
 #[derive(Debug, Default, Clone, FromMeta)]
@@ -42,38 +32,22 @@ pub(crate) struct ServiceDescription {
     /// Path to compiled modules of a service.
     #[darling(default)]
     pub(crate) modules_dir: Option<String>,
-
-    #[darling(skip)]
-    pub(crate) name: String,
 }
 
 impl FromMeta for MTestAttributes {
     fn from_list(items: &[syn::NestedMeta]) -> darling::Result<Self> {
-        let modules = ModulesAttributes::from_list(items);
-        let services = HashMap::<String, ServiceDescription>::from_list(items);
-        match (modules, services) {
-            (Ok(modules), Err(_)) => Ok(Self::Modules(modules)),
-            (Err(_), Ok(services)) => Ok(Self::Services(process_services(services))),
-            (Err(error_modules), Err(error_services)) => {
-                Err(darling::error::Error::multiple(vec![
-                    error_modules,
-                    error_services,
-                ]))
-            }
+        let single_service = ServiceDescription::from_list(items);
+        let multiple_services = HashMap::<String, ServiceDescription>::from_list(items);
+        match (single_service, multiple_services) {
+            (Ok(modules), Err(_)) => Ok(Self::SingleService(modules)),
+            (Err(_), Ok(services)) => Ok(Self::MultipleServices(services)),
+            (Err(error_single), Err(error_multiple)) => Err(darling::error::Error::multiple(vec![
+                error_single,
+                error_multiple,
+            ])),
             (Ok(_), Ok(_)) => Err(darling::Error::custom(
                 "internal sdk error: marine_test attributes are ambiguous",
             )),
         }
     }
-}
-
-fn process_services(services: HashMap<String, ServiceDescription>) -> Vec<ServiceDescription> {
-    services
-        .into_iter()
-        .map(|(name, service_desc)| ServiceDescription {
-            modules_dir: service_desc.modules_dir,
-            config_path: service_desc.config_path,
-            name,
-        })
-        .collect()
 }

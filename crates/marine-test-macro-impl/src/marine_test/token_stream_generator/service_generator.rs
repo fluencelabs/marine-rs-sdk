@@ -27,16 +27,17 @@ use quote::quote;
 use std::path::Path;
 use std::path::PathBuf;
 use itertools::Itertools;
+use std::collections::HashMap;
 
 pub(crate) fn generate_service_definitions(
-    services: Vec<ServiceDescription>,
+    services: HashMap<String, ServiceDescription>,
     file_path: &PathBuf,
 ) -> TResult<Vec<TokenStream>> {
     services
         .into_iter()
-        .sorted_by(|lhs, rhs| lhs.name.cmp(&rhs.name))
-        .map(|service| -> TResult<TokenStream> {
-            let service = ProcessedService::new(service, file_path)?;
+        .sorted_by(|lhs, rhs| lhs.0.cmp(&rhs.0))
+        .map(|(name, service)| -> TResult<TokenStream> {
+            let service = ProcessedService::new(service, name, file_path)?;
             let service_mod = new_ident(&service.name)?;
             let service_definition = generate_service_definition(&service, file_path)?;
             let glue_code = quote! {
