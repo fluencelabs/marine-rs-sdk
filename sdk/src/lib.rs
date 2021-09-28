@@ -55,7 +55,7 @@
 //!     pub fn curl_get(url: String) -> String;
 //! }
 //! ```
-#![doc(html_root_url = "https://docs.rs/sdk/0.6.12")]
+#![doc(html_root_url = "https://docs.rs/sdk/0.6.13")]
 #![deny(
     dead_code,
     nonstandard_style,
@@ -94,6 +94,7 @@ pub use marine_rs_sdk_main::module_manifest;
 
 /// These API functions are intended for internal usage in generated code.
 /// Normally, you shouldn't use them.
+#[doc(hidden)]
 pub mod internal {
     pub use marine_rs_sdk_main::get_result_ptr;
     pub use marine_rs_sdk_main::get_result_size;
