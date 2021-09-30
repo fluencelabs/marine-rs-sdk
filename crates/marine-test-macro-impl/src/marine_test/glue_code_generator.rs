@@ -137,7 +137,11 @@ fn generate_test_glue_code_single_service(
     let modules_dir_test_relative = test_file_path.join(&config_wrapper.resolved_modules_dir);
     let module_interfaces =
         config_utils::collect_modules(&config_wrapper.config, &modules_dir_test_relative)?;
-    let linked_modules = marine_test::modules_linker::link_modules(&module_interfaces)?;
+    let linked_modules = marine_test::modules_linker::link_modules(
+        module_interfaces
+            .iter()
+            .map(|module| (module.name, &module.interface)),
+    )?;
 
     let module_definitions = token_stream_generator::generate_module_definitions(
         module_interfaces.iter(),

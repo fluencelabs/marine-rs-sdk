@@ -75,10 +75,81 @@ fn empty_test() {
                     impl ModuleInterface {}
                 }
             }
-            pub use modules::greeting::CallParameters;
-            pub use modules::greeting::MountedBinaryResult;
-            pub use modules::greeting::MountedBinaryStringResult;
-            pub use modules::greeting::SecurityTetraplet;
+            pub mod __facade_override {
+                #[derive(
+                    Clone,
+                    Debug,
+                    marine_rs_sdk_test :: internal :: serde :: Serialize,
+                    marine_rs_sdk_test :: internal :: serde :: Deserialize
+                )]
+                #[serde(crate = "marine_rs_sdk_test::internal::serde")]
+                pub struct CallParameters {
+                    pub init_peer_id: String,
+                    pub service_id: String,
+                    pub service_creator_peer_id: String,
+                    pub host_id: String,
+                    pub particle_id: String,
+                    pub tetraplets: Vec<Vec<SecurityTetraplet>>
+                }
+                #[derive(
+                    Clone,
+                    Debug,
+                    marine_rs_sdk_test :: internal :: serde :: Serialize,
+                    marine_rs_sdk_test :: internal :: serde :: Deserialize
+                )]
+                #[serde(crate = "marine_rs_sdk_test::internal::serde")]
+                pub struct MountedBinaryResult {
+                    pub ret_code: i32,
+                    pub error: String,
+                    pub stdout: Vec<u8>,
+                    pub stderr: Vec<u8>
+                }
+                #[derive(
+                    Clone,
+                    Debug,
+                    marine_rs_sdk_test :: internal :: serde :: Serialize,
+                    marine_rs_sdk_test :: internal :: serde :: Deserialize
+                )]
+                #[serde(crate = "marine_rs_sdk_test::internal::serde")]
+                pub struct MountedBinaryStringResult {
+                    pub ret_code: i32,
+                    pub error: String,
+                    pub stdout: String,
+                    pub stderr: String
+                }
+                #[derive(
+                    Clone,
+                    Debug,
+                    marine_rs_sdk_test :: internal :: serde :: Serialize,
+                    marine_rs_sdk_test :: internal :: serde :: Deserialize
+                )]
+                #[serde(crate = "marine_rs_sdk_test::internal::serde")]
+                pub struct SecurityTetraplet {
+                    pub peer_pk: String,
+                    pub service_id: String,
+                    pub function_name: String,
+                    pub json_path: String
+                }
+                pub struct ModuleInterface {
+                    marine:
+                        std::rc::Rc<std::cell::RefCell<marine_rs_sdk_test::internal::AppService>,
+                    >,
+                }
+                impl ModuleInterface {
+                    pub fn new(
+                        marine: std::rc::Rc<
+                            std::cell::RefCell<marine_rs_sdk_test::internal::AppService>,
+                        >
+                    ) -> Self {
+                        Self { marine }
+                    }
+                }
+                impl ModuleInterface {}
+            }
+            pub use __facade_override::CallParameters;
+            pub use __facade_override::MountedBinaryResult;
+            pub use __facade_override::MountedBinaryStringResult;
+            pub use __facade_override::SecurityTetraplet;
             pub struct __GeneratedModules {
                 pub greeting: modules::greeting::ModuleInterface,
             }
@@ -95,6 +166,7 @@ fn empty_test() {
             }
             pub struct ServiceInterface {
                 pub modules: __GeneratedModules,
+                __facade: __facade_override::ModuleInterface,
                 marine: std::rc::Rc<std::cell::RefCell<marine_rs_sdk_test::internal::AppService>, >
             }
             impl ServiceInterface {
@@ -153,7 +225,12 @@ fn empty_test() {
                     .unwrap_or_else(|e| panic!("app service can't be created: {}", e));
                     let marine = std::rc::Rc::new(std::cell::RefCell::new(marine));
                     let modules = __GeneratedModules::new(marine.clone());
-                    Self { marine, modules }
+                    let __facade = __facade_override::ModuleInterface::new(marine.clone());
+                    Self {
+                        marine,
+                        modules,
+                        __facade
+                    }
                 }
             }
         }

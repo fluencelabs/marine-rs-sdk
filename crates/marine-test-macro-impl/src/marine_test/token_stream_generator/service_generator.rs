@@ -26,20 +26,42 @@ use quote::quote;
 
 use std::path::Path;
 use std::path::PathBuf;
-use itertools::Itertools;
+use itertools::{Itertools, zip};
 use std::collections::HashMap;
+use crate::marine_test::modules_linker::{LinkedModules, LinkedModule, UseDescription};
+use marine_it_parser::it_interface::IModuleInterface;
 
 pub(crate) fn generate_service_definitions(
     services: HashMap<String, ServiceDescription>,
     file_path: &PathBuf,
 ) -> TResult<Vec<TokenStream>> {
-    services
+    let services = services
         .into_iter()
         .sorted_by(|lhs, rhs| lhs.0.cmp(&rhs.0))
-        .map(|(name, service)| -> TResult<TokenStream> {
-            let service = ProcessedService::new(service, name, file_path)?;
+        .map(|(name, service)| ProcessedService::new(service, name, file_path))
+        .collect::<TResult<Vec<ProcessedService>>>()?;
+
+    let service_modules = services
+        .iter()
+        .map(|service| {
+            let modules_dir_test_relative = file_path.join(&service.config.resolved_modules_dir);
+            let modules =
+                config_utils::collect_modules(&service.config.config, &modules_dir_test_relative)?;
+            Ok(modules)
+        })
+        .collect::<TResult<Vec<Vec<Module<'_>>>>>()?;
+
+    let link_info = link_services(zip(&services, &service_modules))?;
+    services
+        .iter()
+        .map(|service| -> TResult<TokenStream> {
             let service_mod = new_ident(&service.name)?;
-            let service_definition = generate_service_definition(&service, file_path)?;
+            // entry with service.name was added in link_services(...), so unwrap is safe
+            let service_definition = generate_service_definition(
+                &service,
+                file_path,
+                link_info.get::<str>(&service.name).unwrap(),
+            )?;
             let glue_code = quote! {
                 pub mod #service_mod {
                     #service_definition
@@ -50,14 +72,37 @@ pub(crate) fn generate_service_definitions(
         .collect::<TResult<Vec<TokenStream>>>()
 }
 
+fn link_services<'modules>(
+    services: impl ExactSizeIterator<
+        Item = (&'modules ProcessedService, &'modules Vec<Module<'modules>>),
+    >,
+) -> TResult<LinkedModules<'modules>> {
+    let facade_modules = services
+        .map(|(service, modules)| {
+            let facade = match modules.last() {
+                Some(module) => module,
+                None => return Err(TestGeneratorError::NoModulesInService),
+            };
+            Ok((service.name.as_str(), &facade.interface))
+        })
+        .collect::<TResult<Vec<(&str, &IModuleInterface)>>>()?;
+
+    modules_linker::link_modules(facade_modules.iter().map(|tuple| (tuple.0, tuple.1)))
+}
+
 fn generate_service_definition(
     service: &ProcessedService,
     test_file_path: &PathBuf,
+    linked_facade: &LinkedModule<'_>,
 ) -> TResult<TokenStream> {
     let modules_dir_test_relative = test_file_path.join(&service.config.resolved_modules_dir);
     let modules =
         config_utils::collect_modules(&service.config.config, &modules_dir_test_relative)?;
-    let linked_modules = modules_linker::link_modules(&modules)?;
+    let linked_modules = modules_linker::link_modules(
+        modules
+            .iter()
+            .map(|module| (module.name, &module.interface)),
+    )?;
 
     let module_definitions = super::generate_module_definitions(modules.iter(), &linked_modules)?;
 
@@ -66,13 +111,15 @@ fn generate_service_definition(
         None => return Err(TestGeneratorError::NoModulesInService),
     };
 
-    let facade_name = new_ident(&facade.name)?;
     let facade_interface = super::methods_generator::generate_facade_methods(
-        &facade.name,
         facade.interface.function_signatures.iter(),
         &facade.interface.record_types,
     )?;
-    let facade_structs = generate_facade_structs(facade, &facade_name)?;
+
+    let facade_override =
+        super::generate_module_definition(facade, linked_facade, service_import_generator)?;
+    let facade_override_ident = new_ident("__facade_override")?;
+    let facade_structs = generate_facade_structs(facade, &facade_override_ident)?;
 
     let app_service_ctor =
         generate_app_service_ctor(&service.config_path, &service.config.resolved_modules_dir)?;
@@ -83,12 +130,17 @@ fn generate_service_definition(
             #(#module_definitions)*
         }
 
+        pub mod #facade_override_ident {
+            #facade_override
+        }
+
         #(#facade_structs)*
 
         #modules_type
 
         pub struct ServiceInterface {
             pub modules: __GeneratedModules,
+            __facade: #facade_override_ident::ModuleInterface,
             marine: std::rc::Rc<std::cell::RefCell<marine_rs_sdk_test::internal::AppService>, >
         }
 
@@ -96,9 +148,11 @@ fn generate_service_definition(
             pub fn new() -> Self {
                 #app_service_ctor
                 let modules = __GeneratedModules::new(marine.clone());
+                let __facade = #facade_override_ident::ModuleInterface::new(marine.clone());
                 Self {
                     marine,
-                    modules
+                    modules,
+                    __facade
                 }
             }
 
@@ -107,6 +161,12 @@ fn generate_service_definition(
     };
 
     Ok(service_definition)
+}
+
+fn service_import_generator(info: &UseDescription<'_>) -> TResult<TokenStream> {
+    let from_module_ident = new_ident(info.from)?;
+    let record_name_ident = new_ident(info.name)?;
+    Ok(quote! {pub use super::super::#from_module_ident::#record_name_ident;})
 }
 
 fn generate_facade_structs(
@@ -120,7 +180,7 @@ fn generate_facade_structs(
         .sorted_by_key(|(_, record)| &record.name)
         .map(|(_, record)| -> TResult<TokenStream> {
             let record_name = new_ident(&record.name)?;
-            let result = quote! {pub use modules::#module_name::#record_name;};
+            let result = quote! {pub use #module_name::#record_name;};
             Ok(result)
         })
         .collect::<TResult<Vec<TokenStream>>>()

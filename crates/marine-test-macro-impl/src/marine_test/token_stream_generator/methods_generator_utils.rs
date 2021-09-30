@@ -54,14 +54,13 @@ pub(super) fn generate_module_method(
 }
 
 pub(super) fn generate_module_method_forward(
-    module_name: &str,
     signature: &IFunctionSignature,
     cp_setting: CallParametersSettings,
     records: &IRecordTypes,
 ) -> TResult<TokenStream> {
     let arguments = generate_arguments(signature.arguments.iter(), records)?;
     let output_type = generate_output_type(&signature.outputs, records)?;
-    let mcall = generate_forward_call(module_name, cp_setting, &signature)?;
+    let mcall = generate_forward_call(cp_setting, &signature)?;
 
     let (cp, func_name) = generate_call_parameters(&cp_setting, signature)?;
 
@@ -105,7 +104,6 @@ fn generate_marine_call(
 }
 
 fn generate_forward_call(
-    module_name: &str,
     cp_settings: CallParametersSettings,
     method_signature: &IFunctionSignature,
 ) -> TResult<TokenStream> {
@@ -122,10 +120,8 @@ fn generate_forward_call(
         new_ident(method_signature.name.as_str())?
     };
 
-    let module_name = new_ident(module_name)?;
-
     let function_call = quote! {
-        self.modules.#module_name.#method_name(#(#args,)*)
+        self.__facade.#method_name(#(#args,)*)
     };
 
     Ok(function_call)

@@ -48,7 +48,6 @@ pub(super) fn generate_module_methods<'m, 'r>(
 }
 
 pub fn generate_facade_methods<'m, 'r>(
-    module_name: &str,
     method_signatures: impl ExactSizeIterator<Item = &'m IFunctionSignature>,
     records: &'r IRecordTypes,
 ) -> TResult<Vec<proc_macro2::TokenStream>> {
@@ -60,10 +59,8 @@ pub fn generate_facade_methods<'m, 'r>(
         .try_fold::<_, _, TResult<_>>(
             Vec::with_capacity(methods_count),
             |mut methods, signature| {
-                let default_cp =
-                    generate_module_method_forward(module_name, &signature, Default, records)?;
-                let user_cp =
-                    generate_module_method_forward(module_name, &signature, UserDefined, records)?;
+                let default_cp = generate_module_method_forward(&signature, Default, records)?;
+                let user_cp = generate_module_method_forward(&signature, UserDefined, records)?;
 
                 methods.push(default_cp);
                 methods.push(user_cp);

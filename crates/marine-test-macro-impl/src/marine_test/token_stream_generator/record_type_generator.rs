@@ -23,21 +23,20 @@ use marine_it_parser::it_interface::IRecordTypes;
 use proc_macro2::TokenStream;
 use quote::quote;
 
-use crate::marine_test::modules_linker::{LinkedModule, RecordEntry};
+use crate::marine_test::modules_linker::{LinkedModule, RecordEntry, UseDescription};
 use itertools::Itertools;
 
-pub(super) fn generate_records(linked_module: &LinkedModule<'_>) -> TResult<Vec<TokenStream>> {
+pub(super) fn generate_records(
+    linked_module: &LinkedModule<'_>,
+    import_generator: fn(info: &UseDescription<'_>) -> TResult<TokenStream>,
+) -> TResult<Vec<TokenStream>> {
     linked_module.records
         .iter()
         .sorted()
         .map(|record| -> TResult<_> {
             use RecordEntry::*;
             match record {
-                Use(use_info) => {
-                    let from_module_ident = utils::new_ident(use_info.from)?;
-                    let record_name_ident = utils::new_ident(use_info.name)?;
-                    Ok(quote! {pub use super::#from_module_ident::#record_name_ident;})
-                },
+                Use(use_info) => import_generator(use_info),
                 Declare(record) => {
                     let record_name_ident = utils::new_ident(&record.record_type.name)?;
                     let fields = prepare_field(record.record_type.fields.iter(), record.records)?;
