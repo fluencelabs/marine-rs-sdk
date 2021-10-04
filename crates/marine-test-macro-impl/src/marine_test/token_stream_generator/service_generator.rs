@@ -20,15 +20,15 @@ use crate::TestGeneratorError;
 use crate::marine_test::config_utils::{Module, ConfigWrapper, load_config};
 use crate::marine_test::utils::new_ident;
 use crate::marine_test::{modules_linker, config_utils};
+use crate::marine_test::modules_linker::{LinkedModules, LinkedModule, UseDescription};
 
+use marine_it_parser::it_interface::IModuleInterface;
 use proc_macro2::TokenStream;
 use quote::quote;
+use itertools::{Itertools, zip};
 
 use std::path::Path;
-use itertools::{Itertools, zip};
 use std::collections::HashMap;
-use crate::marine_test::modules_linker::{LinkedModules, LinkedModule, UseDescription};
-use marine_it_parser::it_interface::IModuleInterface;
 
 pub(crate) fn generate_service_definitions(
     services: HashMap<String, ServiceDescription>,
