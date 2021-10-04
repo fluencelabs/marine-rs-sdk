@@ -78,10 +78,7 @@ fn link_services<'modules>(
 ) -> TResult<LinkedModules<'modules>> {
     let facade_modules = services
         .map(|(service, modules)| {
-            let facade = match modules.last() {
-                Some(module) => module,
-                None => return Err(TestGeneratorError::NoModulesInService),
-            };
+            let facade = get_facace(modules)?;
             Ok((service.name.as_str(), &facade.interface))
         })
         .collect::<TResult<Vec<(&str, &IModuleInterface)>>>()?;
@@ -105,10 +102,7 @@ fn generate_service_definition(
 
     let module_definitions = super::generate_module_definitions(modules.iter(), &linked_modules)?;
 
-    let facade = match modules.last() {
-        Some(module) => module,
-        None => return Err(TestGeneratorError::NoModulesInService),
-    };
+    let facade = get_facace(&modules)?;
 
     let facade_interface = super::methods_generator::generate_facade_methods(
         facade.interface.function_signatures.iter(),
@@ -160,6 +154,13 @@ fn generate_service_definition(
     };
 
     Ok(service_definition)
+}
+
+fn get_facace<'modules, 'm>(modules: &'modules [Module<'m>]) -> TResult<&'modules Module<'m>> {
+    match modules.last() {
+        Some(module) => Ok(module),
+        None => Err(TestGeneratorError::NoModulesInService),
+    }
 }
 
 fn service_import_generator(info: &UseDescription<'_>) -> TResult<TokenStream> {
