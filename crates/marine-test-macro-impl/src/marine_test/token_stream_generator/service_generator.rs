@@ -106,5 +106,5 @@ fn link_services<'modules>(
         })
         .collect::<TResult<Vec<(&str, &IModuleInterface)>>>()?;
 
-    modules_linker::link_modules(facade_modules.iter().map(|tuple| (tuple.0, tuple.1)))
+    modules_linker::link_modules(facade_modules.iter().copied())
 }
