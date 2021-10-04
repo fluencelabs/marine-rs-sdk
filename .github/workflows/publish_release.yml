@@ -1,9 +1,7 @@
 name: "publish-release"
 
 on:
-  push:
-    branches:
-      - "master"
+  workflow_dispatch:
 
 jobs:
   npm-publish:
