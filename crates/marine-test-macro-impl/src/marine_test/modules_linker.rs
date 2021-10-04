@@ -14,10 +14,9 @@
  * limitations under the License.
  */
 
-use crate::marine_test::config_utils::Module;
 use crate::{TResult, TestGeneratorError};
 
-use marine_it_parser::it_interface::IRecordTypes;
+use marine_it_parser::it_interface::{IRecordTypes, IModuleInterface};
 use marine_it_parser::it_interface::it::{IType, IRecordType};
 
 use itertools::zip;
@@ -28,16 +27,16 @@ use std::rc::Rc;
 use static_assertions::const_assert;
 
 pub(super) fn link_modules<'modules>(
-    modules: &'modules [Module<'_>],
+    modules: impl ExactSizeIterator<Item = (&'modules str, &'modules IModuleInterface)>,
 ) -> TResult<LinkedModules<'modules>> {
     let mut all_record_types = HashMap::<IRecordTypeClosed<'_>, &str>::new();
     let mut linked_modules = HashMap::<&str, LinkedModule<'_>>::new();
 
-    for module in modules {
+    for (name, interface) in modules {
         let mut linking_module = LinkedModule::default();
-        for (_, record_type) in &module.interface.record_types {
+        for record_type in interface.record_types.values() {
             let record_type_ex =
-                IRecordTypeClosed::new(record_type.clone(), &module.interface.record_types);
+                IRecordTypeClosed::new(record_type.clone(), &interface.record_types);
 
             let entry = match all_record_types.get(&record_type_ex) {
                 Some(owner_module) => RecordEntry::Use(UseDescription {
@@ -45,7 +44,7 @@ pub(super) fn link_modules<'modules>(
                     name: &record_type.name,
                 }),
                 None => {
-                    all_record_types.insert(record_type_ex.clone(), module.name);
+                    all_record_types.insert(record_type_ex.clone(), name);
                     RecordEntry::Declare(record_type_ex)
                 }
             };
@@ -53,10 +52,8 @@ pub(super) fn link_modules<'modules>(
             linking_module.records.push(entry);
         }
 
-        if linked_modules.insert(module.name, linking_module).is_some() {
-            return Err(TestGeneratorError::DuplicateModuleName(
-                module.name.to_string(),
-            ));
+        if linked_modules.insert(name, linking_module).is_some() {
+            return Err(TestGeneratorError::DuplicateModuleName(name.to_string()));
         }
     }
 

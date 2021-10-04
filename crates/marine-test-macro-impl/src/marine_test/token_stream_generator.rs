@@ -17,14 +17,20 @@
 mod methods_generator;
 mod methods_generator_utils;
 mod record_type_generator;
+mod service_generator;
+mod service_generation_utils;
 
-use crate::marine_test::utils;
 use crate::marine_test::config_utils::Module;
+use crate::marine_test::modules_linker::{LinkedModule, LinkedModules, UseDescription};
+use crate::marine_test::utils;
 use crate::TResult;
-use crate::marine_test::modules_linker::{LinkedModules, LinkedModule};
+
+pub(super) use service_generator::generate_service_definitions;
+pub(super) use service_generation_utils::generate_app_service_ctor;
 
 use proc_macro2::TokenStream;
 use quote::quote;
+use crate::marine_test::utils::new_ident;
 
 /// Generates definitions of modules and records of this modules.
 /// F.e. for the greeting service the following definitions would be generated:
@@ -61,47 +67,59 @@ pub(super) fn generate_module_definitions<'i>(
 ) -> TResult<Vec<TokenStream>> {
     modules
         .into_iter()
-        .map(|value| generate_module_definition(value, linked_modules.get(&value.name).unwrap())) // linked_modules are built from modules
+        .map(|value| {
+            // linked_modules are built from modules, so unwrap is safe
+            let content = generate_module_definition(
+                value,
+                linked_modules.get(&value.name).unwrap(),
+                module_import_generator,
+            )?;
+            let module_ident = new_ident(&value.name)?;
+            Ok(quote! {
+                pub mod #module_ident {
+                    #content
+                }
+            })
+        })
         .collect::<TResult<Vec<_>>>()
 }
 
 fn generate_module_definition(
     module: &Module<'_>,
     linked_module: &'_ LinkedModule<'_>,
+    import_generator: fn(info: &UseDescription<'_>) -> TResult<TokenStream>,
 ) -> TResult<TokenStream> {
-    let module_name = module.name;
-    let module_ident = utils::new_ident(module_name)?;
     let struct_ident = utils::new_ident("ModuleInterface")?;
-
-    let module_interface = &module.interface;
-    let module_records = record_type_generator::generate_records(linked_module)?;
+    let module_records = record_type_generator::generate_records(linked_module, import_generator)?;
     let module_functions = methods_generator::generate_module_methods(
-        module_name,
-        module_interface.function_signatures.iter(),
-        &module_interface.record_types,
+        module.name,
+        module.interface.function_signatures.iter(),
+        &module.interface.record_types,
     )?;
 
     let module_definition = quote! {
-        // it's a sort of hack: this module structure allows user to import structs by
-        // using marine_env_test::module_name::StructName;
-        pub mod #module_ident {
-            #(#module_records)*
+        #(#module_records)*
 
-            pub struct #struct_ident {
-                marine: std::rc::Rc<std::cell::RefCell<marine_rs_sdk_test::internal::AppService>, >,
-            }
+        pub struct #struct_ident {
+            marine: std::rc::Rc<std::cell::RefCell<marine_rs_sdk_test::internal::AppService>, >,
+        }
 
-            impl #struct_ident {
-                pub fn new(marine: std::rc::Rc<std::cell::RefCell<marine_rs_sdk_test::internal::AppService>, >) -> Self {
-                    Self { marine }
-                }
+        impl #struct_ident {
+            pub fn new(marine: std::rc::Rc<std::cell::RefCell<marine_rs_sdk_test::internal::AppService>, >) -> Self {
+                Self { marine }
             }
+        }
 
-            impl #struct_ident {
-                #(#module_functions)*
-            }
+        impl #struct_ident {
+            #(#module_functions)*
         }
     };
 
     Ok(module_definition)
+}
+
+fn module_import_generator(info: &UseDescription<'_>) -> TResult<TokenStream> {
+    let from_module_ident = utils::new_ident(info.from)?;
+    let record_name_ident = utils::new_ident(info.name)?;
+    Ok(quote! {pub use super::#from_module_ident::#record_name_ident;})
 }

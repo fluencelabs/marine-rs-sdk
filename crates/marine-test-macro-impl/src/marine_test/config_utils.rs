@@ -14,13 +14,13 @@
  * limitations under the License.
  */
 
-use crate::TResult;
+use crate::{TResult, TestGeneratorError};
 
 use fluence_app_service::TomlAppServiceConfig;
 use marine_it_parser::module_it_interface;
 use marine_it_parser::it_interface::IModuleInterface;
 
-use std::path::PathBuf;
+use std::path::{PathBuf, Path};
 
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub(super) struct Module<'m> {
@@ -34,12 +34,36 @@ impl<'m> Module<'m> {
     }
 }
 
+pub(crate) struct ConfigWrapper {
+    pub config: TomlAppServiceConfig,
+    pub resolved_modules_dir: PathBuf,
+}
+
+pub(crate) fn load_config(
+    config_path: &str,
+    modules_dir: Option<String>,
+    file_path: &Path,
+) -> TResult<ConfigWrapper> {
+    let config_path_buf = file_path.join(&config_path);
+
+    let marine_config = TomlAppServiceConfig::load(&config_path_buf)?;
+    let modules_dir = match resolve_modules_dir(&marine_config, modules_dir) {
+        Some(modules_dir) => modules_dir,
+        None => return Err(TestGeneratorError::ModulesDirUnspecified),
+    };
+
+    Ok(ConfigWrapper {
+        config: marine_config,
+        resolved_modules_dir: modules_dir,
+    })
+}
+
 /// Returns all modules the provided config consists of.
-pub(super) fn collect_modules(
-    config: &TomlAppServiceConfig,
-    modules_dir: PathBuf,
-) -> TResult<Vec<Module<'_>>> {
-    let module_paths = collect_module_paths(config, modules_dir);
+pub(super) fn collect_modules<'config>(
+    config: &'config TomlAppServiceConfig,
+    modules_dir: &Path,
+) -> TResult<Vec<Module<'config>>> {
+    let module_paths = collect_module_paths(config, &modules_dir);
 
     module_paths
         .into_iter()
@@ -48,10 +72,10 @@ pub(super) fn collect_modules(
         .map_err(Into::into)
 }
 
-fn collect_module_paths(
-    config: &TomlAppServiceConfig,
-    modules_dir: PathBuf,
-) -> Vec<(&str, PathBuf)> {
+fn collect_module_paths<'config>(
+    config: &'config TomlAppServiceConfig,
+    modules_dir: &Path,
+) -> Vec<(&'config str, PathBuf)> {
     config
         .toml_faas_config
         .module
