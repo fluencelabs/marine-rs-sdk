@@ -119,7 +119,7 @@ pub(super) fn generate_test_glue_code(
 ) -> TResult<TokenStream> {
     match attrs {
         MTestAttributes::MultipleServices(services) => {
-            generate_test_glue_code_multiple_eservices(func_item, services, test_file_path)
+            generate_test_glue_code_multiple_services(func_item, services, test_file_path)
         }
         MTestAttributes::SingleService(service) => {
             generate_test_glue_code_single_service(func_item, service, test_file_path)
@@ -184,7 +184,7 @@ fn generate_test_glue_code_single_service(
     Ok(glue_code)
 }
 
-fn generate_test_glue_code_multiple_eservices(
+fn generate_test_glue_code_multiple_services(
     func_item: syn::ItemFn,
     services: HashMap<String, ServiceDescription>,
     test_file_path: PathBuf,
