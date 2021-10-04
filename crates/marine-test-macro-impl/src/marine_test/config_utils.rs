@@ -20,7 +20,7 @@ use fluence_app_service::TomlAppServiceConfig;
 use marine_it_parser::module_it_interface;
 use marine_it_parser::it_interface::IModuleInterface;
 
-use std::path::PathBuf;
+use std::path::{PathBuf, Path};
 use crate::attributes::ServiceDescription;
 
 #[derive(Debug, Clone, PartialEq, Eq)]
@@ -50,7 +50,7 @@ impl ProcessedService {
     pub(crate) fn new(
         service: ServiceDescription,
         name: String,
-        file_path: &PathBuf,
+        file_path: &Path,
     ) -> TResult<Self> {
         let config_wrapper = load_config(&service.config_path, service.modules_dir, &file_path)?;
 
@@ -65,7 +65,7 @@ impl ProcessedService {
 pub(crate) fn load_config(
     config_path: &str,
     modules_dir: Option<String>,
-    file_path: &PathBuf,
+    file_path: &Path,
 ) -> TResult<ConfigWrapper> {
     let config_path_buf = file_path.join(&config_path);
 
@@ -84,7 +84,7 @@ pub(crate) fn load_config(
 /// Returns all modules the provided config consists of.
 pub(super) fn collect_modules<'config>(
     config: &'config TomlAppServiceConfig,
-    modules_dir: &PathBuf,
+    modules_dir: &Path,
 ) -> TResult<Vec<Module<'config>>> {
     let module_paths = collect_module_paths(config, &modules_dir);
 
@@ -97,7 +97,7 @@ pub(super) fn collect_modules<'config>(
 
 fn collect_module_paths<'config>(
     config: &'config TomlAppServiceConfig,
-    modules_dir: &PathBuf,
+    modules_dir: &Path,
 ) -> Vec<(&'config str, PathBuf)> {
     config
         .toml_faas_config

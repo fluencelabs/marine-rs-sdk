@@ -25,7 +25,6 @@ use proc_macro2::TokenStream;
 use quote::quote;
 
 use std::path::Path;
-use std::path::PathBuf;
 use itertools::{Itertools, zip};
 use std::collections::HashMap;
 use crate::marine_test::modules_linker::{LinkedModules, LinkedModule, UseDescription};
@@ -33,7 +32,7 @@ use marine_it_parser::it_interface::IModuleInterface;
 
 pub(crate) fn generate_service_definitions(
     services: HashMap<String, ServiceDescription>,
-    file_path: &PathBuf,
+    file_path: &Path,
 ) -> TResult<Vec<TokenStream>> {
     let services = services
         .into_iter()
@@ -92,7 +91,7 @@ fn link_services<'modules>(
 
 fn generate_service_definition(
     service: &ProcessedService,
-    test_file_path: &PathBuf,
+    test_file_path: &Path,
     linked_facade: &LinkedModule<'_>,
 ) -> TResult<TokenStream> {
     let modules_dir_test_relative = test_file_path.join(&service.config.resolved_modules_dir);

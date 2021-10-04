@@ -34,7 +34,7 @@ pub(super) fn link_modules<'modules>(
 
     for (name, interface) in modules {
         let mut linking_module = LinkedModule::default();
-        for (_, record_type) in &interface.record_types {
+        for record_type in interface.record_types.values() {
             let record_type_ex =
                 IRecordTypeClosed::new(record_type.clone(), &interface.record_types);
 
