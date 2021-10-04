@@ -18,17 +18,19 @@ mod methods_generator;
 mod methods_generator_utils;
 mod record_type_generator;
 mod service_generator;
+mod service_generation_utils;
 
 use crate::marine_test::config_utils::Module;
 use crate::marine_test::modules_linker::{LinkedModule, LinkedModules, UseDescription};
 use crate::marine_test::utils;
 use crate::TResult;
 
+pub(super) use service_generator::generate_service_definitions;
+pub(super) use service_generation_utils::generate_app_service_ctor;
+
 use proc_macro2::TokenStream;
 use quote::quote;
 use crate::marine_test::utils::new_ident;
-
-pub(super) use service_generator::{generate_app_service_ctor, generate_service_definitions};
 
 /// Generates definitions of modules and records of this modules.
 /// F.e. for the greeting service the following definitions would be generated:
