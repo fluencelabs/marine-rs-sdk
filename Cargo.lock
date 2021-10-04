@@ -879,7 +879,7 @@ dependencies = [
 
 [[package]]
 name = "marine-rs-sdk-test"
-version = "0.2.0"
+version = "0.3.0"
 dependencies = [
  "fluence-app-service",
  "marine-test-macro",
@@ -921,7 +921,7 @@ dependencies = [
 
 [[package]]
 name = "marine-test-macro"
-version = "0.2.0"
+version = "0.3.0"
 dependencies = [
  "marine-test-macro-impl",
  "proc-macro-error",
@@ -932,7 +932,7 @@ dependencies = [
 
 [[package]]
 name = "marine-test-macro-impl"
-version = "0.2.0"
+version = "0.3.0"
 dependencies = [
  "darling",
  "fluence-app-service",
