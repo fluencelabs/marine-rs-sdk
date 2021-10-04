@@ -154,7 +154,7 @@ fn generate_test_glue_code_single_service(
     let inputs = &signature.inputs;
     let arg_names = generate_arg_names(inputs.iter())?;
     let module_ctors = generate_module_ctors(inputs.iter())?;
-    let app_service_ctor = token_stream_generator::service_generator::generate_app_service_ctor(
+    let app_service_ctor = token_stream_generator::generate_app_service_ctor(
         &service.config_path,
         &config_wrapper.resolved_modules_dir,
     )?;
@@ -190,7 +190,7 @@ fn generate_test_glue_code_multiple_eservices(
     test_file_path: PathBuf,
 ) -> TResult<TokenStream> {
     let service_definitions =
-        token_stream_generator::service_generator::generate_service_definitions(
+        token_stream_generator::generate_service_definitions(
             services,
             &test_file_path,
         )?;
