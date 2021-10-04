@@ -17,7 +17,7 @@
 use crate::attributes::{ServiceDescription};
 use crate::TResult;
 use crate::TestGeneratorError;
-use crate::marine_test::config_utils::{Module, ProcessedService};
+use crate::marine_test::config_utils::{Module, ConfigWrapper, load_config};
 use crate::marine_test::utils::new_ident;
 use crate::marine_test::{modules_linker, config_utils};
 
@@ -69,6 +69,28 @@ pub(crate) fn generate_service_definitions(
             Ok(glue_code)
         })
         .collect::<TResult<Vec<TokenStream>>>()
+}
+
+pub(crate) struct ProcessedService {
+    pub(crate) config: ConfigWrapper,
+    pub(crate) config_path: String,
+    pub(crate) name: String,
+}
+
+impl ProcessedService {
+    pub(crate) fn new(
+        service: ServiceDescription,
+        name: String,
+        file_path: &Path,
+    ) -> TResult<Self> {
+        let config_wrapper = load_config(&service.config_path, service.modules_dir, &file_path)?;
+
+        Ok(Self {
+            config: config_wrapper,
+            config_path: service.config_path,
+            name,
+        })
+    }
 }
 
 fn link_services<'modules>(

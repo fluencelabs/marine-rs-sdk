@@ -21,7 +21,6 @@ use marine_it_parser::module_it_interface;
 use marine_it_parser::it_interface::IModuleInterface;
 
 use std::path::{PathBuf, Path};
-use crate::attributes::ServiceDescription;
 
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub(super) struct Module<'m> {
@@ -38,28 +37,6 @@ impl<'m> Module<'m> {
 pub(crate) struct ConfigWrapper {
     pub config: TomlAppServiceConfig,
     pub resolved_modules_dir: PathBuf,
-}
-
-pub(crate) struct ProcessedService {
-    pub(crate) config: ConfigWrapper,
-    pub(crate) config_path: String,
-    pub(crate) name: String,
-}
-
-impl ProcessedService {
-    pub(crate) fn new(
-        service: ServiceDescription,
-        name: String,
-        file_path: &Path,
-    ) -> TResult<Self> {
-        let config_wrapper = load_config(&service.config_path, service.modules_dir, &file_path)?;
-
-        Ok(Self {
-            config: config_wrapper,
-            config_path: service.config_path,
-            name,
-        })
-    }
 }
 
 pub(crate) fn load_config(
