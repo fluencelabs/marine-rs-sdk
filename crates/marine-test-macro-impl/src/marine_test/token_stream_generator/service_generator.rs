@@ -64,10 +64,10 @@ pub(crate) fn generate_service_definitions(
         .collect::<TResult<Vec<TokenStream>>>()
 }
 
-pub(crate) struct ProcessedService {
-    pub(crate) config: ConfigWrapper,
-    pub(crate) config_path: String,
-    pub(crate) name: String,
+struct ProcessedService {
+    config: ConfigWrapper,
+    config_path: String,
+    name: String,
 }
 
 impl ProcessedService {
