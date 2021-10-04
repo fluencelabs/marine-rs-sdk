@@ -54,19 +54,12 @@ pub(crate) fn generate_service_definitions(
     services
         .iter()
         .map(|service| -> TResult<TokenStream> {
-            let service_mod = new_ident(&service.name)?;
             // entry with service.name was added in link_services(...), so unwrap is safe
-            let service_definition = generate_service_definition(
+            generate_service_definition(
                 &service,
                 file_path,
                 link_info.get::<str>(&service.name).unwrap(),
-            )?;
-            let glue_code = quote! {
-                pub mod #service_mod {
-                    #service_definition
-                }
-            };
-            Ok(glue_code)
+            )
         })
         .collect::<TResult<Vec<TokenStream>>>()
 }
@@ -122,6 +115,7 @@ fn generate_service_definition(
             .map(|module| (module.name, &module.interface)),
     )?;
 
+    let service_mod = new_ident(&service.name)?;
     let module_definitions = super::generate_module_definitions(modules.iter(), &linked_modules)?;
 
     let facade = get_facace(&modules)?;
@@ -141,37 +135,39 @@ fn generate_service_definition(
     let modules_type = generate_modules_type(&modules)?;
 
     let service_definition = quote! {
-        pub mod modules {
-            #(#module_definitions)*
-        }
-
-        pub mod #facade_override_ident {
-            #facade_override
-        }
-
-        #(#facade_structs)*
-
-        #modules_type
-
-        pub struct ServiceInterface {
-            pub modules: __GeneratedModules,
-            __facade: #facade_override_ident::ModuleInterface,
-            marine: std::rc::Rc<std::cell::RefCell<marine_rs_sdk_test::internal::AppService>, >
-        }
-
-        impl ServiceInterface {
-            pub fn new() -> Self {
-                #app_service_ctor
-                let modules = __GeneratedModules::new(marine.clone());
-                let __facade = #facade_override_ident::ModuleInterface::new(marine.clone());
-                Self {
-                    marine,
-                    modules,
-                    __facade
-                }
+        pub mod #service_mod {
+            pub mod modules {
+                #(#module_definitions)*
             }
 
-            #(#facade_interface)*
+            pub mod #facade_override_ident {
+                #facade_override
+            }
+
+            #(#facade_structs)*
+
+            #modules_type
+
+            pub struct ServiceInterface {
+                pub modules: __GeneratedModules,
+                __facade: #facade_override_ident::ModuleInterface,
+                marine: std::rc::Rc<std::cell::RefCell<marine_rs_sdk_test::internal::AppService>, >
+            }
+
+            impl ServiceInterface {
+                pub fn new() -> Self {
+                    #app_service_ctor
+                    let modules = __GeneratedModules::new(marine.clone());
+                    let __facade = #facade_override_ident::ModuleInterface::new(marine.clone());
+                    Self {
+                        marine,
+                        modules,
+                        __facade
+                    }
+                }
+
+                #(#facade_interface)*
+            }
         }
     };
 
