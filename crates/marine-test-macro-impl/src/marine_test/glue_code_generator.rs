@@ -190,10 +190,7 @@ fn generate_test_glue_code_multiple_eservices(
     test_file_path: PathBuf,
 ) -> TResult<TokenStream> {
     let service_definitions =
-        token_stream_generator::generate_service_definitions(
-            services,
-            &test_file_path,
-        )?;
+        token_stream_generator::generate_service_definitions(services, &test_file_path)?;
 
     let original_block = func_item.block;
     let signature = func_item.sig;

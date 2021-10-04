@@ -63,7 +63,9 @@ pub(crate) fn generate_service_definitions(
         .collect::<TResult<Vec<TokenStream>>>()
 }
 
-pub(super) fn get_facace<'modules, 'm>(modules: &'modules [Module<'m>]) -> TResult<&'modules Module<'m>> {
+pub(super) fn get_facace<'modules, 'm>(
+    modules: &'modules [Module<'m>],
+) -> TResult<&'modules Module<'m>> {
     match modules.last() {
         Some(module) => Ok(module),
         None => Err(TestGeneratorError::NoModulesInService),
@@ -106,4 +108,3 @@ fn link_services<'modules>(
 
     modules_linker::link_modules(facade_modules.iter().map(|tuple| (tuple.0, tuple.1)))
 }
-
