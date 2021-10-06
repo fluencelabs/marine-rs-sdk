@@ -22,7 +22,6 @@ jobs:
 
           (cd sdk; cargo build -v --target wasm32-wasi --all-features)
           (cd sdk; cargo clippy -v --target wasm32-wasi)
-          (cd sdk-test; cargo build)
           (cd crates/marine-macro-impl; cargo test)
 
           TARGET=wasm32-wasi cargo test -v --all-features
