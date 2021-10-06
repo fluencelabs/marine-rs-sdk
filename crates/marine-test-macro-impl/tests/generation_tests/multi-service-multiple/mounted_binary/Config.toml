@@ -1,8 +1,0 @@
-modules_dir = "artifacts/"
-
-[[module]]
-    name = "greeting"
-    mem_pages_count = 50
-    logger_enabled = false
-    [module.mounted_binaries]
-        echo = "/usr/bin/curl"

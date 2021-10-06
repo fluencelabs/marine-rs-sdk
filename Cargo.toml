@@ -3,9 +3,6 @@ members = [
   "crates/main",
   "crates/marine-macro",
   "crates/marine-macro-impl",
-  "crates/marine-test-macro",
-  "crates/marine-test-macro-impl",
   "crates/timestamp-macro",
   "sdk",
-  "sdk-test"
   ]
