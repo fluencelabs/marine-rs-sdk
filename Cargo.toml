@@ -1,8 +1,35 @@
-[workspace]
-members = [
-  "crates/main",
-  "crates/marine-macro",
-  "crates/marine-macro-impl",
-  "crates/timestamp-macro",
-  "sdk",
-  ]
+[package]
+name = "marine-rs-sdk"
+version = "0.6.14"  # remember to update html_root_url
+description = "Fluence backend SDK for developing backend applications for the Fluence network"
+documentation = "https://docs.rs/fluence"
+repository = "https://github.com/fluencelabs/marine-rs-sdk"
+authors = ["Fluence Labs"]
+keywords = ["fluence", "marine", "sdk", "webassembly"]
+categories = ["api-bindings", "wasm"]
+license = "Apache-2.0"
+edition = "2018"
+
+[package.metadata.docs.rs]
+all-features = true
+
+[lib]
+path = "src/lib.rs"
+doctest = false
+
+[dependencies]
+marine-macro = { path = "crates/marine-macro", version = "=0.6.14" }
+marine-rs-sdk-main = { path = "crates/main", version = "=0.6.14" }
+marine-timestamp-macro = { path = "crates/timestamp-macro", version = "=0.6.14" }
+
+serde = { version = "1.0.118", features = ["derive"]}
+
+[dev-dependencies]
+trybuild = "1.0"
+
+[features]
+# Print some internal logs by log_utf8_string
+debug = ["marine-rs-sdk-main/debug"]
+
+# Enable logger (this will cause log_utf8_string to appear in imports)
+logger = ["marine-rs-sdk-main/logger"]
