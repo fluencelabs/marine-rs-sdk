@@ -33,3 +33,11 @@ debug = ["marine-rs-sdk-main/debug"]
 
 # Enable logger (this will cause log_utf8_string to appear in imports)
 logger = ["marine-rs-sdk-main/logger"]
+
+[workspace]
+members = [
+    "crates/main",
+    "crates/marine-macro",
+    "crates/marine-macro-impl",
+    "crates/timestamp-macro",
+    ]
