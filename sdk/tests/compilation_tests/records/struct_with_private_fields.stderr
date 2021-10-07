@@ -1,5 +1,0 @@
-error: #[marine] could be applied only to struct with all public fields
- --> $DIR/struct_with_private_fields.rs:9:5
-  |
-9 |     a: i32,
-  |     ^^^^^^
