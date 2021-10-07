@@ -1,1 +1,0 @@
-fn empty_test() {}

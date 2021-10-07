@@ -18,11 +18,10 @@ jobs:
           rustup target add wasm32-wasi
           rustup component add rustfmt
           rustup component add clippy
-          cargo fmt --all -- --check --color always
 
-          (cd sdk; cargo build -v --target wasm32-wasi --all-features)
-          (cd sdk; cargo clippy -v --target wasm32-wasi)
-          (cd sdk-test; cargo build)
+          cargo fmt --all -- --check --color always
+          cargo build -v --target wasm32-wasi --all-features
+          cargo clippy -v --target wasm32-wasi
           (cd crates/marine-macro-impl; cargo test)
 
           TARGET=wasm32-wasi cargo test -v --all-features
