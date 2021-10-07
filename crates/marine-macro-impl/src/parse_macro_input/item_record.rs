@@ -86,23 +86,12 @@ fn fields_into_ast(
 }
 
 /// Check that record fields satisfy the following requirements:
-///  - all fields must be public
 ///  - field must have only doc attributes
 fn check_field(field: &syn::Field) -> Result<()> {
-    match field.vis {
-        syn::Visibility::Public(_) => {}
-        _ => {
-            return syn_error!(
-                field.span(),
-                "#[marine] could be applied only to struct with all public fields"
-            )
-        }
-    };
-
     const DOC_ATTR_NAME: &str = "doc";
 
     // Check that all attributes are doc attributes
-    let is_all_attrs_public = field.attrs.iter().all(|attr| {
+    let are_all_attrs_doc = field.attrs.iter().all(|attr| {
         let meta = match attr.parse_meta() {
             Ok(meta) => meta,
             Err(_) => return false,
@@ -110,7 +99,7 @@ fn check_field(field: &syn::Field) -> Result<()> {
         meta.path().is_ident(DOC_ATTR_NAME)
     });
 
-    if !is_all_attrs_public {
+    if !are_all_attrs_doc {
         return syn_error!(field.span(), "field attributes isn't allowed");
     }
 
