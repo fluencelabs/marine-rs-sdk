@@ -114,9 +114,9 @@ checksum = "e2abad23fbc42b3700f2f279844dc832adb2b2eb069b2df918f455c4e18cc646"
 
 [[package]]
 name = "libc"
-version = "0.2.103"
+version = "0.2.106"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "dd8f7255a17a627354f321ef0055d63b898c6fb27eff628af4d1b66b7331edf6"
+checksum = "a60553f9a9e039a333b4e9b20573b9e9b9c0bb3a11e201ccc48ef4283456d673"
 
 [[package]]
 name = "log"
@@ -130,13 +130,37 @@ dependencies = [
 [[package]]
 name = "marine-macro"
 version = "0.6.14"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "94b05da94255c230b7bf139c39c04447677b5d238579bf38ca7b3fcdc3e04993"
 dependencies = [
- "marine-macro-impl",
+ "marine-macro-impl 0.6.14",
+]
+
+[[package]]
+name = "marine-macro"
+version = "0.6.15"
+dependencies = [
+ "marine-macro-impl 0.6.15",
+ "marine-rs-sdk-main 0.6.15",
 ]
 
 [[package]]
 name = "marine-macro-impl"
 version = "0.6.14"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "7846a749f35186f923f71b3132a15add0735376e73978f41f552b92e9d43cbab"
+dependencies = [
+ "proc-macro2",
+ "quote",
+ "serde",
+ "serde_json",
+ "syn",
+ "uuid",
+]
+
+[[package]]
+name = "marine-macro-impl"
+version = "0.6.15"
 dependencies = [
  "marine-macro-testing-utils",
  "pretty_assertions",
@@ -159,11 +183,12 @@ dependencies = [
 
 [[package]]
 name = "marine-rs-sdk"
-version = "0.6.14"
+version = "0.6.15"
 dependencies = [
- "marine-macro",
- "marine-rs-sdk-main",
+ "marine-macro 0.6.15",
+ "marine-rs-sdk-main 0.6.15",
  "marine-timestamp-macro",
+ "polyplets",
  "serde",
  "trybuild",
 ]
@@ -171,17 +196,27 @@ dependencies = [
 [[package]]
 name = "marine-rs-sdk-main"
 version = "0.6.14"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "1e9d9b9ecd87f0dfa8ad9ee594e71f71d8b4f0b819d3b025632a1a6597063088"
+dependencies = [
+ "log",
+ "marine-macro 0.6.14",
+ "serde",
+]
+
+[[package]]
+name = "marine-rs-sdk-main"
+version = "0.6.15"
 dependencies = [
  "lazy_static",
  "log",
- "marine-macro",
  "serde",
  "simple_logger",
 ]
 
 [[package]]
 name = "marine-timestamp-macro"
-version = "0.6.14"
+version = "0.6.15"
 dependencies = [
  "chrono",
  "quote",
@@ -216,6 +251,17 @@ dependencies = [
 ]
 
 [[package]]
+name = "polyplets"
+version = "0.2.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "8cc56e7803860fa903c27675a17215e1cfb39fb26e111c0b93f6c049f9cf8d8e"
+dependencies = [
+ "marine-macro 0.6.14",
+ "marine-rs-sdk-main 0.6.14",
+ "serde",
+]
+
+[[package]]
 name = "pretty_assertions"
 version = "0.7.2"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -229,9 +275,9 @@ dependencies = [
 
 [[package]]
 name = "proc-macro2"
-version = "1.0.29"
+version = "1.0.32"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "b9f5105d4fdaab20335ca9565e106a5d9b82b6219b5ba735731124ac6711d23d"
+checksum = "ba508cc11742c0dc5c1659771673afbab7a0efab23aa17e854cbab0837ed0b43"
 dependencies = [
  "unicode-xid",
 ]
@@ -253,18 +299,18 @@ checksum = "71d301d4193d031abdd79ff7e3dd721168a9572ef3fe51a1517aba235bd8f86e"
 
 [[package]]
 name = "serde"
-version = "1.0.118"
+version = "1.0.130"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "06c64263859d87aa2eb554587e2d23183398d617427327cf2b3d0ed8c69e4800"
+checksum = "f12d06de37cf59146fbdecab66aa99f9fe4f78722e3607577a5375d66bd0c913"
 dependencies = [
  "serde_derive",
 ]
 
 [[package]]
 name = "serde_derive"
-version = "1.0.118"
+version = "1.0.130"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "c84d3526699cd55261af4b941e4e725444df67aa4f9e6a3564f18030d12672df"
+checksum = "d7bc1a1ab1961464eae040d96713baa5a724a8152c1222492465b54322ec508b"
 dependencies = [
  "proc-macro2",
  "quote",
@@ -297,9 +343,9 @@ dependencies = [
 
 [[package]]
 name = "syn"
-version = "1.0.80"
+version = "1.0.81"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "d010a1623fbd906d51d650a9916aaefc05ffa0e4053ff7fe601167f3e715d194"
+checksum = "f2afee18b8beb5a596ecb4a2dce128c719b4ba399d34126b9e4396e3f9860966"
 dependencies = [
  "proc-macro2",
  "quote",
@@ -337,9 +383,9 @@ dependencies = [
 
 [[package]]
 name = "trybuild"
-version = "1.0.48"
+version = "1.0.52"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "4e6088028c71b42d26126c208a072670bcb964cfe73904c331b05e9c26080470"
+checksum = "150e726dc059e6fbd4fce3288f5bb3cf70128cf63b0dde23b938a3cad810fb23"
 dependencies = [
  "glob",
  "lazy_static",

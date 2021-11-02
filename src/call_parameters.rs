@@ -15,19 +15,10 @@
  */
 
 use marine_macro::marine;
+pub use polyplets::SecurityTetraplet;
 
 use serde::Serialize;
 use serde::Deserialize;
-
-/// Describes an origin that set an argument.
-#[marine]
-#[derive(Clone, PartialEq, Default, Eq, Debug, Serialize, Deserialize)]
-pub struct SecurityTetraplet {
-    pub peer_pk: String,
-    pub service_id: String,
-    pub function_name: String,
-    pub json_path: String,
-}
 
 /// This struct contains parameters that would be accessible by Wasm modules.
 #[marine]
