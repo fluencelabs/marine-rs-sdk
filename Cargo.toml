@@ -21,6 +21,7 @@ doctest = false
 marine-macro = { path = "crates/marine-macro", version = "=0.6.15" }
 marine-rs-sdk-main = { path = "crates/main", version = "=0.6.15" }
 marine-timestamp-macro = { path = "crates/timestamp-macro", version = "=0.6.15" }
+polyplets = "0.2.0"
 
 serde = { version = "1.0.118", features = ["derive"]}
 
