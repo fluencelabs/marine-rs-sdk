@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-use marine_macro::marine;
+use marine_macro_export::marine;
 pub use polyplets::SecurityTetraplet;
 
 use serde::Serialize;

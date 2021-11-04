@@ -74,8 +74,8 @@ mod mounted_binary;
 // sdk is used inside CallParameters and MountedBinaryResult glue code
 extern crate self as marine_rs_sdk;
 
-pub use marine_macro::marine;
-pub use marine_macro::fce;
+pub use marine_macro_export::marine;
+pub use marine_macro_export::fce;
 
 pub use call_parameters::CallParameters;
 pub use call_parameters::SecurityTetraplet;

@@ -145,6 +145,14 @@ dependencies = [
 ]
 
 [[package]]
+name = "marine-macro-export"
+version = "0.6.15"
+dependencies = [
+ "marine-macro 0.6.15",
+ "marine-rs-sdk-main 0.6.15",
+]
+
+[[package]]
 name = "marine-macro-impl"
 version = "0.6.14"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -185,7 +193,7 @@ dependencies = [
 name = "marine-rs-sdk"
 version = "0.6.15"
 dependencies = [
- "marine-macro 0.6.15",
+ "marine-macro-export",
  "marine-rs-sdk-main 0.6.15",
  "marine-timestamp-macro",
  "polyplets",

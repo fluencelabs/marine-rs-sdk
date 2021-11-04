@@ -18,7 +18,7 @@ path = "src/lib.rs"
 doctest = false
 
 [dependencies]
-marine-macro = { path = "crates/marine-macro", version = "=0.6.15" }
+marine-macro-export = { path = "crates/marine-macro-export", version = "=0.6.15" }
 marine-rs-sdk-main = { path = "crates/main", version = "=0.6.15" }
 marine-timestamp-macro = { path = "crates/timestamp-macro", version = "=0.6.15" }
 polyplets = "0.2.0"
@@ -39,6 +39,7 @@ logger = ["marine-rs-sdk-main/logger"]
 members = [
     "crates/main",
     "crates/marine-macro",
+    "crates/marine-macro-export",
     "crates/marine-macro-impl",
     "crates/timestamp-macro",
     ]

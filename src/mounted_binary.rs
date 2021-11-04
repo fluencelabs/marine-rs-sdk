@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-use marine_macro::marine;
+use marine_macro_export::marine;
 
 use serde::Serialize;
 use serde::Deserialize;

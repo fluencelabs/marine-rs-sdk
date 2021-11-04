@@ -1,6 +1,6 @@
 version: 2
 jobs:
-  backend sdk:
+  marine rs sdk:
     docker:
       - image: circleci/rust:latest
     environment:
@@ -34,6 +34,6 @@ jobs:
 
 workflows:
   version: 2
-  fluence:
+  marine-rs-sdk:
     jobs:
-      - backend sdk
+      - marine rs sdk

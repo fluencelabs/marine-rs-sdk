@@ -1,0 +1,21 @@
+[package]
+name = "marine-macro-export"
+version = "0.6.15"  # remember to update html_root_url
+edition = "2018"
+description = "Definition of the `#[marine]` macro that intended to use in other crates"
+documentation = "https://docs.rs/fluence/marine-macro-export"
+repository = "https://github.com/fluencelabs/marine-rs-sdk/tree/master/crates/marine-macro-export"
+authors = ["Fluence Labs"]
+keywords = ["fluence", "marine", "sdk", "webassembly", "procedural_macros"]
+categories = ["api-bindings", "wasm"]
+license = "Apache-2.0"
+
+[package.metadata.docs.rs]
+all-features = true
+
+[lib]
+doctest = false
+
+[dependencies]
+marine-macro = { path = "../marine-macro", version = "=0.6.15" }
+marine-rs-sdk-main = { path = "../main", version = "=0.6.15" }
