@@ -24,7 +24,7 @@ pub use marine_macro::fce;
 
 extern crate self as marine_rs_sdk;
 
-mod internal {
+pub mod internal {
     pub use marine_rs_sdk_main::get_result_ptr;
     pub use marine_rs_sdk_main::get_result_size;
     pub use marine_rs_sdk_main::set_result_ptr;
