@@ -80,6 +80,15 @@ macro_rules! module_manifest {
         #[link_section = "__fluence_wasm_module_manifest"]
         #[doc(hidden)]
         pub static __M_WASM_MODULE_MANIFEST: [u8; __M_MANIFEST_SIZE] = generate_manifest();
+
+        extern "C" {
+            __wasm_call_ctors();
+        }
+
+        pub fn main() {
+            __wasm_call_ctors();
+            marine_initialize();
+        }
     };
 
     () => {
