@@ -18,22 +18,21 @@ path = "src/lib.rs"
 doctest = false
 
 [dependencies]
-marine-macro = { path = "crates/marine-macro", version = "=0.6.15" }
-marine-rs-sdk-main = { path = "crates/main", version = "=0.6.15" }
-marine-timestamp-macro = { path = "crates/timestamp-macro", version = "=0.6.15" }
-polyplets = "0.2.0"
-
-serde = { version = "1.0.118", features = ["derive"]}
+#marine-rs-sdk-main = { path = "crates/main", version = "=0.6.15" }
+polyplets = {version = "0.2.0", path = "../aquavm/crates/air-lib/polyplets"}
 
 [dev-dependencies]
 trybuild = "1.0"
 
 [features]
 # Print some internal logs by log_utf8_string
-debug = ["marine-rs-sdk-main/debug"]
+#debug = ["marine-rs-sdk-main/debug"]
 
 # Enable logger (this will cause log_utf8_string to appear in imports)
-logger = ["marine-rs-sdk-main/logger"]
+#logger = ["marine-rs-sdk-main/logger"]
+
+[profile.release]
+lto = true
 
 [workspace]
 members = [

@@ -67,39 +67,15 @@
 )]
 #![warn(rust_2018_idioms)]
 
-mod call_parameters;
-mod mounted_binary;
 
-#[allow(unused_extern_crates)]
-// sdk is used inside CallParameters and MountedBinaryResult glue code
-extern crate self as marine_rs_sdk;
-
-pub use marine_macro::marine;
-pub use marine_macro::fce;
-
-pub use call_parameters::CallParameters;
-pub use call_parameters::SecurityTetraplet;
-pub use call_parameters::get_call_parameters;
-
-#[cfg(feature = "logger")]
-pub use marine_rs_sdk_main::WasmLoggerBuilder;
-#[cfg(feature = "logger")]
-pub use marine_rs_sdk_main::TargetMap;
-
-pub use mounted_binary::MountedBinaryResult;
-pub use mounted_binary::MountedBinaryStringResult;
-pub use mounted_binary::SUCCESS_CODE as BINARY_SUCCESS_CODE;
-
-pub use marine_rs_sdk_main::module_manifest;
+pub use polyplets::SecurityTetraplet;
 
 /// These API functions are intended for internal usage in generated code.
 /// Normally, you shouldn't use them.
 #[doc(hidden)]
 pub mod internal {
-    pub use marine_rs_sdk_main::get_result_ptr;
-    pub use marine_rs_sdk_main::get_result_size;
-    pub use marine_rs_sdk_main::set_result_ptr;
-    pub use marine_rs_sdk_main::set_result_size;
-    pub use marine_rs_sdk_main::add_object_to_release;
-    pub use marine_timestamp_macro::build_timestamp;
+    #[no_mangle]
+    pub unsafe fn get_result_ptr() -> usize {
+        0 as _
+    }
 }

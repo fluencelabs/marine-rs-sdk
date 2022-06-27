@@ -19,12 +19,12 @@ crate-type = ["rlib"]
 doctest = false
 
 [dependencies]
-log = { version = "0.4.8", features = ["std"] }
-serde = "1.0.118"
+#log = { version = "0.4.8", features = ["std"] }
+#serde = "1.0.118"
 
 [dev-dependencies]
-simple_logger = "1.6.0" # used in doc test
-lazy_static = "1.4.0" # used in doc test
+#simple_logger = "1.6.0" # used in doc test
+#lazy_static = "1.4.0" # used in doc test
 
 [features]
 # Print some internal logs by log_utf8_string
