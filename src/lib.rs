@@ -103,3 +103,23 @@ pub mod internal {
     pub use marine_rs_sdk_main::add_object_to_release;
     pub use marine_timestamp_macro::build_timestamp;
 }
+
+// Adds an explicit __wasm_call_ctors call to tell LLVM not to
+// wrap every export in __wasm_call_ctors/__wasm_call_dtors calls.
+// The most referenced issue about it is https://github.com/WebAssembly/WASI/issues/471
+/// For internal use. Not an API function.
+#[cfg(wasm32)]
+#[doc(hidden)]
+extern "C" {
+    fn __wasm_call_ctors();
+}
+
+/// For internal use. Not an API function.
+#[cfg(wasm32)]
+#[doc(hidden)]
+#[no_mangle]
+pub fn _initialize() {
+    unsafe {
+        __wasm_call_ctors();
+    }
+}
