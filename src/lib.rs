@@ -108,14 +108,14 @@ pub mod internal {
 // wrap every export in __wasm_call_ctors/__wasm_call_dtors calls.
 // The most referenced issue about it is https://github.com/WebAssembly/WASI/issues/471
 /// For internal use. Not an API function.
-#[cfg(wasm32)]
+#[cfg(target_arch = "wasm32")]
 #[doc(hidden)]
 extern "C" {
     fn __wasm_call_ctors();
 }
 
 /// For internal use. Not an API function.
-#[cfg(wasm32)]
+#[cfg(target_arch = "wasm32")]
 #[doc(hidden)]
 #[no_mangle]
 pub fn _initialize() {
