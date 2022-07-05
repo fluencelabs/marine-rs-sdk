@@ -104,7 +104,6 @@ pub mod internal {
     pub use marine_timestamp_macro::build_timestamp;
 }
 
-
 #[cfg(not(feature = "no-explicit-ctors-call"))]
 #[cfg(target_arch = "wasm32")]
 #[doc(hidden)]
