@@ -35,6 +35,9 @@ debug = ["marine-rs-sdk-main/debug"]
 # Enable logger (this will cause log_utf8_string to appear in imports)
 logger = ["marine-rs-sdk-main/logger"]
 
+# Remove _initialize function with explicit call to __wasm_call_ctors
+no-explicit-ctors-call = []
+
 [workspace]
 members = [
     "crates/main",
