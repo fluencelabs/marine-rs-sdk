@@ -43,8 +43,6 @@ jobs:
         run: cargo check -v --all-features
 
       - name: "Run marine-macro-impl"
-        env:
-          CARGO_BUILD_TARGET: wasm32-wasi
         run: cargo test
         working-directory: crates/marine-macro-impl
 
