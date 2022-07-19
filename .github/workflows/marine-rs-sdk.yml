@@ -41,9 +41,9 @@ jobs:
       - name: "cargo check"
         run: cargo check -v --all-features
 
-      - name: "Run marine-test-macro-impl"
+      - name: "Run marine-macro-impl"
         run: cargo test
-        working-directory: crates/marine-test-macro-impl
+        working-directory: crates/marine-macro-impl
 
       - name: "cargo test"
         run: cargo test run --release --all-features --no-fail-fast
