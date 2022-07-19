@@ -47,8 +47,6 @@ jobs:
         working-directory: crates/marine-macro-impl
 
       - name: "cargo test"
-        env:
-          CARGO_BUILD_TARGET: wasm32-wasi
         run: cargo test --release --all-features --no-fail-fast
 
       - name: "cargo clippy"
