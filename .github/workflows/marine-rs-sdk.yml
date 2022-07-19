@@ -26,7 +26,6 @@ jobs:
         with:
           toolchain: stable
           target: wasm32-wasi
-          default: true
           components: rustfmt, clippy
 
       - name: "Cache rust"
@@ -36,6 +35,8 @@ jobs:
         run: cargo fmt --all -- --check
 
       - name: "cargo build"
+        env:
+          CARGO_BUILD_TARGET: wasm32-wasi
         run: cargo build
 
       - name: "cargo check"
@@ -51,4 +52,6 @@ jobs:
         run: cargo test run --release --all-features --no-fail-fast
 
       - name: "cargo clippy"
+        env:
+          CARGO_BUILD_TARGET: wasm32-wasi
         run: cargo clippy -Z unstable-options --all
