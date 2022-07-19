@@ -45,8 +45,13 @@ jobs:
         run: cargo test
         working-directory: crates/marine-macro-impl
 
-      - name: "cargo test"
-        run: cargo test run --release --all-features --no-fail-fast
+      - name: "cargo test with env target"
+        env:
+          CARGO_BUILD_TARGET: wasm32-wasi
+        run: cargo test run --release --all-features --no-fail-fast --verbose
+
+      - name: "cargo test without env target"
+        run: cargo test run --release --all-features --no-fail-fast --verbose
 
       - name: "cargo clippy"
         run: cargo clippy -Z unstable-options --all
