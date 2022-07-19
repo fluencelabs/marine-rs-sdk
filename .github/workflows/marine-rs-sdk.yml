@@ -24,7 +24,7 @@ jobs:
 
       - uses: actions-rs/toolchain@v1
         with:
-          toolchain: nightly-2022-06-30
+          toolchain: stable
           target: wasm32-wasi
           default: true
           components: rustfmt, clippy
@@ -45,13 +45,10 @@ jobs:
         run: cargo test
         working-directory: crates/marine-macro-impl
 
-      - name: "cargo test with env target"
+      - name: "cargo test"
         env:
           CARGO_BUILD_TARGET: wasm32-wasi
-        run: cargo test run --release --all-features --no-fail-fast --verbose
-
-      - name: "cargo test without env target"
-        run: cargo test run --release --all-features --no-fail-fast --verbose
+        run: cargo test run --release --all-features --no-fail-fast
 
       - name: "cargo clippy"
         run: cargo clippy -Z unstable-options --all
