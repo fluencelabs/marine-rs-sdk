@@ -50,7 +50,7 @@
 //!
 //! ```
 
-#![doc(html_root_url = "https://docs.rs/marine-macro/0.6.15")]
+#![doc(html_root_url = "https://docs.rs/marine-macro/0.7.0")]
 #![deny(
     dead_code,
     nonstandard_style,
