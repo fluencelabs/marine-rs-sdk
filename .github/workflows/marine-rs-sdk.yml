@@ -1,0 +1,56 @@
+name: "marine-rs-sdk"
+
+on:
+  pull_request:
+  push:
+    branches:
+      - "master"
+
+concurrency:
+  group: "${{ github.workflow }}-${{ github.ref }}"
+  cancel-in-progress: true
+
+jobs:
+  build:
+    name: "Build and test"
+    runs-on: builder
+
+    env:
+      RUST_BACKTRACE: 1
+      RUST_TEST_THREADS: 1
+      CARGO_TERM_COLOR: always
+
+    steps:
+      - uses: actions/checkout@v3
+
+      - uses: actions-rs/toolchain@v1
+        with:
+          toolchain: stable
+          target: wasm32-wasi
+          components: rustfmt, clippy
+
+      - name: "Cache rust"
+        uses: Swatinem/rust-cache@v1
+
+      - name: "cargo fmt"
+        run: cargo fmt --all -- --check
+
+      - name: "cargo build"
+        env:
+          CARGO_BUILD_TARGET: wasm32-wasi
+        run: cargo build
+
+      - name: "cargo check"
+        run: cargo check -v --all-features
+
+      - name: "Run marine-macro-impl"
+        run: cargo test
+        working-directory: crates/marine-macro-impl
+
+      - name: "cargo test"
+        run: cargo test --release --all-features --no-fail-fast
+
+      - name: "cargo clippy"
+        env:
+          CARGO_BUILD_TARGET: wasm32-wasi
+        run: cargo clippy
