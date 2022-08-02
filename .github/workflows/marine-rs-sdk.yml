@@ -53,4 +53,4 @@ jobs:
       - name: "cargo clippy"
         env:
           CARGO_BUILD_TARGET: wasm32-wasi
-        run: cargo clippy -Z unstable-options --all
+        run: cargo clippy
