@@ -10,47 +10,39 @@ concurrency:
   group: "${{ github.workflow }}-${{ github.ref }}"
   cancel-in-progress: true
 
-jobs:
-  build:
-    name: "Build and test"
-    runs-on: builder
+env:
+  RUST_TEST_THREADS: 1
 
-    env:
-      RUST_BACKTRACE: 1
-      RUST_TEST_THREADS: 1
-      CARGO_TERM_COLOR: always
+jobs:
+  marine-rs-sdk:
+    name: "Run tests"
+    runs-on: builder
 
     steps:
       - uses: actions/checkout@v3
 
-      - uses: actions-rs/toolchain@v1
-        with:
-          toolchain: stable
-          target: wasm32-wasi
-          components: rustfmt, clippy
+      - name: Setup rust toolchain
+        uses: actions-rust-lang/setup-rust-toolchain@v1
 
-      - name: "Cache rust"
-        uses: Swatinem/rust-cache@v1
-
-      - name: "cargo fmt"
+      - name: Run cargo fmt
         run: cargo fmt --all -- --check
 
-      - name: "cargo build"
+      - name: Run cargo build
         env:
           CARGO_BUILD_TARGET: wasm32-wasi
         run: cargo build
 
-      - name: "cargo check"
+      - name: Run cargo check
         run: cargo check -v --all-features
 
-      - name: "Run marine-macro-impl"
+      - name: Run marine-macro-impl tests
         run: cargo test
         working-directory: crates/marine-macro-impl
 
-      - name: "cargo test"
+      - name: Run cargo test
         run: cargo test --release --all-features --no-fail-fast
 
-      - name: "cargo clippy"
+      - name: Run cargo clippy
         env:
           CARGO_BUILD_TARGET: wasm32-wasi
         run: cargo clippy
