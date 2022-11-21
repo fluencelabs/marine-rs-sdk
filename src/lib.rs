@@ -106,16 +106,15 @@ pub mod internal {
 
 #[cfg(not(feature = "no-explicit-ctors-call"))]
 #[cfg(target_arch = "wasm32")]
-#[doc(hidden)]
 extern "C" {
     // For internal use. Not an API function.
     fn __wasm_call_ctors();
 }
 
-/// Adds an explicit __wasm_call_ctors call to tell LLVM not to
-/// wrap every export in __wasm_call_ctors/__wasm_call_dtors calls.
-/// The most referenced issue about it is https://github.com/WebAssembly/WASI/issues/471
-/// For internal use. Not an API function.
+// Adds an explicit __wasm_call_ctors call to tell LLVM not to
+// wrap every export in __wasm_call_ctors/__wasm_call_dtors calls.
+// The most referenced issue about it is https://github.com/WebAssembly/WASI/issues/471
+// For internal use. Not an API function.
 #[cfg(not(feature = "no-explicit-ctors-call"))]
 #[cfg(target_arch = "wasm32")]
 #[doc(hidden)]
