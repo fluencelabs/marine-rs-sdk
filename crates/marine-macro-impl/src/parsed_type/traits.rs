@@ -131,7 +131,7 @@ impl fmt::Display for ParsedType {
             }
             ParsedType::Record(record_name, passing_style) => {
                 passing_style.fmt(f)?;
-                f.write_str(&record_name)
+                f.write_str(record_name)
             }
         }?;
 

@@ -34,11 +34,11 @@ impl quote::ToTokens for ast_types::AstExternMod {
         );
 
         let wasm_import_module_name = &self.namespace;
-        let wasm_section_items = generate_extern_section_items(&self, wasm_extern_item_generator);
+        let wasm_section_items = generate_extern_section_items(self, wasm_extern_item_generator);
         let not_wasm_section_items =
-            generate_extern_section_items(&self, not_wasm_extern_item_generator);
+            generate_extern_section_items(self, not_wasm_extern_item_generator);
 
-        let wrapper_functions = generate_wrapper_functions(&self);
+        let wrapper_functions = generate_wrapper_functions(self);
 
         let glue_code = quote! {
             #[link(wasm_import_module = #wasm_import_module_name)]
@@ -72,7 +72,7 @@ fn generate_extern_section_items(
     let mut section_items = Vec::with_capacity(extern_item.imports.len());
 
     for import in &extern_item.imports {
-        section_items.push(item_generator(&import));
+        section_items.push(item_generator(import));
     }
 
     section_items
@@ -109,7 +109,7 @@ fn not_wasm_extern_item_generator(import: &ast_types::AstExternFn) -> TokenStrea
 }
 
 fn generate_original_arguments(
-    arguments: &Vec<ast_types::AstFnArgument>,
+    arguments: &[ast_types::AstFnArgument],
 ) -> Vec<proc_macro2::TokenStream> {
     arguments
         .iter()

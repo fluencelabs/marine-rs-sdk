@@ -23,6 +23,7 @@ pub unsafe fn allocate(elem_count: usize, elem_ty: usize) -> usize {
         return 0;
     }
 
+    #[allow(clippy::let_and_return)]
     let allocated_mem = allocate_impl(elem_count, elem_ty);
     crate::debug_log!(format!(
         "sdk.allocate: {} {} -> {}\n",

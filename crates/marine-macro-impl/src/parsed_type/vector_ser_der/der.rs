@@ -40,7 +40,7 @@ pub(super) fn vector_der(arg_name: &str, ty: &ParsedType) -> proc_macro2::TokenS
     let deserializer_name = crate::utils::prepare_ident(deserializer_name);
     let deserializer_ident = crate::new_ident!(deserializer_name);
 
-    let inner_vector_deserializer = super::generate_vector_der(&*ty, &deserializer_name);
+    let inner_vector_deserializer = super::generate_vector_der(ty, &deserializer_name);
 
     quote! {
         #inner_vector_deserializer
