@@ -26,19 +26,19 @@ macro_rules! new_ident {
 macro_rules! prepare_global_data {
     ($mtype: ident, $self: ident, $name: expr, $data: ident, $data_size: ident, $global_static_name: ident, $section_name: ident) => {
         // TODO: change serialization protocol
-        let mtype = crate::export_ast_types::SDKAst::$mtype($self.clone().into());
+        let mtype = $crate::export_ast_types::SDKAst::$mtype($self.clone().into());
         let $data = serde_json::to_vec(&mtype).unwrap();
         let $data_size = $data.len();
         let $data = syn::LitByteStr::new(&$data, proc_macro2::Span::call_site());
 
-        let $global_static_name = crate::new_ident!(format!(
+        let $global_static_name = $crate::new_ident!(format!(
             "{}{}",
-            crate::token_stream_generator::GENERATED_GLOBAL_PREFIX,
+            $crate::token_stream_generator::GENERATED_GLOBAL_PREFIX,
             $name.replace(".", "_"),
         ));
         let $section_name = format!(
             "{}{}",
-            crate::token_stream_generator::GENERATED_SECTION_PREFIX,
+            $crate::token_stream_generator::GENERATED_SECTION_PREFIX,
             $name.replace(".", "_"),
         );
     };

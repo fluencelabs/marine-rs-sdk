@@ -64,16 +64,14 @@ impl FieldValuesBuilder {
             self.fields_der.extend(field_der);
         }
 
-        let outcome = FieldValuesOutcome {
+        FieldValuesOutcome {
             fields_der: self.fields_der,
             field_value_idents: self.field_value_idents,
-        };
-
-        outcome
+        }
     }
 
     fn field_der(&mut self, ast_field: &AstRecordField, field: &syn::Ident) -> TokenStream {
-        let der = match &ast_field.ty {
+        match &ast_field.ty {
             ParsedType::Boolean(_) => self.bool_der(field),
             ParsedType::I8(_) => self.i8_der(field),
             ParsedType::I16(_) => self.i16_der(field),
@@ -88,9 +86,7 @@ impl FieldValuesBuilder {
             ParsedType::Utf8Str(_) | ParsedType::Utf8String(_) => self.string_der(field),
             ParsedType::Vector(ty, _) => self.vector_der(ty, field),
             ParsedType::Record(name, _) => self.record_der(name, field),
-        };
-
-        der
+        }
     }
 
     fn bool_der(&mut self, field: &syn::Ident) -> TokenStream {

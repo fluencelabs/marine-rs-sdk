@@ -66,7 +66,7 @@ macro_rules! debug_log {
             let level = log::Level::Info as i32;
             let target = 0i32;
             let msg = $msg_generator;
-            crate::logger::log_utf8_string(level, target, msg.as_ptr() as i32, msg.len() as i32);
+            $crate::logger::log_utf8_string(level, target, msg.as_ptr() as i32, msg.len() as i32);
         }
     };
 }

@@ -111,8 +111,7 @@ impl ForeignModPrologGlueCodeGenerator for Vec<AstFnArgument> {
 
         let raw_arg_types: Vec<RustType> = self
             .iter()
-            .map(|input_type| input_type.generate_arguments())
-            .flatten()
+            .flat_map(|input_type| input_type.generate_arguments())
             .collect();
         let raw_arg_names: Vec<syn::Ident> = raw_arg_types
             .iter()
