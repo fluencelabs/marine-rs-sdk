@@ -16,6 +16,6 @@ crate-type = ["rlib"]
 doctest = false
 
 [dependencies]
-quote = "1.0.9"
-proc-macro2 = "1.0.26"
-syn = { version = '1.0.64', features = ['full'] }
+quote = "1.0.21"
+proc-macro2 = "1.0.47"
+syn = { version = '1.0.105', features = ['full'] }

@@ -19,8 +19,8 @@ crate-type = ["rlib"]
 doctest = false
 
 [dependencies]
-log = { version = "0.4.8", features = ["std"] }
-serde = "1.0.118"
+log = { version = "0.4.17", features = ["std"] }
+serde = "1.0.149"
 
 [dev-dependencies]
 simple_logger = "2.3.0" # used in doc test
