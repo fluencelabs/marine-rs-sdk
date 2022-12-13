@@ -1,0 +1,54 @@
+name: Publish snapshot
+
+on:
+  workflow_call:
+    inputs:
+      cargo-dependencies:
+        description: "Cargo dependencies map"
+        type: string
+      ref:
+        description: "git ref to checkout to"
+        type: string
+        default: "master"
+    outputs:
+      cargo-version:
+        description: "Cargo snapshot version"
+        value: ${{ jobs.cargo-snapshot.outputs.version }}
+
+jobs:
+  cargo-snapshot:
+    name: "Publish cargo snapshot"
+    runs-on: builder
+
+    outputs:
+      version: "${{ steps.snapshot.outputs.version }}"
+
+    permissions:
+      contents: read
+      id-token: write
+
+    steps:
+      - name: Checkout to repository
+        uses: actions/checkout@v3
+        with:
+          repository: fluencelabs/marine-rs-sdk
+          ref: ${{ inputs.ref }}
+
+      - name: Setup Rust toolchain
+        uses: actions-rust-lang/setup-rust-toolchain@v1
+
+      - name: Set dependencies
+        if: inputs.cargo-dependencies != ''
+        uses: fluencelabs/github-actions/cargo-set-dependency@main
+        with:
+          dependencies: ${{ inputs.cargo-dependencies }}
+
+      - name: Generate snapshot version
+        id: version
+        uses: fluencelabs/github-actions/generate-snapshot-id@main
+
+      - name: Publish crate snapshots
+        id: snapshot
+        uses: fluencelabs/github-actions/cargo-publish-snapshot@main
+        with:
+          id: ${{ steps.version.outputs.id }}
