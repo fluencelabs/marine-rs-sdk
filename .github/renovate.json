@@ -12,7 +12,8 @@
       "matchPackagePatterns": [
         "fluence-.*",
         "avm-server",
-        "air-intepreter-wasm"
+        "air-intepreter-wasm",
+        "marine-.*"
       ],
       "semanticCommitType": "fix",
       "semanticCommitScope": "deps",
