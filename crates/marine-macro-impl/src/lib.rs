@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-#![doc(html_root_url = "https://docs.rs/marine-macro-impl/0.7.1")]
+#![doc(html_root_url = "https://docs.rs/marine-macro-impl/0.7.1")] // x-release-please-version
 #![deny(
     dead_code,
     nonstandard_style,

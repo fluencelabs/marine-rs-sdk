@@ -1,0 +1,17 @@
+{
+  "bootstrap-sha": "9e75f94c6a3ec37b6dd945435c1d16ecfb4714a4",
+  "release-type": "simple",
+  "bump-minor-pre-major": true,
+  "bump-patch-for-minor-pre-major": true,
+  "packages": {
+    ".": {
+      "component": "marine-rs-sdk",
+      "extra-files": [
+        "crates/main/src/lib.rs",
+        "crates/marine-macro-impl/src/lib.rs",
+        "marine-macro/src/lib.rs",
+        "src/lib.rs"
+      ]
+    }
+  }
+}
