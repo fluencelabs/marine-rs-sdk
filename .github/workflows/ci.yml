@@ -5,14 +5,14 @@ on:
     paths-ignore:
       - "**.md"
       - ".github/**"
-      - "!.github/ci.yml"
+      - "!.github/workflows/ci.yml"
   push:
     branches:
       - "master"
     paths-ignore:
       - "**.md"
       - ".github/**"
-      - "!.github/ci.yml"
+      - "!.github/workflows/ci.yml"
 
 concurrency:
   group: "${{ github.workflow }}-${{ github.ref }}"
