@@ -20,6 +20,10 @@
       "schedule": "at any time"
     },
     {
+      "matchPackagePatterns": ["^@wasmer", "^wasmer", "^wasm-bindgen"],
+      "enabled": false
+    },
+    {
       "matchDepTypes": ["devDependencies"],
       "prPriority": -1
     },
