@@ -4,9 +4,25 @@
     "config:base",
     ":semanticCommitTypeAll(chore)"
   ],
-  "enabledManagers": ["cargo", "npm", "github-actions"],
+  "enabledManagers": ["cargo", "github-actions"],
   "schedule": "every weekend",
   "packageRules": [
+    {
+      "matchManagers": ["cargo"],
+      "matchPackagePatterns": [
+        "fluence-.*",
+        "avm-server",
+        "air-intepreter-wasm",
+        "marine-.*"
+      ],
+      "semanticCommitType": "fix",
+      "semanticCommitScope": "deps",
+      "schedule": "at any time"
+    },
+    {
+      "matchPackagePatterns": ["^@wasmer", "^wasmer", "^wasm-bindgen"],
+      "enabled": false
+    },
     {
       "matchDepTypes": ["devDependencies"],
       "prPriority": -1
@@ -16,14 +32,8 @@
       "prConcurrentLimit": 1
     },
     {
-      "matchManagers": [ "github-actions" ],
-      "automerge": true,
-      "automergeType": "branch",
+      "matchManagers": ["github-actions"],
       "prPriority": 1
-    },
-    {
-      "matchPackagePatterns": ["^@wasmer", "^wasmer", "^wasm-bindgen"],
-      "enabled": false
     }
   ]
 }
