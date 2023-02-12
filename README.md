@@ -76,7 +76,7 @@ At the time, the `#[marine]` macro allows using the following Rust types as an a
 - strings `String`, `&str`
 - a vector of elements of the above types
 - a vector composed of vectors of the above type, where recursion is acceptable, e.g. the type `Vec<Vec<Vec<u8>>>` is permissible
-- a reference to all of the above types
+- a reference of all of the above types
 - a structure where all fields are of the basic Rust types
 - a structure where all fields are of any above types or other structures build with such a way
 
