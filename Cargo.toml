@@ -23,7 +23,7 @@ marine-rs-sdk-main = { path = "crates/main", version = "=0.7.1" }
 marine-timestamp-macro = { path = "crates/timestamp-macro", version = "=0.7.1" }
 polyplets = "0.3.2"
 
-serde = { version = "1.0.118", features = ["derive"]}
+serde = { version = "1.0.152", features = ["derive"]}
 
 [dev-dependencies]
 trybuild = "1.0"
