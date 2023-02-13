@@ -23,7 +23,7 @@ log = { version = "0.4.17", features = ["std"] }
 serde = "1.0.152"
 
 [dev-dependencies]
-simple_logger = "2.3.0" # used in doc test
+simple_logger = "4.0.0" # used in doc test
 lazy_static = "1.4.0" # used in doc test
 
 [features]
