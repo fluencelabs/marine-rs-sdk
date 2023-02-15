@@ -1,13 +1,12 @@
+# Marine Rust SDK
 [![crates.io version](https://img.shields.io/crates/v/marine-rs-sdk?color=green)](https://crates.io/crates/marine-rs-sdk)
-
-## Marine Rust SDK
 
 This SDK empowers developers to create general-purpose Wasm modules and combine them in a multi-module setup with the help of [interface-types](https://github.com/WebAssembly/interface-types) and a [shared-nothing linking](https://training.linuxfoundation.org/blog/how-and-why-to-link-webassembly-modules/) scheme. The SDK provides all necessary macros and other features to make Wasm developing process as close as possible to the one with the "vanilla" Rust. Compiled modules are intended to run with the [Marine](https://github.com/fluencelabs/marine) runtime.
 
 
 ## Usage
 
-The core component of the SDK is the `#[marine]`` macro that should be used with export functions, extern blocks, and structures. Let's consider a simple scenario with a module with one export function:
+The core component of the SDK is the `#[marine]` macro that should be used with export functions, extern blocks, and structures. Let's consider a simple scenario with a module with one export function:
 ```rust
 #[marine]
 use marine_rs_sdk::marine;
@@ -75,10 +74,10 @@ At the moment, the `#[marine]` macro allows the following Rust types as an argum
 - one of the following Rust basic types: `bool`, `u8`, `u16`, `u32`, `u64`, `i8`, `i16`, `i32`, `i64`, `f32`, `f64`
 - strings `String`, `&str`
 - a vector of elements of the above types
-- a vector composed of vectors of the above type, where recursion is acceptable, e.g. the type `Vec<Vec<Vec<u8>>>` is permissible
+- a vector composed of vectors of the above type, where recursion is acceptable, e.g., the type `Vec<Vec<Vec<u8>>>` is permissible
 - a reference of all of the above types
 - a structure where all fields are of the basic Rust types
-- a structure where all fields are of any above types or other structures build with such a way
+- a structure where all fields are of the above types or other structures build with such a way
 
 
 ## Documentation
