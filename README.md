@@ -30,12 +30,12 @@ Finally, you obtain a build manifest embedded into a Wasm binary and can interac
 ```bash
 > marine info ./target/wasm32-wasi/release/greeting.wasm
 it version:  0.23.1
-sdk version: 0.6.0
+sdk version: 0.7.0
 authors:     <user-name>
 version:     0.1.0
 description:
 repository:
-build time:  2022-05-15 14:52:37.865550 +00:00 UTC
+build time:  2023-02-15 18:52:37.865550 +00:00 UTC
 
 > mrepl --quiet
 1> load greeting ./target/wasm32-wasi/release/greeting.wasm
