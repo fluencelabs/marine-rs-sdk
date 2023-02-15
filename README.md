@@ -6,9 +6,8 @@ This SDK empowers developers to create general-purpose Wasm modules and combine 
 
 ## Usage
 
-The core component of the SDK is the `#[marine]` macro that should be used with export functions, extern blocks, and structures. Let's consider a simple scenario with a module with one export function:
+The core component of the SDK is the `#[marine]` macro that should be used with export functions, external blocks, and structures. Let's consider a simple scenario with a module with one export function:
 ```rust
-#[marine]
 use marine_rs_sdk::marine;
 use marine_rs_sdk::module_manifest;
 
