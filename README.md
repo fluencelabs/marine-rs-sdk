@@ -1,4 +1,4 @@
-# Marine Ru
+# Marine Rust SDK
 
 [![crates.io version](https://img.shields.io/crates/v/marine-rs-sdk?color=green)](https://crates.io/crates/marine-rs-sdk)
 
