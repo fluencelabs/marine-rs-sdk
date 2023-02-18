@@ -58,7 +58,7 @@ jobs:
           echo "version=${version}" >> $GITHUB_OUTPUT
 
       - name: Install cargo-workspaces
-        uses: baptiste0928/cargo-install@v1.3.0
+        uses: baptiste0928/cargo-install@v1.3.1
         with:
           crate: cargo-workspaces
 
@@ -112,7 +112,7 @@ jobs:
         uses: actions-rust-lang/setup-rust-toolchain@v1
 
       - name: Install cargo-workspaces
-        uses: baptiste0928/cargo-install@v1.3.0
+        uses: baptiste0928/cargo-install@v1.3.1
         with:
           crate: cargo-workspaces
 
