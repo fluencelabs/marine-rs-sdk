@@ -1,4 +1,5 @@
 # Marine Rust SDK
+
 [![crates.io version](https://img.shields.io/crates/v/marine-rs-sdk?color=green)](https://crates.io/crates/marine-rs-sdk)
 
 This SDK empowers developers to create general-purpose Wasm modules and combine them in a multi-module setup with the help of [interface-types](https://github.com/WebAssembly/interface-types) and a [shared-nothing linking](https://training.linuxfoundation.org/blog/how-and-why-to-link-webassembly-modules/) scheme. The SDK provides all necessary macros and other features to make Wasm developing process as close as possible to the one with the "vanilla" Rust. Compiled modules are intended to run with the [Marine](https://github.com/fluencelabs/marine) runtime.
@@ -85,16 +86,18 @@ At the moment, the `#[marine]` macro allows the following Rust types as an argum
 - [Marine Examples](https://github.com/fluencelabs/examples/tree/main/marine-examples)
 - [Quickstart](https://fluence.dev/docs/marine-book/quick-start/)
 
+Also, check our [YouTube channel](https://www.youtube.com/@fluencelabs).
+
 
 ## Repository structure
 
-- **[crates](./crates)**
-    - [macro-testing-utils](./crates/macro-testing-utils) - internal testing utils
-    - [main](./crates/main) - contains export_allocator, logger and results modules
-    - [marine-macro](./crates/marine-macro) - proc-macro crate for the `#[marine]` macro
-    - [marine-macro-impl](./crates/marine-macro-impl) - the actual realization of the `#[marine]` macro
-    - [timestamp-macro](./crates/timestamp-macro) - a macro to support timestamp embedding into a compiled Wasm binary
-- **[src](./src)** - contains call_parameters and mounted_binary modules along with reexporting all necessary for a user stuff
+- [**crates**](./crates)
+    - [macro-testing-utils](./crates/macro-testing-utils) contains internal testing utils
+    - [main](./crates/main) contains export_allocator, logger and results modules
+    - [marine-macro](./crates/marine-macro) is the proc-macro crate for the `#[marine]` macro
+    - [marine-macro-impl](./crates/marine-macro-impl) is the actual realization of the `#[marine]` macro
+    - [timestamp-macro](./crates/timestamp-macro) is a macro to support timestamp embedding into a compiled Wasm binary
+- [**src**](./src) contains call_parameters and mounted_binary modules along with reexporting all necessary for a user stuff
 
 
 ## Support
@@ -110,4 +113,3 @@ Any interested person is welcome to contribute to the project. Please, make sure
 ## License
 
 All software code is copyright (c) Fluence Labs, Inc. under the [Apache-2.0](./LICENSE) license.
-
