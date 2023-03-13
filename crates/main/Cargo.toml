@@ -20,7 +20,7 @@ doctest = false
 
 [dependencies]
 log = { version = "0.4.17", features = ["std"] }
-serde = "1.0.152"
+serde = "1.0.155"
 
 [dev-dependencies]
 simple_logger = "4.0.0" # used in doc test
