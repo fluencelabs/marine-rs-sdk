@@ -69,7 +69,7 @@ fn fields_into_ast(
     fields
         .iter()
         .map(|field| {
-            print_warning_if_attributes(field, record_ident);
+            maybe_warn_about_non_doc_attributes(field, record_ident);
 
             let name = field.ident.as_ref().map(|ident| {
                 ident
@@ -88,7 +88,7 @@ fn fields_into_ast(
 }
 
 /// Prints an error if a field has an any attribute except doc.
-fn print_warning_if_attributes(field: &syn::Field, record_ident: &syn::Ident) {
+fn maybe_warn_about_non_doc_attributes(field: &syn::Field, record_ident: &syn::Ident) {
     for attr in field.attrs.iter() {
         match attr.parse_meta() {
             Ok(meta) if is_doc_attribute(&meta) => continue,
