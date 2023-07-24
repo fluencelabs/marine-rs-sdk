@@ -38,10 +38,11 @@ impl ParseMacroInput for syn::ItemFn {
         check_args(parsed_args)?;
         check_output_type(&signature.output_type, self.sig.output.span())?;
 
-        let ast_fn = MarineAst::Function(AstFn {
+        let ast_fn = AstFn {
             signature,
             original: self,
-        });
+        };
+        let ast_fn = MarineAst::Function(Box::new(ast_fn));
         Ok(ast_fn)
     }
 }

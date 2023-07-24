@@ -43,8 +43,9 @@ impl ParseMacroInput for syn::ItemStruct {
             fields,
             original: self,
         };
+        let ast_record_item = MarineAst::Record(Box::new(ast_record_item));
 
-        Ok(MarineAst::Record(ast_record_item))
+        Ok(ast_record_item)
     }
 }
 
