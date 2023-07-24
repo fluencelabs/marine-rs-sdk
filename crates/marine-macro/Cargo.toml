@@ -1,6 +1,6 @@
 [package]
 name = "marine-macro"
-version = "0.7.1"
+version = "0.8.0"
 edition = "2018"
 description = "Definition of the `#[marine]` macro"
 documentation = "https://docs.rs/fluence/marine-macro"
@@ -18,5 +18,5 @@ proc-macro = true
 doctest = false
 
 [dependencies]
-marine-macro-impl = { path = "../marine-macro-impl", version = "=0.7.1" }
-marine-rs-sdk-main = { path = "../main", version = "=0.7.1" }
+marine-macro-impl = { path = "../marine-macro-impl", version = "=0.8.0" }
+marine-rs-sdk-main = { path = "../main", version = "=0.8.0" }
