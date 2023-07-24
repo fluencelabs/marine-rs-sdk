@@ -34,7 +34,7 @@ impl ParseMacroInput for syn::ItemStruct {
             _ => return syn_error!(self.span(), "only named fields are allowed in structs"),
         };
 
-        let fields = fields_into_ast(fields)?;
+        let fields = fields_into_ast(fields, &self.ident)?;
         let fields = AstRecordFields::Named(fields);
 
         let name = self.ident.to_string();
@@ -64,11 +64,13 @@ fn check_record(record: &syn::ItemStruct) -> Result<()> {
 
 fn fields_into_ast(
     fields: &syn::punctuated::Punctuated<syn::Field, syn::Token![,]>,
+    record_ident: &syn::Ident,
 ) -> Result<Vec<AstRecordField>> {
     fields
         .iter()
         .map(|field| {
-            check_field(field)?;
+            print_warning_if_attributes(field, record_ident);
+
             let name = field.ident.as_ref().map(|ident| {
                 ident
                     .to_string()
@@ -85,23 +87,31 @@ fn fields_into_ast(
         .collect::<Result<Vec<_>>>()
 }
 
-/// Check that record fields satisfy the following requirements:
-///  - field must have only doc attributes
-fn check_field(field: &syn::Field) -> Result<()> {
+/// Prints an error if a field has an any attribute except doc.
+fn print_warning_if_attributes(field: &syn::Field, record_ident: &syn::Ident) {
+    for attr in field.attrs.iter() {
+        match attr.parse_meta() {
+            Ok(meta) if is_doc_attribute(&meta) => continue,
+            _ => {}
+        }
+
+        // TODO: print message with a span when diagnostic API stabilized
+        // https://github.com/rust-lang/rust/issues/54140
+        match &field.ident {
+            Some(ident) => eprintln!(
+                r#"warning: field "{}" of struct "{}" has an attribute which could cause compatibility issues"#,
+                ident, record_ident
+            ),
+            None => eprintln!(
+                r#"warning: field of struct "{}" has an attribute which could cause compatibility issues"#,
+                record_ident
+            ),
+        };
+    }
+}
+
+fn is_doc_attribute(meta: &syn::Meta) -> bool {
     const DOC_ATTR_NAME: &str = "doc";
 
-    // Check that all attributes are doc attributes
-    let are_all_attrs_doc = field.attrs.iter().all(|attr| {
-        let meta = match attr.parse_meta() {
-            Ok(meta) => meta,
-            Err(_) => return false,
-        };
-        meta.path().is_ident(DOC_ATTR_NAME)
-    });
-
-    if !are_all_attrs_doc {
-        return syn_error!(field.span(), "field attributes isn't allowed");
-    }
-
-    Ok(())
+    meta.path().is_ident(DOC_ATTR_NAME)
 }
