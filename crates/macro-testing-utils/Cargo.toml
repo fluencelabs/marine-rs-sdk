@@ -1,6 +1,6 @@
 [package]
 name = "marine-macro-testing-utils"
-version = "0.1.0"
+version = "0.8.0"
 edition = "2018"
 description = "Some functions for testing procedural macros"
 documentation = "https://docs.rs/fluence/marine-macro-testing-utils"
