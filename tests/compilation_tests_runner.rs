@@ -19,6 +19,8 @@ fn marine_compilation_tests() {
 
     tests.pass("tests/compilation_tests/records/basic_structs.rs");
     tests.pass("tests/compilation_tests/records/empty_struct.rs");
+    tests.pass("tests/compilation_tests/records/struct_with_attribute.rs");
+    tests.pass("tests/compilation_tests/records/struct_with_doc_attribute.rs");
     tests.pass("tests/compilation_tests/records/struct_with_private_fields.rs");
     tests.compile_fail("tests/compilation_tests/records/struct_with_improper_types.rs");
     tests.compile_fail("tests/compilation_tests/records/unnamed_structs.rs");
