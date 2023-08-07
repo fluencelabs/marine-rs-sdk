@@ -7,13 +7,13 @@ Here is the list of main components crucial from the update point of view:
 [**Marine Rust SDK**](./) - the interface crate that will be used by users
 [**Marine Rust SDK main**](./crates/main) - contains all export functions used by IT interpreter, as well as logger
 
-
 ## Marine Rust SDK update policy
 
 ### Versioning
 All the crates in this repo have the same version, and all repository-local dependencies are strict (denoted by `=x.y.z` notation). 
 
 ### Coupling with AquaVM
+
 This crate uses `#[no_mangle]` exports in `marine-rs-sdk-main`, and in `marine-rs-sdk` crate by transitivity. This means that it is impossible to use two different versions of this crate when compiling single binary, regardless of versions. Also there is a circular cross-repository dependency with [**AquaVM**](https://github.com/fluencelabs/aquavm):
 [**polyplets**](https://github.com/fluencelabs/aquavm/tree/master/crates/air-lib/polyplets) depends on `marine-rs-sdk-main`, while `marine-rs-sdk` depends on `polyplets`. AquaVM repo also uses `marine-rs-sdk` in several crates.
 
