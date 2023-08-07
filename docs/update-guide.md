@@ -17,7 +17,7 @@ All the crates in this repo have the same version, and all repository-local depe
 This crate uses `#[no_mangle]` exports in `marine-rs-sdk-main`, and in `marine-rs-sdk` crate by transitivity. This means that it is impossible to use two different versions of this crate when compiling single binary, regardless of versions. Also there is a circular cross-repository dependency with [**AquaVM**](https://github.com/fluencelabs/aquavm):
 [**polyplets**](https://github.com/fluencelabs/aquavm/tree/master/crates/air-lib/polyplets) depends on `marine-rs-sdk-main`, while `marine-rs-sdk` depends on `polyplets`. AquaVM repo also uses `marine-rs-sdk` in several crates.
 
-The conclusion is that there is no way to just update minor or patch version of this repo. It also requires updating `polyplets` to a version that uses `marine-rs-sdk-main` with the same major and minor versions as `marine-rs-sdk`.
+As a result, it is not enough just to update a minor or patch version of this repo - it also requires updating `polyplets` to a version that uses `marine-rs-sdk-main` with the same major and minor versions as `marine-rs-sdk`.
 
 The following update process should ensure that there is no semver-broken version is used:
 1. release new *minor* version `marine-rs-sdk@0.x.0`and so on
