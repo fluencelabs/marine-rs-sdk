@@ -4,8 +4,8 @@
 
 Here is the list of main components crucial from the update point of view:
 
-[**Marine Rust SDK**](./) - the interface crate that will be used by users
-[**Marine Rust SDK main**](./crates/main) - contains all export functions used by IT interpreter, as well as logger
+* [**Marine Rust SDK**](./) - the interface crate that will be used by users
+* [**Marine Rust SDK main**](./crates/main) - contains all export functions used by IT interpreter, as well as logger
 
 ## Marine Rust SDK update policy
 
