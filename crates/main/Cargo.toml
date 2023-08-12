@@ -19,7 +19,7 @@ crate-type = ["rlib"]
 doctest = false
 
 [dependencies]
-log = { version = "0.4.17", features = ["std"] }
+log = { version = "0.4.20", features = ["std"] }
 serde = "1.0.155"
 
 [dev-dependencies]
