@@ -15,10 +15,60 @@
  */
 
 use marine_macro::marine;
-pub use polyplets::SecurityTetraplet;
 
 use serde::Serialize;
 use serde::Deserialize;
+
+/// Describes an origin that set corresponding value.
+#[marine]
+#[derive(Clone, Debug, Default, Eq, PartialEq, Hash, Serialize, Deserialize)]
+pub struct SecurityTetraplet {
+    /// Id of a peer where corresponding value was set.
+    pub peer_pk: String,
+
+    /// Id of a service that set corresponding value.
+    pub service_id: String,
+
+    /// Name of a function that returned corresponding value.
+    pub function_name: String,
+
+    /// Value was produced by applying this `json_path` to the output from `call_service`.
+    // TODO: since it's not a json path anymore, it's needed to rename it to lambda
+    pub json_path: String,
+}
+
+impl SecurityTetraplet {
+    pub fn new(
+        peer_pk: impl Into<String>,
+        service_id: impl Into<String>,
+        function_name: impl Into<String>,
+        json_path: impl Into<String>,
+    ) -> Self {
+        Self {
+            peer_pk: peer_pk.into(),
+            service_id: service_id.into(),
+            function_name: function_name.into(),
+            json_path: json_path.into(),
+        }
+    }
+
+    /// Create a tetraplet for string literals defined in the script
+    /// such as variable here `(call ("" "") "" ["variable_1"])`.
+    pub fn literal_tetraplet(init_peer_id: impl Into<String>) -> Self {
+        Self {
+            // these variables represent the initiator peer
+            peer_pk: init_peer_id.into(),
+            service_id: String::new(),
+            function_name: String::new(),
+            // json path can't be applied to the string literals
+            json_path: String::new(),
+        }
+    }
+
+    pub fn add_lambda(&mut self, json_path: &str) {
+        self.json_path.push_str(json_path)
+    }
+}
 
 /// This struct contains parameters that would be accessible by Wasm modules.
 #[marine]
@@ -41,6 +91,17 @@ pub struct CallParameters {
 
     /// Security tetraplets which described origin of the arguments.
     pub tetraplets: Vec<Vec<SecurityTetraplet>>,
+}
+
+use std::fmt;
+impl fmt::Display for SecurityTetraplet {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+        write!(
+            f,
+            "peer_pk: {}, service_id: {}, function_name: {}, json_path: {}",
+            self.peer_pk, self.service_id, self.function_name, self.json_path
+        )
+    }
 }
 
 /// This functions takes from host current call parameters.
