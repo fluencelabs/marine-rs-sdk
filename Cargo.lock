@@ -234,7 +234,7 @@ dependencies = [
 
 [[package]]
 name = "marine-macro"
-version = "0.8.1"
+version = "0.9.0"
 dependencies = [
  "marine-macro-impl",
  "marine-rs-sdk-main",
@@ -242,7 +242,7 @@ dependencies = [
 
 [[package]]
 name = "marine-macro-impl"
-version = "0.8.1"
+version = "0.9.0"
 dependencies = [
  "marine-macro-testing-utils",
  "pretty_assertions",
@@ -255,7 +255,7 @@ dependencies = [
 
 [[package]]
 name = "marine-macro-testing-utils"
-version = "0.8.1"
+version = "0.9.0"
 dependencies = [
  "proc-macro2",
  "quote",
@@ -264,7 +264,7 @@ dependencies = [
 
 [[package]]
 name = "marine-rs-sdk"
-version = "0.8.1"
+version = "0.9.0"
 dependencies = [
  "marine-macro",
  "marine-rs-sdk-main",
@@ -275,7 +275,7 @@ dependencies = [
 
 [[package]]
 name = "marine-rs-sdk-main"
-version = "0.8.1"
+version = "0.9.0"
 dependencies = [
  "lazy_static",
  "log",
@@ -285,7 +285,7 @@ dependencies = [
 
 [[package]]
 name = "marine-timestamp-macro"
-version = "0.8.1"
+version = "0.9.0"
 dependencies = [
  "chrono",
  "quote",
