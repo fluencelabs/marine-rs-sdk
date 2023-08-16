@@ -1,5 +1,16 @@
 # Changelog
 
+## [0.9.0](https://github.com/fluencelabs/marine-rs-sdk/compare/marine-rs-sdk-v0.8.1...marine-rs-sdk-v0.9.0) (2023-08-16)
+
+
+### ⚠ BREAKING CHANGES
+
+* move SecurityTetraplets from popyplets directly to marine-rs-sdk crate ([#127](https://github.com/fluencelabs/marine-rs-sdk/issues/127))
+
+### Features
+
+* move SecurityTetraplets from popyplets directly to marine-rs-sdk crate ([#127](https://github.com/fluencelabs/marine-rs-sdk/issues/127)) ([add9b91](https://github.com/fluencelabs/marine-rs-sdk/commit/add9b919edcefa06b67975170ea149d148911073))
+
 ## [0.8.1](https://github.com/fluencelabs/marine-rs-sdk/compare/marine-rs-sdk-v0.8.0...marine-rs-sdk-v0.8.1) (2023-08-09)
 
 

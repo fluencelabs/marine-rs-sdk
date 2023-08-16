@@ -19,7 +19,7 @@
 
 #![allow(clippy::missing_safety_doc)]
 #![allow(clippy::needless_doctest_main)]
-#![doc(html_root_url = "https://docs.rs/marine-rs-sdk-main/0.8.1")] // x-release-please-version
+#![doc(html_root_url = "https://docs.rs/marine-rs-sdk-main/0.9.0")] // x-release-please-version
 #![deny(
     dead_code,
     nonstandard_style,
