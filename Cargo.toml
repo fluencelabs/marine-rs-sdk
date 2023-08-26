@@ -22,7 +22,7 @@ marine-macro = { path = "crates/marine-macro", version = "=0.9.0" }
 marine-rs-sdk-main = { path = "crates/main", version = "=0.9.0" } # warning: silent compilation break on minor verison bump. See docs/update-guide.md for details
 marine-timestamp-macro = { path = "crates/timestamp-macro", version = "=0.9.0" }
 
-serde = { version = "1.0.155", features = ["derive"]}
+serde = { version = "1.0.188", features = ["derive"]}
 
 [dev-dependencies]
 trybuild = "1.0"
