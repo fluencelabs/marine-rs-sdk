@@ -67,7 +67,6 @@
 )]
 #![warn(rust_2018_idioms)]
 
-mod call_parameters;
 mod mounted_binary;
 
 #[allow(unused_extern_crates)]
@@ -77,9 +76,9 @@ extern crate self as marine_rs_sdk;
 pub use marine_macro::marine;
 pub use marine_macro::fce;
 
-pub use call_parameters::CallParameters;
-pub use call_parameters::SecurityTetraplet;
-pub use call_parameters::get_call_parameters;
+pub use marine_call_parameters::CallParameters;
+pub use marine_call_parameters::SecurityTetraplet;
+pub use marine_call_parameters::get_call_parameters;
 
 #[cfg(feature = "logger")]
 pub use marine_rs_sdk_main::WasmLoggerBuilder;

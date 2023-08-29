@@ -14,13 +14,14 @@
  * limitations under the License.
  */
 
+#[cfg(target_arch = "wasm32")]
 use marine_macro::marine;
 
 use serde::Serialize;
 use serde::Deserialize;
 
 /// Describes an origin that set corresponding value.
-#[marine]
+#[cfg_attr(target_arch = "wasm32", marine)]
 #[derive(Clone, Debug, Default, Eq, PartialEq, Hash, Serialize, Deserialize)]
 pub struct SecurityTetraplet {
     /// Id of a peer where corresponding value was set.
@@ -71,7 +72,7 @@ impl SecurityTetraplet {
 }
 
 /// This struct contains parameters that would be accessible by Wasm modules.
-#[marine]
+#[cfg_attr(target_arch = "wasm32", marine)]
 #[derive(Clone, PartialEq, Default, Eq, Debug, Serialize, Deserialize)]
 pub struct CallParameters {
     /// Peer id of the AIR script initiator.
