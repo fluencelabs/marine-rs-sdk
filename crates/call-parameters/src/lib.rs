@@ -130,3 +130,17 @@ extern "C" {
     #[link_name = "get_call_parameters"]
     fn get_call_raw_parameters();
 }
+
+#[cfg(target_arch = "wasm32")]
+#[allow(unused_extern_crates)]
+extern crate self as marine_rs_sdk;
+
+#[cfg(target_arch = "wasm32")]
+#[allow(unused_imports)]
+mod internal {
+    pub(crate) use marine_rs_sdk_main::add_object_to_release;
+    pub(crate) use marine_rs_sdk_main::get_result_ptr;
+    pub(crate) use marine_rs_sdk_main::get_result_size;
+    pub(crate) use marine_rs_sdk_main::set_result_ptr;
+    pub(crate) use marine_rs_sdk_main::set_result_size;
+}
