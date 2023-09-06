@@ -223,12 +223,12 @@ impl log::Log for WasmLogger {
     fn flush(&self) {}
 }
 
-#[cfg(target_arch = "wasm32")]
+#[cfg(all(feature = "marine-abi", target_arch = "wasm32"))]
 pub fn log_utf8_string(level: i32, target: i32, msg_ptr: i32, msg_size: i32) {
     unsafe { log_utf8_string_impl(level, target, msg_ptr, msg_size) };
 }
 
-#[cfg(not(target_arch = "wasm32"))]
+#[cfg(any(not(feature = "marine-abi"), not(target_arch = "wasm32")))]
 pub fn log_utf8_string(level: i32, target: i32, msg_ptr: i32, msg_size: i32) {
     use std::str::from_utf8_unchecked;
     use core::slice::from_raw_parts;
@@ -240,7 +240,7 @@ pub fn log_utf8_string(level: i32, target: i32, msg_ptr: i32, msg_size: i32) {
 
 /// TODO: mark `log_utf8_string_impl` as #[wasm_bindgen], so it is polyfilled by bindgen
 /// log_utf8_string should be provided directly by a host.
-#[cfg(target_arch = "wasm32")]
+#[cfg(all(feature = "marine-abi", target_arch = "wasm32"))]
 #[link(wasm_import_module = "host")]
 extern "C" {
     // Writes a byte string of size bytes that starts from ptr to a logger

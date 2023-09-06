@@ -93,6 +93,7 @@ pub use marine_rs_sdk_main::module_manifest;
 
 /// These API functions are intended for internal usage in generated code.
 /// Normally, you shouldn't use them.
+#[cfg(all(feature = "marine-abi", target_arch = "wasm32"))]
 #[doc(hidden)]
 pub mod internal {
     pub use marine_rs_sdk_main::get_result_ptr;
@@ -104,7 +105,7 @@ pub mod internal {
 }
 
 #[cfg(not(feature = "no-explicit-ctors-call"))]
-#[cfg(target_arch = "wasm32")]
+#[cfg(all(feature = "marine-abi", target_arch = "wasm32"))]
 extern "C" {
     // For internal use. Not an API function.
     fn __wasm_call_ctors();
@@ -115,7 +116,7 @@ extern "C" {
 // The most referenced issue about it is https://github.com/WebAssembly/WASI/issues/471
 // For internal use. Not an API function.
 #[cfg(not(feature = "no-explicit-ctors-call"))]
-#[cfg(target_arch = "wasm32")]
+#[cfg(all(feature = "marine-abi", target_arch = "wasm32"))]
 #[doc(hidden)]
 #[no_mangle]
 pub fn _initialize() {

@@ -14,6 +14,7 @@
  * limitations under the License.
  */
 
+#[cfg(all(target_arch = "wasm32", feature = "marine-abi"))]
 use marine_macro::marine;
 
 use serde::Serialize;
@@ -22,7 +23,7 @@ use serde::Deserialize;
 pub const SUCCESS_CODE: i32 = 0;
 
 /// Describes result of calling a CLI service.
-#[marine]
+#[cfg_attr(all(target_arch = "wasm32", feature = "marine-abi"), marine)]
 #[derive(Clone, PartialEq, Default, Eq, Debug, Serialize, Deserialize)]
 pub struct MountedBinaryResult {
     /// Return process exit code or host execution error code, where SUCCESS_CODE means success.
@@ -39,7 +40,7 @@ pub struct MountedBinaryResult {
 }
 
 /// The same as the MountedBinaryResult, but stdout and stderr are utf8 strings.
-#[marine]
+#[cfg_attr(all(target_arch = "wasm32", feature = "marine-abi"), marine)]
 #[derive(Clone, PartialEq, Default, Eq, Debug, Serialize, Deserialize)]
 pub struct MountedBinaryStringResult {
     /// Return process exit code or host execution error code, where SUCCESS_CODE means success.

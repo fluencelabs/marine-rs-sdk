@@ -76,7 +76,7 @@ macro_rules! module_manifest {
             manifest
         }
 
-        #[cfg(target_arch = "wasm32")]
+        #[cfg(all(feature = "marine-abi", target_arch = "wasm32"))]
         #[link_section = "__fluence_wasm_module_manifest"]
         #[doc(hidden)]
         pub static __M_WASM_MODULE_MANIFEST: [u8; __M_MANIFEST_SIZE] = generate_manifest();

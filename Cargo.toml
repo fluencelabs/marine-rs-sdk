@@ -29,6 +29,7 @@ serde = { version = "1.0.155", features = ["derive"]}
 trybuild = "1.0"
 
 [features]
+default = ["marine-abi"]
 # Print some internal logs by log_utf8_string
 debug = ["marine-rs-sdk-main/debug"]
 
@@ -37,6 +38,12 @@ logger = ["marine-rs-sdk-main/logger"]
 
 # Remove _initialize function with explicit call to __wasm_call_ctors
 no-explicit-ctors-call = []
+
+# Enable #[marine] attribute on structures and IT exports
+marine-abi = [
+    "marine-rs-sdk-main/marine-abi",
+    "marine-call-parameters/marine-abi"
+]
 
 [workspace]
 members = [

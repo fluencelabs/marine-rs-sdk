@@ -35,9 +35,11 @@ mod export_allocator;
 #[cfg(any(feature = "debug", feature = "logger"))]
 mod logger;
 mod module_manifest;
+#[cfg(all(feature = "marine-abi", target_arch = "wasm32"))]
 mod result;
 mod sdk_version_embedder;
 
+#[cfg(all(feature = "marine-abi", target_arch = "wasm32"))]
 pub use export_allocator::allocate;
 
 #[cfg(feature = "logger")]
@@ -47,11 +49,17 @@ pub use logger::TargetMap;
 #[cfg(feature = "logger")]
 pub use logger::WASM_LOG_ENV_NAME;
 
+#[cfg(all(feature = "marine-abi", target_arch = "wasm32"))]
 pub use result::get_result_ptr;
+#[cfg(all(feature = "marine-abi", target_arch = "wasm32"))]
 pub use result::get_result_size;
+#[cfg(all(feature = "marine-abi", target_arch = "wasm32"))]
 pub use result::set_result_ptr;
+#[cfg(all(feature = "marine-abi", target_arch = "wasm32"))]
 pub use result::set_result_size;
+#[cfg(all(feature = "marine-abi", target_arch = "wasm32"))]
 pub use result::release_objects;
+#[cfg(all(feature = "marine-abi", target_arch = "wasm32"))]
 pub use result::add_object_to_release;
 
 pub use module_manifest::MANIFEST_SECTION_NAME;

@@ -19,3 +19,8 @@ serde = "1.0.155"
 marine-macro = { path = "../marine-macro", version = "=0.9.0" }
 marine-rs-sdk-main = { path = "../main", version = "=0.9.0" }
 
+[features]
+default = ["marine-abi"]
+marine-abi = [
+    "marine-rs-sdk-main/marine-abi"
+]
