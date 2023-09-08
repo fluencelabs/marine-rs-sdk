@@ -228,7 +228,7 @@ pub fn log_utf8_string(level: i32, target: i32, msg_ptr: i32, msg_size: i32) {
     unsafe { log_utf8_string_impl(level, target, msg_ptr, msg_size) };
 }
 
-#[cfg(any(not(feature = "marine-abi"), not(target_arch = "wasm32")))]
+#[cfg(not(all(feature = "marine-abi", target_arch = "wasm32")))]
 pub fn log_utf8_string(level: i32, target: i32, msg_ptr: i32, msg_size: i32) {
     use std::str::from_utf8_unchecked;
     use core::slice::from_raw_parts;

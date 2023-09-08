@@ -117,7 +117,7 @@ pub fn get_call_parameters() -> CallParameters {
     }
 }
 
-#[cfg(any(not(target_arch = "wasm32"), not(feature = "marine-abi")))]
+#[cfg(not(all(target_arch = "wasm32", feature = "marine-abi")))]
 pub fn get_call_parameters() -> CallParameters {
     unimplemented!()
 }
