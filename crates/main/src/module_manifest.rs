@@ -93,7 +93,6 @@ macro_rules! module_manifest {
     };
 }
 
-
 #[cfg(not(all(feature = "marine-abi", target_arch = "wasm32")))]
 #[macro_export]
 macro_rules! module_manifest {

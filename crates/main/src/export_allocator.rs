@@ -16,7 +16,6 @@
 
 /// Allocates memory area of specified size and type and returns its address.
 /// The allocated memory region is intended to be use as a Vec.
-#[cfg(all(feature = "marine-abi", target_arch = "wasm32"))]
 #[no_mangle]
 pub unsafe fn allocate(elem_count: usize, elem_ty: usize) -> usize {
     if elem_count == 0 {
@@ -34,7 +33,6 @@ pub unsafe fn allocate(elem_count: usize, elem_ty: usize) -> usize {
     allocated_mem
 }
 
-#[cfg(all(feature = "marine-abi", target_arch = "wasm32"))]
 fn allocate_impl(elem_count: usize, elem_ty: usize) -> usize {
     match elem_ty {
         0 => allocate_vec::<u8>(elem_count), // for booleans
@@ -52,7 +50,6 @@ fn allocate_impl(elem_count: usize, elem_ty: usize) -> usize {
     }
 }
 
-#[cfg(all(feature = "marine-abi", target_arch = "wasm32"))]
 fn allocate_vec<T>(count: usize) -> usize {
     // TODO: handle OOM
     // This allocation scheme with vectors is needed to deal with internal Vec layout
