@@ -233,6 +233,15 @@ dependencies = [
 ]
 
 [[package]]
+name = "marine-call-parameters"
+version = "0.9.0"
+dependencies = [
+ "marine-macro",
+ "marine-rs-sdk-main",
+ "serde",
+]
+
+[[package]]
 name = "marine-macro"
 version = "0.9.0"
 dependencies = [
@@ -266,6 +275,7 @@ dependencies = [
 name = "marine-rs-sdk"
 version = "0.9.0"
 dependencies = [
+ "marine-call-parameters",
  "marine-macro",
  "marine-rs-sdk-main",
  "marine-timestamp-macro",

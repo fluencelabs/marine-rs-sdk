@@ -35,7 +35,7 @@ const fn sdk_version() -> [u8; VERSION_SIZE] {
 // TODO: avoid duplication with the link_section when key-value attributes become stable
 pub const VERSION_SECTION_NAME: &str = "__fluence_sdk_version";
 
-#[cfg(target_arch = "wasm32")]
+#[cfg(all(feature = "marine-abi", target_arch = "wasm32"))]
 #[link_section = "__fluence_sdk_version"]
 #[doc(hidden)]
 pub static __M_SDK_VERSION: [u8; VERSION_SIZE] = sdk_version();
