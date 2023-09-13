@@ -1,5 +1,16 @@
 # Changelog
 
+## [0.10.0](https://github.com/fluencelabs/marine-rs-sdk/compare/marine-rs-sdk-v0.9.0...marine-rs-sdk-v0.10.0) (2023-09-13)
+
+
+### ⚠ BREAKING CHANGES
+
+* hide marine ABI exports under `marine-abi` feature ([#129](https://github.com/fluencelabs/marine-rs-sdk/issues/129))
+
+### Features
+
+* hide marine ABI exports under `marine-abi` feature ([#129](https://github.com/fluencelabs/marine-rs-sdk/issues/129)) ([7059e84](https://github.com/fluencelabs/marine-rs-sdk/commit/7059e84635819925b7f84e5b61260037f2ceb265))
+
 ## [0.9.0](https://github.com/fluencelabs/marine-rs-sdk/compare/marine-rs-sdk-v0.8.1...marine-rs-sdk-v0.9.0) (2023-08-16)
 
 
