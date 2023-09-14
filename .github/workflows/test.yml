@@ -1,18 +1,18 @@
-name: "ci"
+name: "test"
 
 on:
   pull_request:
     paths-ignore:
       - "**.md"
       - ".github/**"
-      - "!.github/workflows/ci.yml"
+      - "!.github/workflows/test.yml"
   push:
     branches:
       - "master"
     paths-ignore:
       - "**.md"
       - ".github/**"
-      - "!.github/workflows/ci.yml"
+      - "!.github/workflows/test.yml"
 
 concurrency:
   group: "${{ github.workflow }}-${{ github.ref }}"
@@ -22,18 +22,24 @@ env:
   RUST_TEST_THREADS: 1
 
 jobs:
-  marine-rs-sdk:
-    name: "Run tests"
+  tests:
+    name: "Run cargo tests"
     runs-on: builder
 
     steps:
       - uses: actions/checkout@v3
 
-      - name: Setup rust toolchain
-        uses: actions-rust-lang/setup-rust-toolchain@v1
+      - name: Setup Rust toolchain
+        uses: dsherret/rust-toolchain-file@v1
 
-      - name: Run cargo fmt
-        run: cargo fmt --all -- --check
+      - name: Setup cache
+        uses: Swatinem/rust-cache@v2
+        with:
+          shared-key: marine-rs-sdk
+          # github allows only 10GB of cache
+          # so save cache only on merge to master
+          # to use less space and speed up CI
+          save-if: ${{ github.event_name == 'push' }}
 
       - name: Run cargo build
         env:
@@ -54,3 +60,6 @@ jobs:
         env:
           CARGO_BUILD_TARGET: wasm32-wasi
         run: cargo clippy
+
+      - name: Run cargo fmt
+        run: cargo fmt --all -- --check
