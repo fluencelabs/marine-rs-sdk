@@ -17,6 +17,7 @@
 // TODO: avoid duplication with the link_section when key-value attributes become stable
 pub const MANIFEST_SECTION_NAME: &str = "__fluence_wasm_module_manifest";
 
+#[cfg(all(feature = "marine-abi", target_arch = "wasm32"))]
 #[macro_export]
 macro_rules! module_manifest {
     ($authors:expr, $version:expr, $description:expr, $repository:expr) => {
@@ -76,7 +77,7 @@ macro_rules! module_manifest {
             manifest
         }
 
-        #[cfg(target_arch = "wasm32")]
+        #[cfg(all(feature = "marine-abi", target_arch = "wasm32"))]
         #[link_section = "__fluence_wasm_module_manifest"]
         #[doc(hidden)]
         pub static __M_WASM_MODULE_MANIFEST: [u8; __M_MANIFEST_SIZE] = generate_manifest();
@@ -90,4 +91,11 @@ macro_rules! module_manifest {
             env!("CARGO_PKG_REPOSITORY")
         );
     };
+}
+
+#[cfg(not(all(feature = "marine-abi", target_arch = "wasm32")))]
+#[macro_export]
+macro_rules! module_manifest {
+    ($authors:expr, $version:expr, $description:expr, $repository:expr) => {};
+    () => {};
 }

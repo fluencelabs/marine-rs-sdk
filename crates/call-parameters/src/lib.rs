@@ -14,13 +14,14 @@
  * limitations under the License.
  */
 
+#[cfg(all(feature = "marine-abi", target_arch = "wasm32"))]
 use marine_macro::marine;
 
 use serde::Serialize;
 use serde::Deserialize;
 
 /// Describes an origin that set corresponding value.
-#[marine]
+#[cfg_attr(all(target_arch = "wasm32", feature = "marine-abi"), marine)]
 #[derive(Clone, Debug, Default, Eq, PartialEq, Hash, Serialize, Deserialize)]
 pub struct SecurityTetraplet {
     /// Id of a peer where corresponding value was set.
@@ -71,7 +72,7 @@ impl SecurityTetraplet {
 }
 
 /// This struct contains parameters that would be accessible by Wasm modules.
-#[marine]
+#[cfg_attr(all(target_arch = "wasm32", feature = "marine-abi"), marine)]
 #[derive(Clone, PartialEq, Default, Eq, Debug, Serialize, Deserialize)]
 pub struct CallParameters {
     /// Peer id of the AIR script initiator.
@@ -106,7 +107,7 @@ impl fmt::Display for SecurityTetraplet {
 
 /// This functions takes from host current call parameters.
 /// Beware that this implies import function call which takes some time.
-#[cfg(target_arch = "wasm32")]
+#[cfg(all(feature = "marine-abi", target_arch = "wasm32"))]
 pub fn get_call_parameters() -> CallParameters {
     // it's safe until it is executed on standard Fluence node with appropriate import function
     unsafe {
@@ -116,16 +117,30 @@ pub fn get_call_parameters() -> CallParameters {
     }
 }
 
-#[cfg(not(target_arch = "wasm32"))]
+#[cfg(not(all(target_arch = "wasm32", feature = "marine-abi")))]
 pub fn get_call_parameters() -> CallParameters {
     unimplemented!()
 }
 
-#[cfg(target_arch = "wasm32")]
+#[cfg(all(feature = "marine-abi", target_arch = "wasm32"))]
 #[link(wasm_import_module = "host")]
 #[allow(improper_ctypes)]
 extern "C" {
     // returns serialized current call parameters
     #[link_name = "get_call_parameters"]
     fn get_call_raw_parameters();
+}
+
+#[cfg(all(feature = "marine-abi", target_arch = "wasm32"))]
+#[allow(unused_extern_crates)]
+extern crate self as marine_rs_sdk;
+
+#[cfg(all(feature = "marine-abi", target_arch = "wasm32"))]
+#[allow(unused_imports)]
+mod internal {
+    pub(crate) use marine_rs_sdk_main::add_object_to_release;
+    pub(crate) use marine_rs_sdk_main::get_result_ptr;
+    pub(crate) use marine_rs_sdk_main::get_result_size;
+    pub(crate) use marine_rs_sdk_main::set_result_ptr;
+    pub(crate) use marine_rs_sdk_main::set_result_size;
 }

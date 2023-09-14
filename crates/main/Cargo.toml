@@ -1,6 +1,6 @@
 [package]
 name = "marine-rs-sdk-main"
-version = "0.9.0"
+version = "0.10.0"
 edition = "2018"
 description = "Contains logger, allocators and several other modules for marine-rs-sdk"
 documentation = "https://docs.rs/marine-rs-sdk-main"
@@ -32,3 +32,6 @@ debug = []
 
 # Enable logger (this will cause log_utf8_string to appear in imports)
 logger = []
+
+# Enable #[marine] attributes and IT exports
+marine-abi = []

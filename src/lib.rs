@@ -55,7 +55,7 @@
 //!     pub fn curl_get(url: String) -> String;
 //! }
 //! ```
-#![doc(html_root_url = "https://docs.rs/sdk/0.9.0")] // x-release-please-version
+#![doc(html_root_url = "https://docs.rs/sdk/0.10.0")] // x-release-please-version
 #![deny(
     dead_code,
     nonstandard_style,
@@ -67,7 +67,6 @@
 )]
 #![warn(rust_2018_idioms)]
 
-mod call_parameters;
 mod mounted_binary;
 
 #[allow(unused_extern_crates)]
@@ -77,9 +76,9 @@ extern crate self as marine_rs_sdk;
 pub use marine_macro::marine;
 pub use marine_macro::fce;
 
-pub use call_parameters::CallParameters;
-pub use call_parameters::SecurityTetraplet;
-pub use call_parameters::get_call_parameters;
+pub use marine_call_parameters::CallParameters;
+pub use marine_call_parameters::SecurityTetraplet;
+pub use marine_call_parameters::get_call_parameters;
 
 #[cfg(feature = "logger")]
 pub use marine_rs_sdk_main::WasmLoggerBuilder;
@@ -94,6 +93,7 @@ pub use marine_rs_sdk_main::module_manifest;
 
 /// These API functions are intended for internal usage in generated code.
 /// Normally, you shouldn't use them.
+#[cfg(all(feature = "marine-abi", target_arch = "wasm32"))]
 #[doc(hidden)]
 pub mod internal {
     pub use marine_rs_sdk_main::get_result_ptr;
@@ -105,7 +105,7 @@ pub mod internal {
 }
 
 #[cfg(not(feature = "no-explicit-ctors-call"))]
-#[cfg(target_arch = "wasm32")]
+#[cfg(all(feature = "marine-abi", target_arch = "wasm32"))]
 extern "C" {
     // For internal use. Not an API function.
     fn __wasm_call_ctors();
@@ -116,7 +116,7 @@ extern "C" {
 // The most referenced issue about it is https://github.com/WebAssembly/WASI/issues/471
 // For internal use. Not an API function.
 #[cfg(not(feature = "no-explicit-ctors-call"))]
-#[cfg(target_arch = "wasm32")]
+#[cfg(all(feature = "marine-abi", target_arch = "wasm32"))]
 #[doc(hidden)]
 #[no_mangle]
 pub fn _initialize() {
