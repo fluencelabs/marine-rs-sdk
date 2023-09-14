@@ -1,0 +1,69 @@
+name: Publish cargo snapshots
+
+on:
+  workflow_call:
+    inputs:
+      ref:
+        description: "git ref to checkout to"
+        type: string
+        default: "master"
+      cargo-dependencies:
+        description: "Cargo dependencies map"
+        type: string
+        default: "null"
+    outputs:
+      version:
+        description: "crate snapshots version"
+        value: ${{ jobs.snapshots.outputs.version }}
+
+jobs:
+  snapshots:
+    name: "Publish crates"
+    runs-on: builder
+    timeout-minutes: 60
+
+    outputs:
+      version: "${{ steps.snapshot.outputs.version }}"
+
+    permissions:
+      contents: read
+      id-token: write
+
+    steps:
+      - name: Checkout repo
+        uses: actions/checkout@v4
+        with:
+          repository: fluencelabs/marine-rs-sdk
+          ref: ${{ inputs.ref }}
+
+      - name: Import secrets
+        uses: hashicorp/vault-action@v2.7.3
+        with:
+          url: https://vault.fluence.dev
+          path: jwt/github
+          role: ci
+          method: jwt
+          jwtGithubAudience: "https://github.com/fluencelabs"
+          jwtTtl: 300
+          exportToken: false
+          secrets: |
+            kv/cargo-registry/users/ci token | CARGO_REGISTRIES_FLUENCE_TOKEN
+
+      - name: Setup Rust toolchain
+        uses: dsherret/rust-toolchain-file@v1
+
+      - name: Setup cache
+        uses: Swatinem/rust-cache@v2
+        with:
+          shared-key: marine-rs-sdk
+          save-if: false
+
+      - name: Generate snapshot version
+        id: version
+        uses: fluencelabs/github-actions/generate-snapshot-id@main
+
+      - name: Publish crate snapshots
+        id: snapshot
+        uses: fluencelabs/github-actions/cargo-publish-snapshot@main
+        with:
+          id: ${{ steps.version.outputs.id }}
