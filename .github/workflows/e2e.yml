@@ -39,7 +39,7 @@ jobs:
 
   sqlite-wasm:
     needs: marine-rs-sdk
-    uses: fluencelabs/sqlite-wasm-connector/.github/workflows/snapshot.yml@master
+    uses: fluencelabs/sqlite-wasm-connector/.github/workflows/snapshot.yml@FLU-416
     with:
       cargo-dependencies: |
         [
