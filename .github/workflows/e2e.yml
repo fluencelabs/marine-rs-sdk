@@ -47,5 +47,5 @@ jobs:
             "package": "fluence-app-service",
             "version": "=${{ needs.marine.outputs.version }}",
             "registry": "fluence"
-          },
-          {
+          }
+        ]
