@@ -52,7 +52,9 @@ jobs:
 
 
   marine:
-    needs: marine-rs-sdk
+    needs:
+      - marine-rs-sdk
+      - sqlite-wasm
     uses: fluencelabs/marine/.github/workflows/tests.yml@FLU-416
     with:
       ref: FLU-416
