@@ -37,6 +37,20 @@ jobs:
     with:
       ref: ${{ github.ref }}
 
+  sqlite-wasm:
+    needs: marine-rs-sdk
+    uses: fluencelabs/sqlite-wasm-connector/.github/workflows/snapshot.yml@master
+    with:
+      cargo-dependencies: |
+        [
+          {
+            "package": "marine-rs-sdk",
+            "version": "=${{ needs.marine-rs-sdk.outputs.version }}",
+            "registry": "fluence"
+          }
+        ]
+
+
   marine:
     needs: marine-rs-sdk
     uses: fluencelabs/marine/.github/workflows/tests.yml@FLU-416
@@ -52,6 +66,12 @@ jobs:
           {
             "package": "marine-rs-sdk-main",
             "version": "=${{ needs.marine-rs-sdk.outputs.version }}",
+            "registry": "fluence"
+          },
+          {
+            "package": "marine-sqlite-connector",
+            "version": "=${{ needs.sqlite-wasm.outputs.version }}",
+            "path": "examples/sqlite",
             "registry": "fluence"
           }
         ]
