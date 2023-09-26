@@ -26,7 +26,7 @@ concurrency:
   cancel-in-progress: true
 
 jobs:
-  marie-rs-sdk:
+  marine-rs-sdk:
     if: >
       github.event_name == 'push' ||
       (
@@ -36,3 +36,16 @@ jobs:
     uses: ./.github/workflows/snapshot.yml
     with:
       ref: ${{ github.ref }}
+
+  marine:
+    needs: marine-rs-sdk
+    uses: fluencelabs/marine/.github/workflows/tests.yml@FLU-416
+    with:
+      cargo-dependencies: |
+        [
+          {
+            "package": "fluence-app-service",
+            "version": "=${{ needs.marine.outputs.version }}",
+            "registry": "fluence"
+          },
+          {
