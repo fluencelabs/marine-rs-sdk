@@ -27,6 +27,7 @@ use serde::Deserialize;
 #[cfg_attr(feature = "rkyv", archive(check_bytes))]
 #[cfg_attr(feature = "rkyv", archive_attr(derive(Debug, Eq, PartialEq, Hash)))]
 #[cfg_attr(feature = "rkyv", archive(compare(PartialEq)))]
+#[cfg_attr(feature = "borsh", derive(::borsh::BorshSerialize, ::borsh::BorshDeserialize))]
 pub struct SecurityTetraplet {
     /// Id of a peer where corresponding value was set.
     pub peer_pk: String,
