@@ -11,7 +11,7 @@ categories = ["api-bindings", "wasm"]
 license = "Apache-2.0"
 
 [dependencies]
-serde = "1.0.155"
+serde = "1.0.189"
 
 [target.'cfg(target_arch = "wasm32")'.dependencies]
 marine-macro = { path = "../marine-macro", version = "=0.10.0" }
