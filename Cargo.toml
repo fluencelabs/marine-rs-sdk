@@ -1,6 +1,6 @@
 [package]
 name = "marine-rs-sdk"
-version = "0.10.0"
+version = "0.10.1"
 description = "Fluence backend SDK for developing backend applications for the Fluence network"
 documentation = "https://docs.rs/fluence"
 repository = "https://github.com/fluencelabs/marine-rs-sdk"
@@ -18,10 +18,10 @@ path = "src/lib.rs"
 doctest = false
 
 [dependencies]
-marine-call-parameters = { path = "crates/call-parameters", version = "=0.10.0" }
-marine-macro = { path = "crates/marine-macro", version = "=0.10.0" }
-marine-rs-sdk-main = { path = "crates/main", version = "=0.10.0" } # warning: silent compilation break on minor verison bump. See docs/update-guide.md for details
-marine-timestamp-macro = { path = "crates/timestamp-macro", version = "=0.10.0" }
+marine-call-parameters = { path = "crates/call-parameters", version = "=0.10.1" }
+marine-macro = { path = "crates/marine-macro", version = "=0.10.1" }
+marine-rs-sdk-main = { path = "crates/main", version = "=0.10.1" } # warning: silent compilation break on minor verison bump. See docs/update-guide.md for details
+marine-timestamp-macro = { path = "crates/timestamp-macro", version = "=0.10.1" }
 
 serde = { version = "1.0.189", features = ["derive"]}
 
