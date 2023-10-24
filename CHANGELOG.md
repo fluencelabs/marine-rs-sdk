@@ -1,5 +1,18 @@
 # Changelog
 
+## [0.10.1](https://github.com/fluencelabs/marine-rs-sdk/compare/marine-rs-sdk-v0.10.0...marine-rs-sdk-v0.10.1) (2023-10-24)
+
+
+### Features
+
+* **deps:** update rust crate chrono to 0.4.31 ([#119](https://github.com/fluencelabs/marine-rs-sdk/issues/119)) ([69d04d1](https://github.com/fluencelabs/marine-rs-sdk/commit/69d04d1cbd80068aa5bb4cb5aeb7d09d0349c4f3))
+* **deps:** update rust crate log to 0.4.20 ([#118](https://github.com/fluencelabs/marine-rs-sdk/issues/118)) ([b08bcf1](https://github.com/fluencelabs/marine-rs-sdk/commit/b08bcf1bd183667e636f3033cf51d6fd6328a7b8))
+* **deps:** update rust crate pretty_assertions to 1.4.0 ([#137](https://github.com/fluencelabs/marine-rs-sdk/issues/137)) ([00f745f](https://github.com/fluencelabs/marine-rs-sdk/commit/00f745fa157a0105f4c32875079ed34c040c221f))
+* **deps:** update rust crate proc-macro2 to 1.0.69 ([#111](https://github.com/fluencelabs/marine-rs-sdk/issues/111)) ([7cd6d86](https://github.com/fluencelabs/marine-rs-sdk/commit/7cd6d867830a44763b26470a0ac37f8f61e8d3e7))
+* **deps:** update rust crate quote to 1.0.33 ([0e4cb4b](https://github.com/fluencelabs/marine-rs-sdk/commit/0e4cb4b1f2742095d1f42ee08b2110553100fb8b))
+* **deps:** update rust crate serde to 1.0.189 ([#136](https://github.com/fluencelabs/marine-rs-sdk/issues/136)) ([9827098](https://github.com/fluencelabs/marine-rs-sdk/commit/9827098735b0e01288acc844ebceae35ea5ef96b))
+* **deps:** update rust crate serde_json to 1.0.107 ([#117](https://github.com/fluencelabs/marine-rs-sdk/issues/117)) ([513a80a](https://github.com/fluencelabs/marine-rs-sdk/commit/513a80aa153cb61a0da133aba734b7a5ba700fab))
+
 ## [0.10.0](https://github.com/fluencelabs/marine-rs-sdk/compare/marine-rs-sdk-v0.9.0...marine-rs-sdk-v0.10.0) (2023-09-13)
 
 
