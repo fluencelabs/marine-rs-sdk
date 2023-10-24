@@ -226,7 +226,7 @@ checksum = "b5e6163cb8c49088c2c36f57875e58ccd8c87c7427f7fbd50ea6710b2f3f2e8f"
 
 [[package]]
 name = "marine-call-parameters"
-version = "0.10.0"
+version = "0.10.1"
 dependencies = [
  "marine-macro",
  "marine-rs-sdk-main",
@@ -235,7 +235,7 @@ dependencies = [
 
 [[package]]
 name = "marine-macro"
-version = "0.10.0"
+version = "0.10.1"
 dependencies = [
  "marine-macro-impl",
  "marine-rs-sdk-main",
@@ -243,7 +243,7 @@ dependencies = [
 
 [[package]]
 name = "marine-macro-impl"
-version = "0.10.0"
+version = "0.10.1"
 dependencies = [
  "marine-macro-testing-utils",
  "pretty_assertions",
@@ -256,7 +256,7 @@ dependencies = [
 
 [[package]]
 name = "marine-macro-testing-utils"
-version = "0.10.0"
+version = "0.10.1"
 dependencies = [
  "proc-macro2",
  "quote",
@@ -265,7 +265,7 @@ dependencies = [
 
 [[package]]
 name = "marine-rs-sdk"
-version = "0.10.0"
+version = "0.10.1"
 dependencies = [
  "marine-call-parameters",
  "marine-macro",
@@ -277,7 +277,7 @@ dependencies = [
 
 [[package]]
 name = "marine-rs-sdk-main"
-version = "0.10.0"
+version = "0.10.1"
 dependencies = [
  "lazy_static",
  "log",
@@ -287,7 +287,7 @@ dependencies = [
 
 [[package]]
 name = "marine-timestamp-macro"
-version = "0.10.0"
+version = "0.10.1"
 dependencies = [
  "chrono",
  "quote",
