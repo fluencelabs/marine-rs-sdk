@@ -27,7 +27,12 @@ pub(super) fn string_der() -> proc_macro2::TokenStream {
 
         while let Some(offset) = arg.next() {
             let size = arg.next().unwrap();
-            let value = String::from_raw_parts(offset as _, size as _, size as _);
+            // Empty string has a non-zero buffer address in Rust,
+            // so we ensure that an empty string is correctly represented.
+            let value = match size {
+                0 => String::default(),
+                n => String::from_raw_parts(offset as _, size as _, size as _)
+            };
             result.push(value);
         }
 

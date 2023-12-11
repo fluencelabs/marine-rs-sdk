@@ -126,7 +126,13 @@ fn generate_type_lifting_prolog(
             let size = new_ident!(format!("arg_{}", supplied_arg_start_id + 1));
             match ty {
                 ParsedType::Utf8Str(_) | ParsedType::Utf8String(_) => quote! {
-                    let #type_modifier #converted_arg_ident = String::from_raw_parts(#ptr as _, #size as _ , #size as _);
+                    let #type_modifier #converted_arg_ident =
+                        // Empty string has a non-zero buffer address in Rust,
+                        // so we ensure that an empty string is correctly represented.
+                        match #size {
+                            0 => String::default(),
+                            n => String::from_raw_parts(#ptr as _, #size as _, #size as _)
+                        };
                 },
                 ParsedType::Vector(ty, _) => {
                     let generated_der_name =

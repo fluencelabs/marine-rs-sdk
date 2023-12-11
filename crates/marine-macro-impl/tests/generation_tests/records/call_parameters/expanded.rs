@@ -83,7 +83,10 @@ impl CallParameters {
                 raw_record[0usize + 6],
                 raw_record[0usize + 7],
             ]);
-            String::from_raw_parts(offset as _, size as _, size as _)
+            match size {
+                0 => String::default(),
+                n => String::from_raw_parts(offset as _, size as _, size as _)
+            }
         };
         let field_1 = unsafe {
             let offset = u32::from_le_bytes([
@@ -98,7 +101,10 @@ impl CallParameters {
                 raw_record[8usize + 6],
                 raw_record[8usize + 7],
             ]);
-            String::from_raw_parts(offset as _, size as _, size as _)
+            match size {
+                0 => String::default(),
+                n => String::from_raw_parts(offset as _, size as _, size as _)
+            }
         };
         let field_2 = unsafe {
             let offset = u32::from_le_bytes([
@@ -113,7 +119,10 @@ impl CallParameters {
                 raw_record[16usize + 6],
                 raw_record[16usize + 7],
             ]);
-            String::from_raw_parts(offset as _, size as _, size as _)
+            match size {
+                0 => String::default(),
+                n => String::from_raw_parts(offset as _, size as _, size as _)
+            }
         };
         let field_3 = unsafe {
             let offset = u32::from_le_bytes([
@@ -128,7 +137,10 @@ impl CallParameters {
                 raw_record[24usize + 6],
                 raw_record[24usize + 7],
             ]);
-            String::from_raw_parts(offset as _, size as _, size as _)
+            match size {
+                0 => String::default(),
+                n => String::from_raw_parts(offset as _, size as _, size as _)
+            }
         };
         let field_4 = unsafe {
             let offset = u32::from_le_bytes([
@@ -143,7 +155,10 @@ impl CallParameters {
                 raw_record[32usize + 6],
                 raw_record[32usize + 7],
             ]);
-            String::from_raw_parts(offset as _, size as _, size as _)
+            match size {
+                0 => String::default(),
+                n => String::from_raw_parts(offset as _, size as _, size as _)
+            }
         };
         unsafe fn __m_generated_vec_deserializer_40(
             offset: u32,

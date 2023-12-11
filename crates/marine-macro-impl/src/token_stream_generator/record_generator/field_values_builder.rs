@@ -248,8 +248,12 @@ impl FieldValuesBuilder {
                     raw_record[#value_id + 6],
                     raw_record[#value_id + 7],
                 ]);
-
-                String::from_raw_parts(offset as _, size as _, size as _)
+                // Empty string has a non-zero buffer address in Rust,
+                // so we ensure that an empty string is correctly represented.
+                match size {
+                    0 => String::default(),
+                    n => String::from_raw_parts(offset as _, size as _, size as _)
+                }
             };
         };
 

@@ -45,7 +45,10 @@ pub unsafe fn __m_generated_wrapper_func_all_types(
     let converted_arg_7 = arg_7 as _;
     let converted_arg_8 = arg_8 as _;
     let converted_arg_9 = arg_9 as _;
-    let converted_arg_10 = String::from_raw_parts(arg_10 as _, arg_11 as _, arg_11 as _);
+    let converted_arg_10 = match arg_11 {
+        0 => String::default(),
+        n => String::from_raw_parts(arg_10 as _, arg_11 as _, arg_11 as _)
+    };
     unsafe fn __m_generated_vec_deserializer_12(offset: u32, size: u32) -> Vec<u8> {
         Vec::from_raw_parts(offset as _, size as _, size as _)
     }
