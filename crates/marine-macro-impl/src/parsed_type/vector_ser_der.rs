@@ -85,7 +85,12 @@ pub(crate) fn generate_vector_der(
         ParsedType::Record(record_name, _) => record_der(record_name),
         _ => {
             quote! {
-                Vec::from_raw_parts(offset as _, size as _, size as _)
+                // Empty vector has a non-zero buffer address in Rust,
+                // so we ensure that an empty vector is correctly represented.
+                match size {
+                    0 => Vec::default(),
+                    _ => Vec::from_raw_parts(offset as _, size as _, size as _)
+                }
             }
         }
     };

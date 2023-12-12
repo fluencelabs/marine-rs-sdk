@@ -78,7 +78,10 @@ pub fn all_types(
         );
         std::mem::ManuallyDrop::drop(&mut arg_10);
         unsafe fn __m_generated_vec_deserializer(offset: u32, size: u32) -> Vec<u8> {
-            Vec::from_raw_parts(offset as _, size as _, size as _)
+            match size {
+                0 => Vec::default(),
+                _ => Vec::from_raw_parts(offset as _, size as _, size as _)
+            }
         }
         __m_generated_vec_deserializer(
             marine_rs_sdk::internal::get_result_ptr() as _,

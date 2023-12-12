@@ -16,7 +16,10 @@ pub unsafe fn __m_generated_wrapper_func_test_array_refs(arg_0: u32, arg_1: u32)
             let mut result = Vec::with_capacity(arg.len() / 2);
             while let Some(offset) = arg.next() {
                 let size = arg.next().unwrap();
-                let value = String::from_raw_parts(offset as _, size as _, size as _);
+                let value = match size {
+                    0 => String::default(),
+                    _ => String::from_raw_parts(offset as _, size as _, size as _)
+                };
                 result.push(value);
             }
             result

@@ -50,11 +50,14 @@ impl ForeignModEpilogGlueCodeGenerator for Option<ParsedType> {
                 return result as _;
             },
             Some(ParsedType::Utf8String(_)) => quote! {
-                String::from_raw_parts(
-                    marine_rs_sdk::internal::get_result_ptr() as _,
-                    marine_rs_sdk::internal::get_result_size() as _,
-                    marine_rs_sdk::internal::get_result_size() as _
-                )
+                let ptr = marine_rs_sdk::internal::get_result_ptr();
+                let size = marine_rs_sdk::internal::get_result_size();
+                // Empty string has a non-zero buffer address in Rust,
+                // so we ensure that an empty string is correctly represented.
+                match size {
+                    0 => String::default(),
+                    _ => String::from_raw_parts(ptr as _, size as _, size as _)
+                }
             },
             Some(ParsedType::Vector(ty, _)) => {
                 let generated_der_name = "__m_generated_vec_deserializer";
