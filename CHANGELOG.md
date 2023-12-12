@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.10.2](https://github.com/fluencelabs/marine-rs-sdk/compare/marine-rs-sdk-v0.10.1...marine-rs-sdk-v0.10.2) (2023-12-12)
+
+
+### Bug Fixes
+
+* **ABI:** use correct empty string/vector representation  ([#146](https://github.com/fluencelabs/marine-rs-sdk/issues/146)) ([d3cade9](https://github.com/fluencelabs/marine-rs-sdk/commit/d3cade98f8555cb31907d890a91c87bb53ee9c18))
+
 ## [0.10.1](https://github.com/fluencelabs/marine-rs-sdk/compare/marine-rs-sdk-v0.10.0...marine-rs-sdk-v0.10.1) (2023-10-24)
 
 
