@@ -1,6 +1,6 @@
 [package]
 name = "marine-call-parameters"
-version = "0.10.1"
+version = "0.10.2"
 edition = "2021"
 description = "Contains CallParameters and SecurityTetralets structures for marine-rs-sdk"
 documentation = "https://docs.rs/fluence"
@@ -14,8 +14,8 @@ license = "Apache-2.0"
 serde = "1.0.189"
 
 [target.'cfg(target_arch = "wasm32")'.dependencies]
-marine-macro = { path = "../marine-macro", version = "=0.10.1" }
-marine-rs-sdk-main = { path = "../main", version = "=0.10.1" }
+marine-macro = { path = "../marine-macro", version = "=0.10.2" }
+marine-rs-sdk-main = { path = "../main", version = "=0.10.2" }
 
 [features]
 default = ["marine-abi"]
