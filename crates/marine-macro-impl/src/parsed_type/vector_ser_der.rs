@@ -89,7 +89,7 @@ pub(crate) fn generate_vector_der(
                 // so we ensure that an empty vector is correctly represented.
                 match size {
                     0 => Vec::default(),
-                    n => Vec::from_raw_parts(offset as _, size as _, size as _)
+                    _ => Vec::from_raw_parts(offset as _, size as _, size as _)
                 }
             }
         }

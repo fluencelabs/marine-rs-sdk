@@ -80,7 +80,7 @@ pub fn all_types(
         unsafe fn __m_generated_vec_deserializer(offset: u32, size: u32) -> Vec<u8> {
             match size {
                 0 => Vec::default(),
-                n => Vec::from_raw_parts(offset as _, size as _, size as _)
+                _ => Vec::from_raw_parts(offset as _, size as _, size as _)
             }
         }
         __m_generated_vec_deserializer(

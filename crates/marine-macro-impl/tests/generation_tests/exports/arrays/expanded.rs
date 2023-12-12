@@ -22,7 +22,7 @@ pub unsafe fn __m_generated_wrapper_func_inner_arrays_1(arg_0: u32, arg_1: u32) 
                 ) -> Vec<u8> {
                     match size {
                         0 => Vec::default(),
-                        n => Vec::from_raw_parts(offset as _, size as _, size as _)
+                        _ => Vec::from_raw_parts(offset as _, size as _, size as _)
                     }
                 }
                 let vec_passing_size = 2;

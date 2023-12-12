@@ -131,7 +131,7 @@ fn generate_type_lifting_prolog(
                         // so we ensure that an empty string is correctly represented.
                         match #size {
                             0 => String::default(),
-                            n => String::from_raw_parts(#ptr as _, #size as _, #size as _)
+                            _ => String::from_raw_parts(#ptr as _, #size as _, #size as _)
                         };
                 },
                 ParsedType::Vector(ty, _) => {

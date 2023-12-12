@@ -31,7 +31,7 @@ pub(super) fn string_der() -> proc_macro2::TokenStream {
             // so we ensure that an empty string is correctly represented.
             let value = match size {
                 0 => String::default(),
-                n => String::from_raw_parts(offset as _, size as _, size as _)
+                _ => String::from_raw_parts(offset as _, size as _, size as _)
             };
             result.push(value);
         }

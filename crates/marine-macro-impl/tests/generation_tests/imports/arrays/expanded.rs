@@ -80,7 +80,7 @@ pub fn inner_arrays_1(arg_0: Vec<Vec<Vec<Vec<u8>>>>) -> Vec<Vec<Vec<Vec<u8>>>> {
                     ) -> Vec<u8> {
                         match size {
                             0 => Vec::default(),
-                            n => Vec::from_raw_parts(offset as _, size as _, size as _)
+                            _ => Vec::from_raw_parts(offset as _, size as _, size as _)
                         }
                     }
                     let vec_passing_size = 2;

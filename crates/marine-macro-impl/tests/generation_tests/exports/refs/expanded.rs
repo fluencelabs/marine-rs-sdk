@@ -18,7 +18,7 @@ pub unsafe fn __m_generated_wrapper_func_test_array_refs(arg_0: u32, arg_1: u32)
                 let size = arg.next().unwrap();
                 let value = match size {
                     0 => String::default(),
-                    n => String::from_raw_parts(offset as _, size as _, size as _)
+                    _ => String::from_raw_parts(offset as _, size as _, size as _)
                 };
                 result.push(value);
             }

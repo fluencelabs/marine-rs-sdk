@@ -56,7 +56,7 @@ impl ForeignModEpilogGlueCodeGenerator for Option<ParsedType> {
                 // so we ensure that an empty string is correctly represented.
                 match size {
                     0 => String::default(),
-                    n => String::from_raw_parts(ptr as _, size as _, size as _)
+                    _ => String::from_raw_parts(ptr as _, size as _, size as _)
                 }
             },
             Some(ParsedType::Vector(ty, _)) => {
