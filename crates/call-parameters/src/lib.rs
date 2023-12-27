@@ -23,7 +23,10 @@ use serde::Deserialize;
 /// Describes an origin that set corresponding value.
 #[cfg_attr(all(target_arch = "wasm32", feature = "marine-abi"), marine)]
 #[derive(Clone, Debug, Default, Eq, PartialEq, Hash, Serialize, Deserialize)]
-#[cfg_attr(feature = "rkyv", derive(::rkyv::Archive, ::rkyv::Serialize, ::rkyv::Deserialize))]
+#[cfg_attr(
+    feature = "rkyv",
+    derive(::rkyv::Archive, ::rkyv::Serialize, ::rkyv::Deserialize)
+)]
 #[cfg_attr(feature = "rkyv", archive(check_bytes))]
 pub struct SecurityTetraplet {
     /// Id of a peer where corresponding value was set.
@@ -76,7 +79,10 @@ impl SecurityTetraplet {
 /// This struct contains parameters that would be accessible by Wasm modules.
 #[cfg_attr(all(target_arch = "wasm32", feature = "marine-abi"), marine)]
 #[derive(Clone, PartialEq, Default, Eq, Debug, Serialize, Deserialize)]
-#[cfg_attr(feature = "rkyv", derive(::rkyv::Archive, ::rkyv::Serialize, ::rkyv::Deserialize))]
+#[cfg_attr(
+    feature = "rkyv",
+    derive(::rkyv::Archive, ::rkyv::Serialize, ::rkyv::Deserialize)
+)]
 #[cfg_attr(feature = "rkyv", archive(check_bytes))]
 pub struct CallParameters {
     /// Peer id of the AIR script initiator.
