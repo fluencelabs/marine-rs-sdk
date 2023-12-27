@@ -1,6 +1,6 @@
 [package]
 name = "marine-timestamp-macro"
-version = "0.10.2"
+version = "0.10.3"
 edition = "2018"
 description = "Definition of the `#[build_timestamp]` macro"
 documentation = "https://docs.rs/fluence/marine-timestamp-macro"
