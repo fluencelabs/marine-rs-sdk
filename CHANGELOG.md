@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.10.3](https://github.com/fluencelabs/marine-rs-sdk/compare/marine-rs-sdk-v0.10.2...marine-rs-sdk-v0.10.3) (2023-12-27)
+
+
+### Features
+
+* **call-parameters:** optional rkyv support ([#148](https://github.com/fluencelabs/marine-rs-sdk/issues/148)) ([22863bc](https://github.com/fluencelabs/marine-rs-sdk/commit/22863bc94f620fcd9fee4dc1476a71248cc94963))
+
 ## [0.10.2](https://github.com/fluencelabs/marine-rs-sdk/compare/marine-rs-sdk-v0.10.1...marine-rs-sdk-v0.10.2) (2023-12-12)
 
 
