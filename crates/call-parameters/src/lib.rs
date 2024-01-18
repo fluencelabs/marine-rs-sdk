@@ -94,8 +94,11 @@ pub struct CallParameters {
     /// Id of the service creator.
     pub service_creator_peer_id: String,
 
-    /// PeerId of the peer who hosts this service.
+    /// PeerId of the peer who hosts worker with this service.
     pub host_id: String,
+
+    /// PeerId of the worker who hosts this service.
+    pub worker_id: String,
 
     /// Id of the particle which execution resulted a call this service.
     pub particle_id: String,
