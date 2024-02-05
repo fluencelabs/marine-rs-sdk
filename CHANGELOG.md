@@ -1,5 +1,16 @@
 # Changelog
 
+## [0.11.0](https://github.com/fluencelabs/marine-rs-sdk/compare/marine-rs-sdk-v0.10.3...marine-rs-sdk-v0.11.0) (2024-02-05)
+
+
+### ⚠ BREAKING CHANGES
+
+* **ABI, call-parameters:** add worker_id field into CallParameters ([#151](https://github.com/fluencelabs/marine-rs-sdk/issues/151))
+
+### Features
+
+* **ABI, call-parameters:** add worker_id field into CallParameters ([#151](https://github.com/fluencelabs/marine-rs-sdk/issues/151)) ([3bdf0c2](https://github.com/fluencelabs/marine-rs-sdk/commit/3bdf0c242aa1da62be319f2131b9c14e396d23f9))
+
 ## [0.10.3](https://github.com/fluencelabs/marine-rs-sdk/compare/marine-rs-sdk-v0.10.2...marine-rs-sdk-v0.10.3) (2023-12-27)
 
 
