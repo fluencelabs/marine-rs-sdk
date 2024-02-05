@@ -31,7 +31,7 @@ where
         .unwrap_or_else(|e| panic!("failed to apply the marine macro due {}", e));
 
     let expanded_item = items_from_file(&expanded_path);
-    let marine_item = to_syn_item(marine_token_streams.clone());
+    let marine_item = to_syn_item(marine_token_streams);
 
     marine_item == expanded_item
 }
