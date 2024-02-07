@@ -1,4 +1,4 @@
-#[link(wasm_import_module = "test")]
+#[module_import("test")]
 extern "C" {
     pub fn all_types(
         arg_0: i8,

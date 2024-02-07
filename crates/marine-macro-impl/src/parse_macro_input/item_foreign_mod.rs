@@ -22,15 +22,16 @@ use crate::syn_error;
 use syn::Result;
 use syn::spanned::Spanned;
 
-const LINK_DIRECTIVE_NAME: &str = "link";
 const LINK_NAME_DIRECTIVE_NAME: &str = "link_name";
-const WASM_IMPORT_MODULE_DIRECTIVE_NAME: &str = "wasm_import_module";
+const HOST_IMPORT_DIRECTIVE_NAME: &str = "host_import";
+const MODULE_IMPORT_DIRECTIVE_NAME: &str = "module_import";
+const HOST_IMPORT_NAMESPACE: &str = "__marine_host_api_v1";
 
 impl ParseMacroInput for syn::ItemForeignMod {
     fn parse_macro_input(self) -> Result<MarineAst> {
         check_foreign_section(&self)?;
 
-        let wasm_import_module: Option<String> = parse_wasm_import_module(&self);
+        let wasm_import_module = parse_wasm_import_module(&self);
         let namespace = try_extract_namespace(wasm_import_module, &self)?;
 
         let imports = extract_import_functions(&self)?;
@@ -52,45 +53,67 @@ fn check_foreign_section(foreign_mod: &syn::ItemForeignMod) -> Result<()> {
 
 /// Tries to find and parse wasm module name from
 ///   #[link(wasm_import_module = "host")]
-fn parse_wasm_import_module(foreign_mod: &syn::ItemForeignMod) -> Option<String> {
+fn parse_wasm_import_module(foreign_mod: &syn::ItemForeignMod) -> Vec<String> {
     foreign_mod
         .attrs
         .iter()
         .filter_map(|attr| attr.parse_meta().ok())
-        .filter(|meta| meta.path().is_ident(LINK_DIRECTIVE_NAME))
         .filter_map(|meta| {
-            let pair = match meta {
-                syn::Meta::List(mut meta_list) if meta_list.nested.len() == 1 => {
-                    meta_list.nested.pop().unwrap()
-                }
-                _ => return None,
-            };
-            Some(pair.into_tuple().0)
+            if meta.path().is_ident(HOST_IMPORT_DIRECTIVE_NAME) {
+                Some(HOST_IMPORT_NAMESPACE.to_string())
+            } else if meta.path().is_ident(MODULE_IMPORT_DIRECTIVE_NAME) {
+                parse_module_import_directive(meta)
+            } else {
+                None
+            }
         })
-        .filter_map(|nested| match nested {
-            syn::NestedMeta::Meta(meta) => Some(meta),
-            _ => None,
-        })
-        .filter(|meta| meta.path().is_ident(WASM_IMPORT_MODULE_DIRECTIVE_NAME))
-        .map(extract_value)
         .collect()
 }
 
+fn parse_module_import_directive(meta: syn::Meta) -> Option<String> {
+    let nested_meta = match meta {
+        syn::Meta::List(mut meta_list) if meta_list.nested.len() == 1 => {
+            Some(meta_list.nested.pop().unwrap())
+        }
+        _ => None,
+    }?;
+
+    match nested_meta.value() {
+        syn::NestedMeta::Lit(syn::Lit::Str(lit)) => Some(lit.value()),
+        _ => None,
+    }
+}
+
 fn try_extract_namespace(
-    attr: Option<String>,
+    mut attr: Vec<String>,
     foreign_mod: &syn::ItemForeignMod,
 ) -> Result<String> {
-    match attr {
-        Some(namespace) if namespace.is_empty() => syn_error!(
+    if attr.len() == 0 {
+        return syn_error!(
             foreign_mod.span(),
-            "import module name should be defined by 'wasm_import_module' directive"
-        ),
-        Some(namespace) => Ok(namespace),
-        None => syn_error!(
-            foreign_mod.span(),
-            "import module name should be defined by 'wasm_import_module' directive"
-        ),
+            "import module name should be defined by either '#[host_import]' or '#[module_import(\"module_name\")]' attributes"
+        );
     }
+
+    if attr.len() > 1 {
+        return syn_error!(
+            foreign_mod.span(),
+            "only one of '#[host_import]' or '#[module_import(\"module_name\")]' attributes is allowed"
+        );
+    }
+
+    let namespace = attr
+        .pop()
+        .expect("length of attribute vec should be checked before");
+
+    if namespace.is_empty() {
+        return syn_error!(
+            foreign_mod.span(),
+            "#[module_import(\"module_name\")] attribute should have a non-empty module name"
+        );
+    }
+
+    Ok(namespace)
 }
 
 fn extract_import_functions(

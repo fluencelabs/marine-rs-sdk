@@ -12,7 +12,7 @@ pub struct TestRecord {
 }
 
 #[marine]
-#[link(wasm_import_module = "arrays_passing_effector")]
+#[module_import("arrays_passing_effector")]
 extern "C" {
     pub fn inner_arrays_1(arg: Vec<Vec<Vec<Vec<u8>>>>) -> Vec<Vec<Vec<Vec<u8>>>>;
 
