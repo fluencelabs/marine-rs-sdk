@@ -5,7 +5,7 @@ use marine_rs_sdk::marine;
 pub fn main() {}
 
 #[marine]
-#[link(wasm_import_module = "arrays_passing_effector")]
+#[module_import("arrays_passing_effector")]
 extern "C" {
     #[marine]
     pub fn func_1() -> &String;

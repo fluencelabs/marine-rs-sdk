@@ -5,7 +5,7 @@ use marine_rs_sdk::marine;
 pub fn main() {}
 
 #[marine]
-#[link(wasm_import_module = "arguments_passing_effector")]
+#[module_import("arrays_passing_effector")]
 extern "C" {
     #[marine]
     fn test(_arg_1: Box<i32>);

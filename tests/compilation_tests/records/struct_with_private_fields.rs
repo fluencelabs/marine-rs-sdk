@@ -14,7 +14,7 @@ struct StructWithPrivateFields {
 fn export_func(_field: StructWithPrivateFields) { }
 
 #[marine]
-#[link(wasm_import_module = "record_module")]
+#[module_import("record_module")]
 extern "C" {
     fn import_func(arg: &StructWithPrivateFields) -> StructWithPrivateFields;
 }

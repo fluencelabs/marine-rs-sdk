@@ -49,3 +49,5 @@ pub use token_stream_generator::GENERATED_GLOBAL_PREFIX;
 pub use wasm_type::RustType;
 
 pub const GENERATED_SECTION_PREFIX_FCE: &str = "__fce_generated_section__";
+pub const MARINE_HOST_API_NAMESPACE_PREFIX: &str = "__marine_host_api_v";
+pub const MARINE_HOST_API_VERSION: u32 = 1;
