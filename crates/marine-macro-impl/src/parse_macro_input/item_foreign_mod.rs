@@ -88,7 +88,7 @@ fn try_extract_namespace(
     mut attr: Vec<String>,
     foreign_mod: &syn::ItemForeignMod,
 ) -> Result<String> {
-    if attr.len() == 0 {
+    if attr.is_empty() {
         return syn_error!(
             foreign_mod.span(),
             "import module name should be defined by either '#[host_import]' or '#[module_import(\"module_name\")]' attributes"
