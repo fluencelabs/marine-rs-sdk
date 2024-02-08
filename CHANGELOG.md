@@ -1,5 +1,16 @@
 # Changelog
 
+## [0.12.0](https://github.com/fluencelabs/marine-rs-sdk/compare/marine-rs-sdk-v0.11.0...marine-rs-sdk-v0.12.0) (2024-02-08)
+
+
+### ⚠ BREAKING CHANGES
+
+* introduce host import API versions ([#154](https://github.com/fluencelabs/marine-rs-sdk/issues/154))
+
+### Features
+
+* introduce host import API versions ([#154](https://github.com/fluencelabs/marine-rs-sdk/issues/154)) ([eaf9512](https://github.com/fluencelabs/marine-rs-sdk/commit/eaf9512cf1da8b6e641e6b42d31db4915a27901e))
+
 ## [0.11.0](https://github.com/fluencelabs/marine-rs-sdk/compare/marine-rs-sdk-v0.10.3...marine-rs-sdk-v0.11.0) (2024-02-05)
 
 
