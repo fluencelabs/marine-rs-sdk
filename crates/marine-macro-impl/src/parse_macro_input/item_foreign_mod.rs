@@ -52,7 +52,7 @@ fn check_foreign_section(foreign_mod: &syn::ItemForeignMod) -> Result<()> {
 }
 
 /// Tries to find and parse wasm module name from
-///   #[link(wasm_import_module = "host")]
+/// #[module_import("module_name")] or #[host_import]
 fn parse_wasm_import_module(foreign_mod: &syn::ItemForeignMod) -> Vec<String> {
     foreign_mod
         .attrs
