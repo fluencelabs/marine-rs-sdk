@@ -163,7 +163,7 @@ pub fn get_call_parameters() -> CallParameters {
 }
 
 #[cfg(all(feature = "marine-abi", target_arch = "wasm32"))]
-#[link(wasm_import_module = "__marine_host_api_v1")]
+#[link(wasm_import_module = "__marine_host_api_v2")]
 #[allow(improper_ctypes)]
 extern "C" {
     // returns serialized current call parameters

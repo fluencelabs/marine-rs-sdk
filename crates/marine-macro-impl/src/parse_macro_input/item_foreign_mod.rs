@@ -25,7 +25,7 @@ use syn::spanned::Spanned;
 const LINK_NAME_DIRECTIVE_NAME: &str = "link_name";
 const HOST_IMPORT_DIRECTIVE_NAME: &str = "host_import";
 const MODULE_IMPORT_DIRECTIVE_NAME: &str = "module_import";
-const HOST_IMPORT_NAMESPACE: &str = "__marine_host_api_v1";
+const HOST_IMPORT_NAMESPACE: &str = "__marine_host_api_v2";
 
 impl ParseMacroInput for syn::ItemForeignMod {
     fn parse_macro_input(self) -> Result<MarineAst> {
