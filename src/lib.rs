@@ -77,6 +77,7 @@ pub use marine_macro::marine;
 pub use marine_macro::fce;
 
 pub use marine_call_parameters::CallParameters;
+pub use marine_call_parameters::ParticleParameters;
 pub use marine_call_parameters::SecurityTetraplet;
 pub use marine_call_parameters::get_call_parameters;
 
