@@ -85,8 +85,8 @@ impl SecurityTetraplet {
 )]
 #[cfg_attr(feature = "rkyv", archive(check_bytes))]
 pub struct CallParameters {
-    /// Peer id of the AIR script initiator.
-    pub init_peer_id: String,
+    /// Parameters of the particle that caused this call.
+    pub particle: ParticleParameters,
 
     /// Id of the current service.
     pub service_id: String,
@@ -100,11 +100,38 @@ pub struct CallParameters {
     /// PeerId of the worker who hosts this service.
     pub worker_id: String,
 
-    /// Id of the particle which execution resulted a call this service.
-    pub particle_id: String,
-
     /// Security tetraplets which described origin of the arguments.
     pub tetraplets: Vec<Vec<SecurityTetraplet>>,
+}
+
+#[cfg_attr(all(target_arch = "wasm32", feature = "marine-abi"), marine)]
+#[derive(Clone, PartialEq, Default, Eq, Debug, Serialize, Deserialize)]
+#[cfg_attr(
+    feature = "rkyv",
+    derive(::rkyv::Archive, ::rkyv::Serialize, ::rkyv::Deserialize)
+)]
+#[cfg_attr(feature = "rkyv", archive(check_bytes))]
+pub struct ParticleParameters {
+    /// Id of the particle which execution resulted a call this service.
+    pub id: String,
+
+    /// Peer id of the AIR script initiator.
+    pub init_peer_id: String,
+
+    /// Unix timestamp of the particle start time.
+    pub timestamp: u64,
+
+    /// Time to live for this particle in milliseconds.
+    pub ttl: u32,
+
+    /// AIR script in this particle.
+    pub script: String,
+
+    /// Signature made by particle initiator -- init_peer_id.
+    pub signature: Vec<u8>,
+
+    /// particle.signature signed by host_id -- used for FS access.
+    pub token: String,
 }
 
 use std::fmt;
