@@ -1,5 +1,18 @@
 # Changelog
 
+## [0.13.0](https://github.com/fluencelabs/marine-rs-sdk/compare/marine-rs-sdk-v0.12.0...marine-rs-sdk-v0.13.0) (2024-02-20)
+
+
+### ⚠ BREAKING CHANGES
+
+* **host api:** rename `json_path` field in SecurityTetraplet to `lambda` to follow AquaVM naming ([#158](https://github.com/fluencelabs/marine-rs-sdk/issues/158))
+* **host api:** add particle parameters into CallParameters ([#156](https://github.com/fluencelabs/marine-rs-sdk/issues/156))
+
+### Features
+
+* **host api:** add particle parameters into CallParameters ([#156](https://github.com/fluencelabs/marine-rs-sdk/issues/156)) ([8c7352e](https://github.com/fluencelabs/marine-rs-sdk/commit/8c7352e599b7fdda7c29643b1d8138061f1b455d))
+* **host api:** rename `json_path` field in SecurityTetraplet to `lambda` to follow AquaVM naming ([#158](https://github.com/fluencelabs/marine-rs-sdk/issues/158)) ([4a9e72e](https://github.com/fluencelabs/marine-rs-sdk/commit/4a9e72e64c5d18b14ae12311845bcf716f5532d5))
+
 ## [0.12.0](https://github.com/fluencelabs/marine-rs-sdk/compare/marine-rs-sdk-v0.11.0...marine-rs-sdk-v0.12.0) (2024-02-08)
 
 
