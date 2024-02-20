@@ -38,9 +38,8 @@ pub struct SecurityTetraplet {
     /// Name of a function that returned corresponding value.
     pub function_name: String,
 
-    /// Value was produced by applying this `json_path` to the output from `call_service`.
-    // TODO: since it's not a json path anymore, it's needed to rename it to lambda
-    pub json_path: String,
+    /// Value was produced by applying this `lambda` to the output from `call_service`.
+    pub lambda: String,
 }
 
 impl SecurityTetraplet {
@@ -48,13 +47,13 @@ impl SecurityTetraplet {
         peer_pk: impl Into<String>,
         service_id: impl Into<String>,
         function_name: impl Into<String>,
-        json_path: impl Into<String>,
+        lambda: impl Into<String>,
     ) -> Self {
         Self {
             peer_pk: peer_pk.into(),
             service_id: service_id.into(),
             function_name: function_name.into(),
-            json_path: json_path.into(),
+            lambda: lambda.into(),
         }
     }
 
@@ -66,13 +65,13 @@ impl SecurityTetraplet {
             peer_pk: init_peer_id.into(),
             service_id: String::new(),
             function_name: String::new(),
-            // json path can't be applied to the string literals
-            json_path: String::new(),
+            // lambda can't be applied to the string literals
+            lambda: String::new(),
         }
     }
 
-    pub fn add_lambda(&mut self, json_path: &str) {
-        self.json_path.push_str(json_path)
+    pub fn add_lambda(&mut self, lambda: &str) {
+        self.lambda.push_str(lambda)
     }
 }
 
@@ -139,8 +138,8 @@ impl fmt::Display for SecurityTetraplet {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
         write!(
             f,
-            "peer_pk: {}, service_id: {}, function_name: {}, json_path: {}",
-            self.peer_pk, self.service_id, self.function_name, self.json_path
+            "peer_pk: {}, service_id: {}, function_name: {}, lambda: {}",
+            self.peer_pk, self.service_id, self.function_name, self.lambda
         )
     }
 }
