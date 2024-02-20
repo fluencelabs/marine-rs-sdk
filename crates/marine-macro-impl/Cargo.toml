@@ -1,6 +1,6 @@
 [package]
 name = "marine-macro-impl"
-version = "0.12.0"
+version = "0.13.0"
 edition = "2018"
 description = "Implementation of the `#[marine]` macro"
 documentation = "https://docs.rs/fluence/marine-macro-impl"
