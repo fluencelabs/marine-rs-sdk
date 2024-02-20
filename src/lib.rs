@@ -55,7 +55,7 @@
 //!     pub fn curl_get(url: String) -> String;
 //! }
 //! ```
-#![doc(html_root_url = "https://docs.rs/sdk/0.12.0")] // x-release-please-version
+#![doc(html_root_url = "https://docs.rs/sdk/0.13.0")] // x-release-please-version
 #![deny(
     dead_code,
     nonstandard_style,
