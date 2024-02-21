@@ -38,8 +38,8 @@ pub struct SecurityTetraplet {
     /// Name of a function that returned corresponding value.
     pub function_name: String,
 
-    /// Value was produced by applying this `lambda` to the output from `call_service`.
-    pub lambda: String,
+    /// Value was produced by applying this `lens` to the output from `call_service`.
+    pub lens: String,
 }
 
 impl SecurityTetraplet {
@@ -47,13 +47,13 @@ impl SecurityTetraplet {
         peer_pk: impl Into<String>,
         service_id: impl Into<String>,
         function_name: impl Into<String>,
-        lambda: impl Into<String>,
+        lens: impl Into<String>,
     ) -> Self {
         Self {
             peer_pk: peer_pk.into(),
             service_id: service_id.into(),
             function_name: function_name.into(),
-            lambda: lambda.into(),
+            lens: lens.into(),
         }
     }
 
@@ -65,13 +65,13 @@ impl SecurityTetraplet {
             peer_pk: init_peer_id.into(),
             service_id: String::new(),
             function_name: String::new(),
-            // lambda can't be applied to the string literals
-            lambda: String::new(),
+            // lens can't be applied to the string literals
+            lens: String::new(),
         }
     }
 
-    pub fn add_lambda(&mut self, lambda: &str) {
-        self.lambda.push_str(lambda)
+    pub fn add_lens(&mut self, lens: &str) {
+        self.lens.push_str(lens)
     }
 }
 
@@ -138,8 +138,8 @@ impl fmt::Display for SecurityTetraplet {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
         write!(
             f,
-            "peer_pk: {}, service_id: {}, function_name: {}, lambda: {}",
-            self.peer_pk, self.service_id, self.function_name, self.lambda
+            "peer_pk: {}, service_id: {}, function_name: {}, lens: {}",
+            self.peer_pk, self.service_id, self.function_name, self.lens
         )
     }
 }
@@ -162,7 +162,7 @@ pub fn get_call_parameters() -> CallParameters {
 }
 
 #[cfg(all(feature = "marine-abi", target_arch = "wasm32"))]
-#[link(wasm_import_module = "__marine_host_api_v2")]
+#[link(wasm_import_module = "__marine_host_api_v3")]
 #[allow(improper_ctypes)]
 extern "C" {
     // returns serialized current call parameters
