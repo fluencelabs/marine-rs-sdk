@@ -1,6 +1,6 @@
 [package]
 name = "marine-rs-sdk-main"
-version = "0.13.0"
+version = "0.14.0"
 edition = "2018"
 description = "Contains logger, allocators and several other modules for marine-rs-sdk"
 documentation = "https://docs.rs/marine-rs-sdk-main"
