@@ -1,5 +1,16 @@
 # Changelog
 
+## [0.14.0](https://github.com/fluencelabs/marine-rs-sdk/compare/marine-rs-sdk-v0.13.0...marine-rs-sdk-v0.14.0) (2024-02-21)
+
+
+### ⚠ BREAKING CHANGES
+
+* rename lambda to lens ([#159](https://github.com/fluencelabs/marine-rs-sdk/issues/159))
+
+### Features
+
+* rename lambda to lens ([#159](https://github.com/fluencelabs/marine-rs-sdk/issues/159)) ([9bb739a](https://github.com/fluencelabs/marine-rs-sdk/commit/9bb739a6e733cbaef2ab850dfd6d890b478342b5))
+
 ## [0.13.0](https://github.com/fluencelabs/marine-rs-sdk/compare/marine-rs-sdk-v0.12.0...marine-rs-sdk-v0.13.0) (2024-02-20)
 
 
