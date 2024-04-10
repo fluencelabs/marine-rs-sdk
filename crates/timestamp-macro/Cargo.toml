@@ -16,4 +16,4 @@ doctest = false
 
 [dependencies]
 chrono = "0.4.31"
-quote = "1.0.33"
+quote = "1.0.36"
