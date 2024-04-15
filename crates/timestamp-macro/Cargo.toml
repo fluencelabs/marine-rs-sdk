@@ -15,5 +15,5 @@ proc-macro = true
 doctest = false
 
 [dependencies]
-chrono = "0.4.31"
+chrono = "0.4.38"
 quote = "1.0.33"
