@@ -8,7 +8,7 @@ repository = "https://github.com/fluencelabs/marine-rs-sdk"
 authors = ["Fluence Labs"]
 keywords = ["fluence", "marine", "sdk", "webassembly"]
 categories = ["api-bindings", "wasm"]
-license = "Apache-2.0"
+license = "AGPL-3.0-only"
 
 [dependencies]
 rkyv = { version = "0.7.43", features = ["validation", "strict"], optional = true }

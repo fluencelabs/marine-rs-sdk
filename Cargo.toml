@@ -7,7 +7,7 @@ repository = "https://github.com/fluencelabs/marine-rs-sdk"
 authors = ["Fluence Labs"]
 keywords = ["fluence", "marine", "sdk", "webassembly"]
 categories = ["api-bindings", "wasm"]
-license = "Apache-2.0"
+license = "AGPL-3.0-only"
 edition = "2018"
 
 [package.metadata.docs.rs]
