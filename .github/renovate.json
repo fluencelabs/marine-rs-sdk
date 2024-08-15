@@ -1,6 +1,6 @@
 {
   "extends": [
-    "github>fluencelabs/renovate#add-configs",
-    "github>fluencelabs/renovate:cargo#add-configs"
+    "github>fluencelabs/renovate",
+    "github>fluencelabs/renovate:cargo"
   ]
 }
