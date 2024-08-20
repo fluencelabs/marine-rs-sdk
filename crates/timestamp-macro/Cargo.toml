@@ -8,7 +8,7 @@ repository = "https://github.com/fluencelabs/marine-rs-sdk/tree/master/crates/ma
 authors = ["Fluence Labs"]
 keywords = ["fluence", "marine", "sdk", "webassembly", "procedural_macros"]
 categories = ["api-bindings", "wasm"]
-license = "Apache-2.0"
+license = "AGPL-3.0-only"
 
 [lib]
 proc-macro = true
